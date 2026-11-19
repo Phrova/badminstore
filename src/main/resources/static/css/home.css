@@ -46,21 +46,22 @@
 /* Tiêu đề slide co giãn theo bề rộng màn hình: không tràn ở 375px, không thưa ở 1366px */
 .home-page .hero-slide h1,
 .home-page .hero-slide h2 {
-    font-size: clamp(1.3rem, 1rem + 1.4vw, 2.05rem);
-    line-height: 1.25;
+    font-size: clamp(1.55rem, 1rem + 2vw, 2.55rem);
+    line-height: 1.18;
     max-width: 40rem;
 }
 
-/* Dòng mô tả ngắn gọn, không dài quá 46rem cho dễ đọc trên màn hình lớn */
+/* Dòng mô tả ngắn gọn, không dài quá 42rem cho dễ đọc trên màn hình lớn */
 .home-page .hero-slide p {
-    max-width: 46rem;
+    max-width: 42rem;
 }
 
-/* Trên điện thoại: slide gọn hơn để thấy được CTA ngay khi mở trang */
+/* Trên điện thoại: slide gọn hơn để thấy được CTA ngay khi mở trang,
+   vẫn chừa chỗ cho dải chấm phân trang ở đáy. */
 @media (max-width: 767.98px) {
     .home-page .hero-slide {
-        min-height: 13rem;
-        padding: 1.75rem 1.25rem;
+        min-height: 15rem;
+        padding: 1.9rem 1.25rem 2.75rem;
     }
 }
 

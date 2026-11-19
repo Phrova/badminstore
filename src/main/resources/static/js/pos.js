@@ -38,24 +38,28 @@
         cashPanel: document.querySelector('[data-pos-cash-panel]'),
         transferPanel: document.querySelector('[data-pos-transfer-panel]'),
         cashReceived: document.getElementById('posCashReceived'),
-<<<<<<< HEAD
         change: document.querySelector('[data-pos-change] strong'),
+        orderCode: document.getElementById('posOrderCode'),
         resultsStatus: document.getElementById('posResultsStatus'),
         linesStatus: document.getElementById('posLinesStatus'),
         submit: document.getElementById('posSubmit')
-=======
-        orderCode: document.getElementById('posOrderCode'),
-        change: document.querySelector('[data-pos-change] strong')
->>>>>>> 66d042210404905a2dc23dda980f069c783b8120
     };
 
     var state = {
         lines: [],       // { sku, quantity, productName, variantLabel, unitPrice, lineTotal, stock, error }
         subtotal: 0,
         discount: 0,
-        total: 0
+        total: 0,
+        voucherError: null,
+        pricePending: false
     };
     var priceTimer = null;
+    /* Mỗi lần gọi tính tiền có một số thứ tự; kết quả cũ về muộn không được ghi đè kết quả mới. */
+    var priceSeq = 0;
+    /* Số tiền hoá đơn tại thời điểm quầy tích "đã nhận chuyển khoản" – đổi tiền thì phải tích lại. */
+    var confirmedTransferTotal = null;
+    /* Khách vừa tra được + các giá trị đã tự điền, để xoá đi khi quầy đổi sang SĐT khác. */
+    var lookedUpCustomer = null;
     /* Nhãn (aria-label) của ô/nút cần giữ focus sau khi hoá đơn được vẽ lại.
        Vì renderLines() tạo lại toàn bộ DOM, không lưu focus thì người dùng bàn phím
        bấm "+" xong là mất chỗ đứng, phải Tab lại từ đầu. */
@@ -287,23 +291,34 @@
             var minus = el('button', 'btn btn-sm btn-outline-secondary');
             minus.type = 'button';
             minus.setAttribute('aria-label', 'Giảm số lượng ' + line.sku);
+            minus.disabled = line.quantity <= 1;
             minus.appendChild(icon('bi-dash'));
             var quantity = el('input', 'form-control form-control-sm text-center');
             quantity.type = 'number';
             quantity.min = '1';
+            if (line.stock != null && line.stock > 0) {
+                quantity.max = String(line.stock);
+            }
             quantity.value = String(line.quantity);
             quantity.setAttribute('aria-label', 'Số lượng ' + line.sku);
             var plus = el('button', 'btn btn-sm btn-outline-secondary');
             plus.type = 'button';
             plus.setAttribute('aria-label', 'Tăng số lượng ' + line.sku);
+            plus.disabled = line.stock != null && line.quantity >= line.stock;
             plus.appendChild(icon('bi-plus'));
 
             minus.addEventListener('click', function () {
-                focusAfterRender = 'Giảm số lượng ' + line.sku;
+                // Về 1 thì nút trừ bị khoá ⇒ trả focus cho ô số lượng thay vì làm mất focus.
+                focusAfterRender = line.quantity - 1 <= 1
+                    ? 'Số lượng ' + line.sku
+                    : 'Giảm số lượng ' + line.sku;
                 changeQuantity(index, line.quantity - 1);
             });
             plus.addEventListener('click', function () {
-                focusAfterRender = 'Tăng số lượng ' + line.sku;
+                // Chạm tồn kho thì nút cộng bị khoá ⇒ trả focus cho ô số lượng.
+                focusAfterRender = line.stock != null && line.quantity + 1 >= line.stock
+                    ? 'Số lượng ' + line.sku
+                    : 'Tăng số lượng ' + line.sku;
                 changeQuantity(index, line.quantity + 1);
             });
             quantity.addEventListener('input', function () {
@@ -406,15 +421,20 @@
         if (priceTimer) {
             clearTimeout(priceTimer);
         }
+        var seq = ++priceSeq;
         if (!state.lines.length) {
+            state.pricePending = false;
             state.subtotal = 0;
             state.discount = 0;
             state.total = 0;
+            state.voucherError = null;
             renderTotals();
             renderVoucher(null, null);
+            invalidateTransferIfChanged();
             refreshQr();
             return;
         }
+        state.pricePending = true;
         priceTimer = setTimeout(function () {
             postJson(URL_PRICE, {
                 voucherCode: refs.voucher ? refs.voucher.value.trim() : '',
@@ -422,11 +442,30 @@
                     return { sku: line.sku, quantity: line.quantity };
                 })
             }).then(function (result) {
+                if (seq !== priceSeq) {
+                    return;
+                }
+                state.pricePending = false;
                 applyPrice(result);
             }).catch(function () {
+                if (seq !== priceSeq) {
+                    return;
+                }
+                state.pricePending = false;
                 notify('error', 'Không kết nối được máy chủ để tính tiền. Vui lòng thử lại.');
             });
         }, 200);
+    }
+
+    /** Trước khi vẽ lại hoá đơn, nhớ ô đang có focus để trả lại sau (bàn phím không bị nhảy về đầu trang). */
+    function captureLineFocus() {
+        var active = document.activeElement;
+        if (active && refs.lines && refs.lines.contains(active)) {
+            var label = active.getAttribute('aria-label');
+            if (label) {
+                focusAfterRender = label;
+            }
+        }
     }
 
     function applyPrice(result) {
@@ -447,8 +486,12 @@
         state.subtotal = Number(result.subtotal || 0);
         state.discount = Number(result.discount || 0);
         state.total = Number(result.total || 0);
+        state.voucherError = result.voucherError || null;
+        captureLineFocus();
         renderLines();
         renderVoucher(result.voucherDescription, result.voucherError);
+        announceLines();
+        invalidateTransferIfChanged();
         refreshQr();
     }
 
@@ -494,6 +537,22 @@
         }
         updateChange();
         refreshQr();
+    }
+
+    /**
+     * Hoá đơn đổi số tiền sau khi quầy đã tích "đã nhận chuyển khoản" ⇒ bỏ tích, tránh ghi nhận
+     * đã thu tiền trong khi khách mới chuyển số tiền cũ. Quầy phải cho khách quét lại mã mới.
+     */
+    function invalidateTransferIfChanged() {
+        var box = document.getElementById('posTransferConfirmed');
+        if (!box || !box.checked || confirmedTransferTotal === null) {
+            return;
+        }
+        if (confirmedTransferTotal !== state.total) {
+            box.checked = false;
+            confirmedTransferTotal = null;
+            notify('warning', 'Hoá đơn vừa đổi số tiền – hãy cho khách chuyển khoản lại rồi tích xác nhận.');
+        }
     }
 
     // ------------------------------------------------------------------ mã QR chuyển khoản (VietQR)
@@ -638,18 +697,24 @@
                     if (refs.customerEmail) {
                         refs.customerEmail.value = customer.email || '';
                     }
+                    var autoName = '';
                     if (refs.receiverName && (!refs.receiverName.value || refs.receiverName.value === 'Khách lẻ tại quầy')) {
                         refs.receiverName.value = customer.fullName || '';
+                        autoName = customer.fullName || '';
                     }
+                    var autoPhone = '';
                     if (refs.receiverPhone && !refs.receiverPhone.value) {
-                        refs.receiverPhone.value = customer.phone || phone;
+                        autoPhone = customer.phone || phone;
+                        refs.receiverPhone.value = autoPhone;
                     }
+                    lookedUpCustomer = { fullName: autoName, phone: autoPhone };
                 } else {
                     refs.customerFound.className = 'alert alert-info py-2 small mb-2';
                     refs.customerFound.textContent = 'Chưa có tài khoản với SĐT này – hoá đơn sẽ ghi là khách lẻ.';
                     if (refs.customerEmail) {
                         refs.customerEmail.value = '';
                     }
+                    lookedUpCustomer = null;
                 }
             })
             .catch(function () {
@@ -658,8 +723,22 @@
     }
 
     function notify(icon, title) {
+        // Dùng toast dùng chung để có nút ×, xếp hàng và tạm dừng đếm giờ khi rê chuột.
+        if (window.badToast) {
+            window.badToast(icon, title);
+            return;
+        }
         if (window.Swal) {
-            Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, timer: 3500 });
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: title,
+                showConfirmButton: false,
+                showCloseButton: true,
+                closeButtonAriaLabel: 'Đóng thông báo',
+                timer: 3500
+            });
         }
     }
 
@@ -735,8 +814,24 @@
         refs.cashReceived.addEventListener('input', updateChange);
     }
     form.querySelectorAll('input[name="paymentMethod"]').forEach(function (radio) {
-        radio.addEventListener('change', syncPaymentPanels);
+        radio.addEventListener('change', function () {
+            // Quay lại tiền mặt thì bỏ xác nhận chuyển khoản của lần trước.
+            if (isCash()) {
+                var box = document.getElementById('posTransferConfirmed');
+                if (box && box.checked) {
+                    box.checked = false;
+                }
+                confirmedTransferTotal = null;
+            }
+            syncPaymentPanels();
+        });
     });
+    var transferConfirmed = document.getElementById('posTransferConfirmed');
+    if (transferConfirmed) {
+        transferConfirmed.addEventListener('change', function () {
+            confirmedTransferTotal = transferConfirmed.checked ? state.total : null;
+        });
+    }
     document.querySelectorAll('[data-pos-cash]').forEach(function (button) {
         button.addEventListener('click', function () {
             if (!refs.cashReceived) {
@@ -751,6 +846,26 @@
         refs.lookupCustomer.addEventListener('click', lookupCustomer);
     }
     if (refs.customerPhone) {
+        // Đổi SĐT ⇒ bỏ kết quả tra cũ (email + tên/SĐT đã tự điền) để không gắn nhầm khách.
+        refs.customerPhone.addEventListener('input', function () {
+            if (refs.customerEmail) {
+                refs.customerEmail.value = '';
+            }
+            if (lookedUpCustomer) {
+                if (lookedUpCustomer.fullName && refs.receiverName
+                        && refs.receiverName.value === lookedUpCustomer.fullName) {
+                    refs.receiverName.value = '';
+                }
+                if (lookedUpCustomer.phone && refs.receiverPhone
+                        && refs.receiverPhone.value === lookedUpCustomer.phone) {
+                    refs.receiverPhone.value = '';
+                }
+                lookedUpCustomer = null;
+            }
+            if (refs.customerFound) {
+                refs.customerFound.hidden = true;
+            }
+        });
         refs.customerPhone.addEventListener('keydown', function (event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -758,6 +873,18 @@
             }
         });
     }
+
+    // F2: quay nhanh về ô quét SKU khi nhân viên đang thao tác ở cột hoá đơn.
+    document.addEventListener('keydown', function (event) {
+        if (event.key !== 'F2') {
+            return;
+        }
+        event.preventDefault();
+        if (refs.search) {
+            refs.search.focus();
+            refs.search.select();
+        }
+    });
 
     /** Chặn submit khi hoá đơn còn lỗi, rồi mới hỏi xác nhận (SweetAlert2) và gửi lên server. */
     form.addEventListener('submit', function (event) {
@@ -770,11 +897,17 @@
         if (!state.lines.length) {
             problems.push('Hoá đơn chưa có sản phẩm nào.');
         }
+        if (state.pricePending) {
+            problems.push('Hệ thống đang tính lại tiền cho hoá đơn – vui lòng chờ một chút rồi bấm lại.');
+        }
         state.lines.forEach(function (line) {
             if (line.error) {
                 problems.push('SKU ' + line.sku + ': ' + line.error);
             }
         });
+        if (state.voucherError) {
+            problems.push('Mã giảm giá: ' + state.voucherError);
+        }
         if (isCash()) {
             var received = cashReceived();
             if (received != null && received > 0 && received < state.total) {
@@ -788,6 +921,9 @@
             }
             if (!confirmBox || !confirmBox.checked) {
                 problems.push('Hãy chờ khách chuyển khoản xong và tích "Đã nhận được tiền chuyển khoản" trước khi thu tiền.');
+            } else if (confirmedTransferTotal !== null && confirmedTransferTotal !== state.total) {
+                problems.push('Số tiền hoá đơn đã thay đổi sau khi xác nhận chuyển khoản – hãy cho khách chuyển lại đúng '
+                    + money(state.total) + ' rồi tích xác nhận lại.');
             }
         }
         if (problems.length) {
@@ -873,6 +1009,15 @@
         refreshPrice();
         restoreDefaultList();
         syncPaymentPanels();
+    }
+
+    // Trang render lại sau lỗi: hoá đơn đã gắn khách quen thì coi tên/SĐT đang có là do tra khách điền,
+    // để lần đổi SĐT tiếp theo còn xoá được (tránh in nhầm tên khách cũ).
+    if (refs.customerEmail && refs.customerEmail.value) {
+        lookedUpCustomer = {
+            fullName: refs.receiverName ? refs.receiverName.value : '',
+            phone: refs.receiverPhone ? refs.receiverPhone.value : ''
+        };
     }
 
     loadInitialLines();

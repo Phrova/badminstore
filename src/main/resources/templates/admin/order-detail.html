@@ -29,9 +29,22 @@
             <span class="badge badge-brand" th:if="${detail.order.orderSource.name() == 'MANUAL'}">
                 Tạo thủ công
             </span>
+            <a class="btn btn-sm btn-outline-secondary"
+               th:if="${detail.order.orderSource != null and detail.order.orderSource.name() == 'MANUAL'}"
+               th:href="@{'/admin/ban-hang/phieu/' + ${detail.order.id}}">
+                <i class="bi bi-printer" aria-hidden="true"></i> In phiếu bán hàng
+            </a>
             <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/don-hang}">
                 <i class="bi bi-arrow-left" aria-hidden="true"></i> Danh sách đơn
             </a>
+        </div>
+    </div>
+
+    <div class="alert alert-warning d-flex gap-2" role="alert" th:if="${hasShortage and canSwapItems}">
+        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+        <div>
+            Đơn có sản phẩm <strong>không đủ tồn kho</strong>. Bấm nút <strong>Đổi</strong> ở dòng tương ứng
+            để thay bằng sản phẩm khác trước khi xác nhận đơn.
         </div>
     </div>
 
@@ -50,6 +63,7 @@
                             <th scope="col" class="text-end">Đơn giá</th>
                             <th scope="col" class="text-center">SL</th>
                             <th scope="col" class="text-end">Thành tiền</th>
+                            <th scope="col" class="text-end" th:if="${canSwapItems}">Thao tác</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -65,12 +79,27 @@
                                              th:text="|${item.color} · ${item.weightClass} · ${item.gripSize} · SKU ${item.sku}|">
                                             Phiên bản
                                         </div>
+                                        <div class="small mt-1" th:if="${detail.order.orderStatus.name() == 'PENDING'}">
+                                            <span class="text-muted">
+                                                Tồn kho: <span th:text="${item.productVariant.stockQuantity}">0</span>
+                                            </span>
+                                            <span class="badge text-bg-danger ms-1"
+                                                  th:if="${item.productVariant.stockQuantity < item.quantity}">
+                                                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Thiếu hàng
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </td>
                             <td class="text-end" th:insert="~{fragments/common :: money(${item.unitPrice})}">0 ₫</td>
                             <td class="text-center" th:text="${item.quantity}">1</td>
                             <td class="text-end fw-semibold" th:insert="~{fragments/common :: money(${item.subtotal})}">0 ₫</td>
+                            <td class="text-end" th:if="${canSwapItems}">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   th:href="@{/admin/don-hang/{id}/doi-san-pham/{itemId}(id=${detail.order.id}, itemId=${item.id})}">
+                                    <i class="bi bi-arrow-left-right" aria-hidden="true"></i> Đổi
+                                </a>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -179,9 +208,20 @@
             <div class="card-soft mb-3" th:if="${ghnEnabled}">
                 <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-truck" aria-hidden="true"></i> Vận chuyển GHN</span>
-                    <span class="badge text-bg-warning" th:if="${ghnMock}">Phí &amp; vận đơn demo</span>
+                    <span class="badge text-bg-warning" th:if="${ghnMock}">Demo ngoại tuyến</span>
+                    <span class="badge text-bg-success" th:if="${!ghnMock and !ghnProduction}"
+                          th:text="${ghnEnvironment}">STAGING</span>
+                    <span class="badge text-bg-danger" th:if="${ghnProduction}">PRODUCTION</span>
                 </div>
                 <div class="card-body">
+                    <div class="alert alert-danger small mb-2" role="alert" th:if="${ghnProduction}">
+                        <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+                        Đang kết nối GHN <strong>Production</strong>: vận đơn tạo ra là đơn thật và có thể bị tính phí.
+                    </div>
+                    <div class="alert alert-info small mb-2" role="alert" th:if="${!ghnMock and !ghnProduction}">
+                        <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+                        Đang kết nối GHN <strong>Staging</strong> để kiểm thử – không tạo vận đơn thật.
+                    </div>
                     <div class="alert alert-warning small mb-2" role="alert" th:unless="${ghnShippingEnabled}">
                         <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
                         Chưa khai báo đủ <code>app.ghn.shop-id</code> và kho lấy hàng
@@ -190,6 +230,10 @@
                     <div class="d-flex justify-content-between small" th:if="${ghnShippingEnabled and ghnFeeEstimate != null}">
                         <span class="text-muted">Phí GHN dự kiến</span>
                         <span class="fw-semibold" th:insert="~{fragments/common :: money(${ghnFeeEstimate})}">0 ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between small mt-1" th:if="${ghnLeadtime != null}">
+                        <span class="text-muted">Giao dự kiến</span>
+                        <span class="fw-semibold" th:text="${ghnLeadtime.estimateDateLabel()}">04/11/2026 17:00</span>
                     </div>
                     <div class="small text-muted"
                          th:if="${ghnShippingEnabled and ghnFeeEstimate == null and detail.order.ghnOrderCode == null}">
@@ -232,9 +276,25 @@
                         </button>
                     </form>
 
+                    <!-- Huỷ vận đơn: GHN huỷ thành công thì đơn shop cũng huỷ và cộng lại kho -->
+                    <form class="mt-3"
+                          th:if="${detail.order.ghnOrderCode != null and detail.order.orderStatus.name() != 'DELIVERED'
+                                  and !detail.order.orderStatus.final}"
+                          th:action="@{/admin/don-hang/{id}/ghn/huy-van-don(id=${detail.order.id})}" method="post"
+                          data-confirm="Huỷ vận đơn GHN sẽ huỷ luôn đơn hàng và cộng lại kho (nếu đã trừ). Tiếp tục?">
+                        <label class="form-label small" for="ghnCancelReason">Lý do huỷ (tuỳ chọn)</label>
+                        <input class="form-control form-control-sm mb-2" id="ghnCancelReason" name="reason"
+                               maxlength="200" placeholder="Ví dụ: khách đổi ý, hết hàng…">
+                        <button class="btn btn-outline-danger w-100" type="submit">
+                            <i class="bi bi-x-octagon" aria-hidden="true"></i> Huỷ vận đơn GHN
+                        </button>
+                    </form>
+
                     <p class="small text-muted mb-0 mt-2">
                         GHN báo “Đã giao” ⇒ đơn chuyển <strong>Giao thành công</strong>;
-                        báo hoàn hàng ⇒ <strong>Hoàn trả</strong> (hoặc <strong>Đã huỷ</strong> nếu đang giao) và cộng lại kho.
+                        báo “Đã hoàn hàng” chỉ tự chuyển <strong>Hoàn trả</strong> khi đơn đã giao thành công,
+                        còn lại hệ thống giữ nguyên để admin kiểm tra.
+                        Ngoại lệ/hư hỏng/mất hàng/tiêu hủy: không tự hủy, chỉ cảnh báo để admin xử lý tay.
                     </p>
                 </div>
             </div>

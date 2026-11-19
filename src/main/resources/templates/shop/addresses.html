@@ -4,7 +4,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title>Sổ địa chỉ giao hàng</title>
+    <title>Địa chỉ giao hàng</title>
 </head>
 <body>
 
@@ -13,11 +13,11 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/}">Trang chủ</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Sổ địa chỉ</li>
+            <li class="breadcrumb-item active" aria-current="page">Địa chỉ</li>
         </ol>
     </nav>
 
-    <h1 class="page-title mb-3"><i class="bi bi-geo-alt text-primary" aria-hidden="true"></i> Sổ địa chỉ giao hàng</h1>
+    <h1 class="page-title mb-3"><i class="bi bi-geo-alt text-primary" aria-hidden="true"></i> Địa chỉ giao hàng</h1>
 
     <div class="row g-4">
         <div class="col-lg-7">
@@ -56,7 +56,7 @@
                                 </button>
                             </form>
                             <form th:action="@{/dia-chi/xoa}" method="post"
-                                  data-confirm="Xoá địa chỉ này khỏi sổ địa chỉ?">
+                                  data-confirm="Xoá địa chỉ này khỏi Địa chỉ?">
                                 <input type="hidden" name="addressId" th:value="${address.id}">
                                 <input type="hidden" name="next" th:value="${param.next}">
                                 <button type="submit" class="btn btn-sm btn-outline-danger"
@@ -74,13 +74,13 @@
 
         <div class="col-lg-5">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white fw-semibold">
+                <div class="card-header fw-semibold">
                     <i class="bi bi-plus-circle" aria-hidden="true"></i> Thêm địa chỉ mới
                 </div>
                 <div class="card-body">
                     <!-- Validate 2 lớp: HTML (required/pattern) + Bean Validation ở server -->
                     <form th:action="@{/dia-chi/them}" th:object="${form}" method="post"
-                          data-confirm="Lưu địa chỉ giao hàng này vào sổ địa chỉ?">
+                          data-confirm="Lưu địa chỉ giao hàng này vào Địa chỉ?">
                         <input type="hidden" name="next" th:value="${param.next}">
 
                         <div class="mb-3">
@@ -102,18 +102,23 @@
                         </div>
 
                         <!--
-                            Địa chỉ lấy từ GHN: khách chọn Tỉnh → Huyện → Xã (63 tỉnh/thành, mã thật của GHN).
-                            GHN_MOCK=true ⇒ dùng dữ liệu GHN lưu sẵn trong resources/ghn (không cần mạng);
-                            GHN_MOCK=false ⇒ gọi API GHN trực tiếp.
-                            Tên địa danh do JavaScript điền từ chính dữ liệu GHN vào 3 ô ẩn;
+                            Địa chỉ lấy từ GHN:
+                              • mô hình 3 cấp cũ: Tỉnh → Quận/Huyện → Phường/Xã (mock hoặc cấu hình LEGACY);
+                              • mô hình 2 cấp mới: Tỉnh → Phường/Xã (GHN khuyến nghị từ 01/07/2025).
+                            Tên địa danh do JavaScript điền từ chính dữ liệu GHN vào ô ẩn;
                             server kiểm tra lại mã (có tồn tại thật) và tên (khớp với mã) trước khi lưu.
                         -->
                         <div class="card bg-light border-0 mb-3" th:if="${ghnReady}" data-ghn-picker
-                             th:attr="data-ghn-shipping=${ghnShippingEnabled},data-ghn-district=${form.districtId},data-ghn-ward=${form.wardCode}">
+                             th:attr="data-ghn-model=${ghnNewAddress ? 'new' : 'legacy'},
+                                      data-ghn-shipping=${ghnShippingEnabled},
+                                      data-ghn-district=${form.districtId},data-ghn-ward=${form.wardCode}">
                             <div class="card-body">
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
                                     <span class="small fw-semibold">
                                         <i class="bi bi-truck text-primary" aria-hidden="true"></i> Địa chỉ giao hàng theo GHN
+                                    </span>
+                                    <span class="badge text-bg-success" th:if="${ghnNewAddress and !ghnMock}">
+                                        Địa chỉ 2 cấp mới
                                     </span>
                                     <span class="badge text-bg-warning" th:if="${ghnMock}">Địa chỉ GHN lưu sẵn</span>
                                 </div>
@@ -137,7 +142,7 @@
                                              th:errors="*{provinceName}">Vui lòng chọn tỉnh/thành phố</div>
                                     </div>
 
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-6" th:unless="${ghnNewAddress}">
                                         <label class="form-label small mb-1" for="districtId">Quận / huyện <span class="text-danger">*</span></label>
                                         <select class="form-select" id="districtId" data-ghn-district th:field="*{districtId}" required disabled
                                                 th:classappend="${#fields.hasErrors('districtId')} ? 'is-invalid'"
@@ -161,9 +166,9 @@
                                              th:errors="*{wardCode}">Vui lòng chọn phường/xã</div>
                                         <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('wardName')}"
                                              th:errors="*{wardName}">Vui lòng chọn phường/xã</div>
-                                        <!-- Vài quận/huyện GHN không có phường/xã nào ⇒ JS hiện lời nhắc này -->
+                                        <!-- Vài khu vực GHN không có phường/xã nào ⇒ JS hiện lời nhắc này -->
                                         <div class="small text-muted mt-1 d-none" data-ghn-ward-hint aria-live="polite">
-                                            GHN chưa có phường/xã cho quận/huyện này. Bạn chọn quận/huyện khác giúp shop nhé.
+                                            GHN chưa có phường/xã cho khu vực này. Bạn chọn khu vực khác giúp shop nhé.
                                         </div>
                                     </div>
                                 </div>

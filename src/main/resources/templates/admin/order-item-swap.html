@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
+<head>
+    <title>Đổi sản phẩm trong đơn</title>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/admin}">Tổng quan</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/admin/don-hang}">Đơn hàng</a></li>
+            <li class="breadcrumb-item">
+                <a th:href="@{/admin/don-hang/{id}(id=${detail.order.id})}"
+                   th:text="${detail.order.orderCode}">BS000</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Đổi sản phẩm</li>
+        </ol>
+    </nav>
+
+    <div class="page-head">
+        <h1 class="page-title">
+            <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+            Đổi sản phẩm trong đơn
+        </h1>
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/don-hang/{id}(id=${detail.order.id})}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Quay lại đơn
+        </a>
+    </div>
+
+    <div class="alert alert-info" role="alert">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        Đơn đang chờ xác nhận nên kho <strong>chưa bị trừ</strong>. Sau khi đổi, hệ thống tính lại tạm tính,
+        giảm giá và tổng tiền; khi xác nhận đơn sẽ trừ kho theo sản phẩm mới.
+    </div>
+
+    <!-- ===== Dòng hàng đang cần đổi ===== -->
+    <div class="card-soft mb-3">
+        <div class="card-header fw-semibold">
+            <i class="bi bi-box-seam" aria-hidden="true"></i> Dòng hàng hiện tại
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <img class="admin-thumb border" loading="lazy"
+                     th:src="${item.imageUrl != null} ? ${item.imageUrl} : '/images/no-image.svg'"
+                     th:alt="|Ảnh ${item.productName}|">
+                <div class="flex-grow-1">
+                    <div class="fw-semibold" th:text="${item.productName}">Tên vợt</div>
+                    <div class="small text-muted"
+                         th:text="|${item.color} · ${item.weightClass} · ${item.gripSize} · SKU ${item.sku}|">
+                        Phiên bản
+                    </div>
+                    <div class="small mt-1">
+                        <span class="text-muted">
+                            Tồn kho hiện tại:
+                            <span th:text="${item.productVariant.stockQuantity}">0</span>
+                        </span>
+                        <span class="badge text-bg-danger ms-1"
+                              th:if="${item.productVariant.stockQuantity < item.quantity}">
+                            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> Thiếu hàng
+                        </span>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="small text-muted">Số lượng</div>
+                    <div class="fs-5 fw-semibold" th:text="${item.quantity}">1</div>
+                    <div class="small text-muted mt-1">
+                        Đơn giá
+                        <span th:insert="~{fragments/common :: money(${item.unitPrice})}">0 ₫</span>
+                    </div>
+                    <div class="small text-muted">
+                        Thành tiền
+                        <span class="fw-semibold" th:insert="~{fragments/common :: money(${item.subtotal})}">0 ₫</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Chọn sản phẩm thay thế ===== -->
+    <div class="card-soft">
+        <div class="card-header fw-semibold">
+            <i class="bi bi-search" aria-hidden="true"></i> Chọn sản phẩm thay thế
+        </div>
+        <div class="card-body">
+
+            <form class="row g-2 align-items-end mb-3" method="get"
+                  th:action="@{/admin/don-hang/{id}/doi-san-pham/{itemId}(id=${detail.order.id}, itemId=${item.id})}">
+                <div class="col-12 col-md-8">
+                    <label class="form-label small" for="keyword">Tìm theo tên sản phẩm hoặc SKU</label>
+                    <input class="form-control" id="keyword" name="keyword" maxlength="100"
+                           th:value="${keyword}" placeholder="Ví dụ: Yonex Astrox hoặc YX-AX100ZZ-01">
+                </div>
+                <div class="col-12 col-md-auto d-grid">
+                    <button class="btn btn-outline-primary" type="submit">
+                        <i class="bi bi-search" aria-hidden="true"></i> Tìm
+                    </button>
+                </div>
+            </form>
+
+            <div class="alert alert-warning" role="alert" th:if="${detail.voucherLabel != null}">
+                <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+                Đơn đang dùng voucher <strong th:text="${detail.voucherLabel}">Mã giảm giá</strong>.
+                Giảm giá sẽ được tính lại theo tạm tính mới; nếu tạm tính thấp hơn mức tối thiểu của voucher,
+                hệ thống sẽ chặn đổi.
+            </div>
+
+            <form method="post"
+                  th:action="@{/admin/don-hang/{id}/doi-san-pham/{itemId}(id=${detail.order.id}, itemId=${item.id})}"
+                  data-confirm="Đổi dòng hàng này sang sản phẩm đã chọn và tính lại tổng tiền?">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="text-center">Chọn</th>
+                            <th scope="col">Sản phẩm</th>
+                            <th scope="col" class="text-end">Giá</th>
+                            <th scope="col" class="text-center">Tồn kho</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="variant : ${candidates}">
+                            <td class="text-center">
+                                <input class="form-check-input" type="radio" name="variantId"
+                                       th:id="|variant-${variant.id}|" th:value="${variant.id}"
+                                       th:aria-label="|Chọn SKU ${variant.sku}|"
+                                       th:disabled="${variant.stockQuantity < item.quantity}" required>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <img class="admin-thumb border" loading="lazy"
+                                         th:src="${variant.imageUrl != null} ? ${variant.imageUrl} : '/images/no-image.svg'"
+                                         th:alt="|Ảnh ${variant.product.name}|">
+                                    <div>
+                                        <label class="fw-semibold d-block" th:for="|variant-${variant.id}|"
+                                               th:text="${variant.product.name}">Tên vợt</label>
+                                        <div class="small text-muted"
+                                             th:text="|${variant.color} · ${variant.weightClass} · ${variant.gripSize} · SKU ${variant.sku}|">
+                                            Phiên bản
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end" th:insert="~{fragments/common :: money(${variant.price})}">0 ₫</td>
+                            <td class="text-center">
+                                <span class="badge"
+                                      th:classappend="${variant.stockQuantity >= item.quantity} ? 'text-bg-success' : 'text-bg-danger'"
+                                      th:text="${variant.stockQuantity}">0</span>
+                                <div class="small text-danger mt-1"
+                                     th:if="${variant.stockQuantity < item.quantity}">
+                                    Không đủ số lượng
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(candidates)}">
+                            <td colspan="4">
+                                <div th:replace="~{fragments/common :: emptyState('bi-search', 'Không tìm thấy sản phẩm đang bán phù hợp. Hãy thử từ khoá khác.')}">
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/don-hang/{id}(id=${detail.order.id})}">
+                        Huỷ
+                    </a>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-check2-circle" aria-hidden="true"></i> Xác nhận đổi sản phẩm
+                    </button>
+                </div>
+                <p class="small text-muted mb-0 mt-2">
+                    Chỉ hiển thị biến thể đang bán của sản phẩm chưa xoá. Biến thể không đủ tồn kho bị khoá
+                    để tránh đổi sang món không thể xác nhận đơn.
+                </p>
+            </form>
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

@@ -2,7 +2,7 @@
    BadStore – bảng phong cách dùng chung (theo docs/UI_GUIDE.md)
    Nạp SAU bootstrap.min.css trong layout/base.html, layout/admin.html và trang lỗi.
    Nhận diện: xanh sân cầu #0f8a5f (chính) · vàng #ffb703 (CTA/nhấn)
-              đỏ #e63946 (giá/giảm giá) · nền #f7f8fa · chữ #1f2937
+              đỏ #cf2431 (giá/giảm giá) · nền #eef1f4 · chữ #1f2937
    Font: Be Vietnam Pro (nạp ở layout). Icon: Bootstrap Icons.
    Quy ước: mọi màu/bo góc/khoảng cách lấy từ biến --bad-* hoặc --bs-* bên dưới,
    KHÔNG viết CSS inline trong template.
@@ -19,31 +19,41 @@
 
     /* Liên kết: dùng màu XANH CHỮ (--bad-primary-text) chứ không dùng --bs-primary.
        Vì sao: #0f8a5f trên nền trắng chỉ đạt 4.36:1 (WCAG AA cần ≥ 4.5:1 cho chữ thường),
-       còn #0c7852 đạt 5.49:1 trên trắng và 5.17:1 trên nền #f7f8fa. */
+       còn #0c7852 đạt 5.25:1 trên nền thẻ #f9fafb và 4.84:1 trên nền trang #eef1f4. */
     --bs-link-color: #0c7852;
     --bs-link-color-rgb: 12, 120, 82;
     --bs-link-hover-color: #0b6b4a;
     --bs-link-hover-color-rgb: 11, 107, 74;
 
     /* Đỏ đậm hơn một chút: #e63946 chỉ đạt 4.17:1 trên trắng (trượt AA),
-       #d92b39 đạt 4.82:1 trên trắng – 4.54:1 trên nền trang – vẫn là "đỏ sale" recognisable. */
-    --bs-danger: #d92b39;
-    --bs-danger-rgb: 217, 43, 57;
+       #cf2431 đạt 5.09:1 trên nền thẻ – 4.69:1 trên nền trang – vẫn là "đỏ sale" dễ nhận ra.
+       Không dùng #d92b39 nữa vì trên nền trang dịu hơn chỉ còn 4.25:1 (trượt AA). */
+    --bs-danger: #cf2431;
+    --bs-danger-rgb: 207, 36, 49;
     --bs-body-font-family: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --bs-body-bg: #f7f8fa;
+    /* Nền dịu hơn #f7f8fa để đỡ chói; thẻ sáng hơn nền một bậc (--bad-surface) để vẫn tách lớp. */
+    --bs-body-bg: #eef1f4;
+    --bs-body-bg-rgb: 238, 241, 244;
+    --bs-secondary-bg: #e5e9ee;
+    --bs-secondary-bg-rgb: 229, 233, 238;
+    --bs-tertiary-bg: #eaedf1;
+    --bs-tertiary-bg-rgb: 234, 237, 241;
+    --bs-light: #e9edf1;
+    --bs-light-rgb: 233, 237, 241;
     --bs-body-color: #1f2937;
+    --bs-border-color: #dfe4ea;
     --bs-border-radius: .75rem;
     --bs-border-radius-lg: 1rem;
 
     /* Token riêng của BadStore */
     --bad-accent: #ffb703;            /* vàng – nhấn CTA, gạch tiêu đề khối */
     --bad-accent-dark: #e5a400;
-    --bad-sale: #d92b39;              /* giá bán, giảm giá (4.82:1 trên trắng – đạt AA) */
+    --bad-sale: #cf2431;              /* giá bán, giảm giá (4.69:1 trên nền trang – đạt AA) */
     --bad-primary-dark: #0b6b4a;      /* nền nút xanh (chữ trắng trên nền này: 6.53:1) */
     --bad-primary-darker: #0a5c40;    /* nền nút xanh khi hover/rê chuột */
-    --bad-primary-text: #0c7852;      /* XANH DÙNG LÀM MÀU CHỮ (link, nút outline, nhãn) 5.49:1 trên trắng */
-    --bad-success-text: #0f7449;      /* xanh "thành công" dùng làm màu chữ (5.81:1 trên trắng) */
-    --bad-warning-text: #8a6100;      /* vàng hổ phách dùng làm màu chữ (5.54:1 trên trắng) */
+    --bad-primary-text: #0c7852;      /* XANH DÙNG LÀM MÀU CHỮ (link, nút outline, nhãn) 4.84:1 trên nền trang */
+    --bad-success-text: #0f7449;      /* xanh "thành công" dùng làm màu chữ (5.12:1 trên nền trang) */
+    --bad-warning-text: #8a6100;      /* vàng hổ phách dùng làm màu chữ (4.89:1 trên nền trang) */
     /* Màu biểu đồ Chart.js (dashboard) – 6 trạng thái đơn; trước đây template đọc --bad-chart-*
        nhưng chưa hề định nghĩa nên cả 6 lát tròn cùng một màu xanh, không phân biệt được. */
     --bad-chart-1: #d97706;
@@ -52,21 +62,27 @@
     --bad-chart-4: #16a34a;
     --bad-chart-5: #dc2626;
     --bad-chart-6: #7e22ce;
-    --bad-muted: #6b7280;
-    --bad-surface: #ffffff;
-    --bad-border: #e6e8ee;
+    --bad-muted: #5f6975;              /* chữ phụ: 4.92:1 trên nền trang, 5.34:1 trên nền thẻ */
+    --bad-surface: #f9fafb;            /* nền thẻ: gần trắng nhưng dịu hơn #fff */
+    --bad-surface-rgb: 249, 250, 251;
+    --bad-surface-muted: #e9edf1;      /* ô tìm kiếm, hàng tiêu đề bảng, nền lõm nhẹ */
+    --bad-border: #dfe4ea;
     --bad-card-shadow: 0 1px 3px rgba(16, 24, 40, .08);
     --bad-card-shadow-hover: 0 12px 28px rgba(16, 24, 40, .14);
-    --bad-transition: .18s ease;
+    /* Easing lấy từ thang của Emil Kowalski: ease-out mạnh cho phản hồi hover/bấm,
+       ease-in-out cho phần tử di chuyển trên màn hình. */
+    --bad-ease-out: cubic-bezier(.23, 1, .32, 1);
+    --bad-ease-in-out: cubic-bezier(.77, 0, .175, 1);
+    --bad-transition: .18s var(--bad-ease-out);
 }
 
 /* -------------------------------------------------------------------------
    Bổ sung cho các lớp tiện ích màu của Bootstrap (utility).
    Bootstrap viết màu chữ bằng !important, muốn sửa phải dùng !important và nạp SAU bootstrap.
-   Lý do đổi (đã đo bằng công thức WCAG 2.1, nền trắng):
-     .text-primary  #0f8a5f → 4.36:1 (trượt AA)  ⇒ #0c7852 = 5.49:1
-     .text-success  #198754 → 4.53:1 (sát ngưỡng, trên nền #f7f8fa chỉ 4.26:1) ⇒ #0f7449 = 5.81:1
-     .text-warning  #ffc107 → 1.63:1 (rất kém, dùng cho con số ở dashboard) ⇒ #8a6100 = 5.54:1
+   Lý do đổi (đã đo bằng công thức WCAG 2.1, nền trang #eef1f4):
+     .text-primary  #0f8a5f → 3.84:1 (trượt AA)  ⇒ #0c7852 = 4.84:1
+     .text-success  #198754 → 4.00:1 (trượt AA)  ⇒ #0f7449 = 5.12:1
+     .text-warning  #ffc107 → 1.44:1 (rất kém, dùng cho con số ở dashboard) ⇒ #8a6100 = 4.89:1
    KHÔNG đổi biến --bs-success-rgb/--bs-warning-rgb vì các nhãn .text-bg-success/.text-bg-warning
    dùng chính biến đó làm NỀN (chữ trắng/đen trên nền đậm sẽ mất tương phản).
    ------------------------------------------------------------------------- */
@@ -135,7 +151,7 @@ a {
     --bs-btn-disabled-border-color: var(--bad-primary-dark);
 }
 
-/* Nút viền xanh: chữ dùng màu xanh CHỮ (5.49:1), khi rê chuột mới tô nền xanh đậm + chữ trắng */
+/* Nút viền xanh: chữ dùng màu xanh CHỮ (4.84:1 trên nền trang), khi rê chuột mới tô nền xanh đậm + chữ trắng */
 .btn-outline-primary {
     --bs-btn-color: var(--bad-primary-text);
     --bs-btn-border-color: var(--bad-primary-text);
@@ -206,6 +222,9 @@ a {
 .form-control, .form-select {
     border-radius: .6rem;
     padding: .6rem .85rem;
+    /* Bootstrap mặc định dùng --bs-body-bg, giờ là nền trang xám nên ô nhập sẽ bị tối;
+       giữ ô nhập sáng hơn nền một bậc để dễ đọc và phân biệt với khung bao. */
+    background-color: var(--bad-surface);
 }
 
 .form-control-sm, .form-select-sm {
@@ -218,6 +237,7 @@ a {
 }
 
 .form-control:focus, .form-select:focus {
+    background-color: var(--bad-surface);
     border-color: var(--bs-primary);
     box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .18);
 }
@@ -238,6 +258,10 @@ a {
 
 /* ============ 5. Thẻ / khối nội dung ============ */
 .card {
+    /* Bootstrap mặc định lấy nền thẻ = --bs-body-bg; tách ra để thẻ vẫn sáng hơn nền trang. */
+    --bs-card-bg: var(--bad-surface);
+    background-color: var(--bad-surface);
+    border-color: var(--bad-border);
     border-radius: var(--bs-border-radius-lg);
 }
 
@@ -245,6 +269,12 @@ a {
     border-top-left-radius: var(--bs-border-radius-lg);
     border-top-right-radius: var(--bs-border-radius-lg);
     border-bottom-color: var(--bad-border);
+}
+
+/* Một số template cũ còn gắn bg-white cho header thẻ; trong theme dịu này header
+   dùng đúng lớp phủ nhẹ của Bootstrap thay vì bật thành một dải trắng. */
+.card > .card-header.bg-white {
+    background-color: var(--bs-card-cap-bg) !important;
 }
 
 /* Thẻ dùng khắp nơi với "border-0 shadow-sm" – thay bóng mặc định bằng bóng mềm của theme */
@@ -372,10 +402,15 @@ a {
     position: sticky;
     top: 0;
     z-index: 1030;
-    background: rgba(255, 255, 255, .96);
+    background: rgba(var(--bad-surface-rgb), .96);
     border-bottom: 1px solid var(--bad-border);
     padding-top: .45rem;
     padding-bottom: .45rem;
+}
+
+/* Menu mobile của trang khách dùng cùng nền thẻ dịu, không bật ra một tấm trắng lớn. */
+.navbar-bad .offcanvas-lg {
+    --bs-offcanvas-bg: var(--bad-surface);
 }
 
 /* Làm mờ nền sau header CHỈ từ lg trở lên: dưới lg, backdrop-filter tạo "containing block"
@@ -419,7 +454,7 @@ a {
 .navbar-bad .nav-link:hover,
 .navbar-bad .nav-link:focus {
     color: var(--bad-primary-text);
-    background: #eefaf4;
+    background: rgba(var(--bs-primary-rgb), .10);
 }
 
 .navbar-bad .navbar-toggler {
@@ -427,6 +462,7 @@ a {
 }
 
 .navbar-bad .dropdown-menu {
+    --bs-dropdown-bg: var(--bad-surface);
     border: 0;
     border-radius: var(--bs-border-radius);
     box-shadow: var(--bad-card-shadow-hover);
@@ -456,12 +492,12 @@ a {
 .nav-search .form-control {
     padding-left: 2.25rem;
     border-radius: 999px;
-    background: #f3f4f8;
+    background: var(--bad-surface-muted);
     border-color: transparent;
 }
 
 .nav-search .form-control:focus {
-    background: #fff;
+    background: var(--bad-surface);
     border-color: var(--bs-primary);
     box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .12);
 }
@@ -556,6 +592,55 @@ a {
     font-weight: 600;
 }
 
+/* Nút tạm dừng banner tự chuyển (WCAG 2.2.2 – nội dung tự cập nhật quá 5 giây phải
+   có cách dừng). Chỉ hiện khi JS bật autoplay: nếu không có JS thì slider không tự chạy
+   nên nút sẽ là nút chết ⇒ template để `hidden`, main.js mới bỏ hidden.
+   Nền trắng đặc + icon xanh đậm #0a5c40 ⇒ tương phản 8:1, đứng trên dải gradient vẫn rõ. */
+.hero-swiper .hero-pause {
+    position: absolute;
+    right: .85rem;
+    bottom: .85rem;
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .7);
+    border-radius: 999px;
+    background: #fff;
+    color: #0a5c40;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, .25);
+    transition: background-color var(--bad-transition), transform var(--bad-transition);
+}
+
+.hero-swiper .hero-pause:hover {
+    background: #ecfdf5;
+}
+
+.hero-swiper .hero-pause:active {
+    transform: translateY(1px);
+}
+
+/* Viền focus mặc định của theme là xanh trong suốt, sẽ chìm trên nền gradient xanh. */
+.hero-swiper .hero-pause:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+.hero-swiper .hero-pause[hidden] {
+    display: none;
+}
+
+@media (max-width: 575.98px) {
+    /* 375px: thu nhỏ khoảng đệm để nút không đè lên dòng chữ cuối của slide. */
+    .hero-swiper .hero-pause {
+        right: .6rem;
+        bottom: .6rem;
+    }
+}
+
 /* Ô "chọn nhanh" và thẻ thống kê nhỏ ở trang chủ */
 .quick-tile {
     display: block;
@@ -617,7 +702,7 @@ a {
     min-height: 2.5rem;
 }
 
-/* Giá: đỏ; giá gạch ngang màu xám */
+/* Giá: đỏ; Giá gốc màu xám */
 .price,
 .price-current {
     color: var(--bad-sale);
@@ -826,11 +911,18 @@ a {
 
 /* Bảng trong thẻ: hàng tiêu đề nền nhạt, hàng có phản hồi khi rê chuột */
 .card .table thead th {
-    background: #f8fafc;
+    background: var(--bad-surface-muted);
     color: #475569;
     font-size: .8rem;
     text-transform: uppercase;
     letter-spacing: .02em;
+}
+
+/* .table-light của Bootstrap hard-code #f8f9fa – đổi sang token dịu của theme. */
+.table-light {
+    --bs-table-bg: var(--bad-surface-muted);
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-border-color: var(--bad-border);
 }
 
 .card .table tbody tr {
@@ -838,7 +930,7 @@ a {
 }
 
 .card .table tbody tr:hover {
-    background-color: #f2faf6;
+    background-color: rgba(var(--bs-primary-rgb), .06);
 }
 
 .pagination {
@@ -960,7 +1052,7 @@ a {
     align-items: center;
     gap: .5rem;
     padding: .6rem 1rem;
-    background: rgba(255, 255, 255, .97);
+    background: rgba(var(--bad-surface-rgb), .97);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--bad-border);
 }
@@ -1029,8 +1121,8 @@ a {
     width: 100%;
     padding: .5rem;
     text-align: left;
-    background: #fff;
-    border: 1px solid #e3e6ea;
+    background: var(--bad-surface);
+    border: 1px solid var(--bad-border);
     border-radius: .75rem;
     transition: border-color .15s ease, box-shadow .15s ease;
 }
@@ -1160,6 +1252,11 @@ a {
     line-height: 1.1;
 }
 
+/* Ảnh VietQR vừa đủ để khách quét tại quầy, không phình to trên màn hình lớn */
+.pos-qr-image {
+    max-width: 230px;
+}
+
 .pos-pay .btn {
     flex: 1 1 auto;
 }
@@ -1255,6 +1352,11 @@ a {
 
 /* ============ 20. Giảm chuyển động khi người dùng yêu cầu ============ */
 @media (prefers-reduced-motion: reduce) {
+    /* Cuộn mượt cũng là chuyển động: người bật "giảm chuyển động" nhảy thẳng tới đích. */
+    html {
+        scroll-behavior: auto;
+    }
+
     * {
         transition: none !important;
         animation: none !important;
@@ -1294,6 +1396,79 @@ a {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Màu sắc thực tế của biến thể: chip gọn, không dùng màu hard-code vì tên màu do dữ liệu quyết định */
+.product-card .card-color-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .25rem;
+}
+
+.product-card .card-color-chip,
+.product-card .card-color-more {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: .12rem .45rem;
+    border: 1px solid var(--bad-border);
+    border-radius: 999px;
+    background: var(--bad-surface-muted);
+    color: var(--bad-muted);
+    font-size: .72rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card .card-color-more {
+    flex: 0 0 auto;
+}
+
+.product-card .card-variant-summary {
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card .card-price-range {
+    line-height: 1.3;
+}
+
+/* Giá là một đơn vị không tách dòng: tránh "₫" rơi xuống dòng riêng ở thẻ hẹp.
+   Giá gốc cũng vậy, để cả cụm giá bán + giá gốc tự xuống dòng cùng nhau. */
+.product-card .price,
+.product-card .price-old {
+    white-space: nowrap;
+}
+
+/* 320px: thẻ 2 cột quá hẹp cho tên + khoảng giá + 3 nhóm thông tin biến thể.
+   Cho lưới sản phẩm về 1 cột; các màn hình ≥360px vẫn giữ 2 cột. */
+@media (max-width: 359.98px) {
+    .catalog-grid > .col,
+    .catalog-grid > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Thẻ 2 cột trên điện thoại: nút "Chọn phiên bản" phải nằm gọn 1 dòng.
+   Bỏ icon ở breakpoint này để chữ không xuống dòng trong cột ~160px. */
+@media (min-width: 360px) and (max-width: 575.98px) {
+    .product-card .card-action .btn {
+        padding-left: .5rem;
+        padding-right: .5rem;
+        font-size: .8rem;
+        white-space: nowrap;
+    }
+
+    .product-card .card-action .btn i {
+        display: none;
+    }
 }
 
 /* Hết hàng: làm mờ ảnh để khách thấy ngay là chưa mua được */
@@ -1398,40 +1573,161 @@ a {
     width: auto;
 }
 
-/* --- Phân trang dạng viên thuốc, trang hiện tại tô xanh thương hiệu --- */
-.catalog-pager .page-link {
-    margin: 0 .15rem;
-    min-width: 2.4rem;
+/* --- Phân trang: thanh viên thuốc, nút tròn 44px, trang hiện tại tô xanh thương hiệu ---
+   Cấu trúc do fragments/pagination.html sinh ra:
+     ul.pagination > li.page-item > a/span.page-link
+     li.page-step (Trước/Sau, có nhãn chữ), li.page-edge (trang 1 / trang cuối),
+     li.page-gap (dấu …), các li còn lại là số trang.
+   Trước/Sau khi bị vô hiệu hoá là <span> nên không Tab vào được (a11y). */
+.catalog-pager {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .7rem;
+}
+
+/* Thanh bao ngoài: một "viên thuốc" nhẹ, tách cụm nút khỏi nền trang */
+.catalog-pager .pagination {
+    --bs-pagination-padding-x: 0;
+    --bs-pagination-padding-y: 0;
+    --bs-pagination-border-width: 0;
+    --bs-pagination-bg: transparent;
+    gap: .35rem;
+    margin: 0;
+    padding: .45rem .55rem;
     border: 1px solid var(--bad-border);
     border-radius: 999px;
-    text-align: center;
+    background: var(--bad-surface);
+    box-shadow: var(--bad-card-shadow);
+}
+
+/* Mọi nút: hình tròn 44px, số canh giữa, dùng số đẳng khoảng (không nhảy khi đổi trang) */
+.catalog-pager .page-item > .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
     color: var(--bs-body-color);
     font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--bad-transition), border-color var(--bad-transition),
+                color var(--bad-transition), box-shadow var(--bad-transition),
+                transform var(--bad-transition);
 }
 
-.catalog-pager .page-link:hover {
-    border-color: var(--bs-primary);
-    background: var(--bs-primary-bg-subtle);
-    color: var(--bad-primary-dark);
+/* Trước/Sau: viên thuốc có viền để tách khỏi cụm số trang */
+.catalog-pager .page-link.page-step {
+    width: auto;
+    min-width: 2.75rem;
+    padding: 0 .9rem;
+    border-color: var(--bad-border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--bad-primary-text);
 }
 
-.catalog-pager .page-item.active .page-link {
+/* Chỉ link thật mới có phản hồi rê chuột (span vô hiệu hoá / dấu … đứng yên).
+   Gói trong (hover: hover) để điện thoại không dính trạng thái hover sau khi chạm. */
+@media (hover: hover) and (pointer: fine) {
+    .catalog-pager a.page-link:hover {
+        border-color: var(--bs-primary);
+        background: var(--bs-primary-bg-subtle);
+        color: var(--bad-primary-dark);
+        transform: translateY(-1px);
+    }
+}
+
+/* Phản hồi khi nhấn: thu nhẹ để nút "biết" đã nhận thao tác */
+.catalog-pager a.page-link:active {
+    transform: scale(.96);
+}
+
+/* Trang hiện tại: nền xanh đậm + quầng sáng nhẹ, chữ trắng (6.53:1) */
+.catalog-pager .page-item.active > .page-link {
     border-color: var(--bad-primary-dark);
     background: var(--bad-primary-dark);
     color: #fff;
+    box-shadow: 0 6px 14px rgba(var(--bs-primary-rgb), .3);
+    cursor: default;
 }
 
-.catalog-pager .page-item.disabled .page-link {
-    border-color: var(--bad-border);
-    background: transparent;
+/* Nút vô hiệu hoá: nền xám dịu, không viền, không phản hồi */
+.catalog-pager .page-item.disabled > .page-link {
+    border-color: transparent;
+    background: var(--bad-surface-muted);
     color: var(--bad-muted);
+    opacity: .8;
 }
 
-/* Trên điện thoại: chừa chỗ cho bàn phím số khi nhập khoảng giá */
+/* Dấu "…" chỉ là khoảng ngắt thị giác, không phải nút */
+.catalog-pager .page-gap > .page-link {
+    width: 1.6rem;
+    color: var(--bad-muted);
+    font-weight: 700;
+    letter-spacing: .08em;
+}
+
+.catalog-pager-meta {
+    margin: 0;
+    color: var(--bad-muted);
+    font-size: .85rem;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Trên điện thoại: bộ lọc xếp dọc; phân trang ẩn trang đầu/cuối + dấu "…"
+   (vẫn còn Trước/Sau và 5 số quanh trang hiện tại), thu nút về 40px cho vừa màn hình. */
 @media (max-width: 575.98px) {
     .catalog-sort .form-select {
         min-width: 0;
         width: 100%;
+    }
+
+    .catalog-pager .pagination {
+        gap: .2rem;
+        padding: .3rem .35rem;
+        border-radius: 1.25rem;
+    }
+
+    .catalog-pager .page-edge,
+    .catalog-pager .page-gap {
+        display: none;
+    }
+
+    .catalog-pager .page-item > .page-link {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .catalog-pager .page-link.page-step {
+        min-width: 2.5rem;
+        padding: 0 .55rem;
+    }
+}
+
+/* Màn hình rất hẹp (320px): thu thêm để 7 nút vẫn nằm trên một hàng */
+@media (max-width: 359.98px) {
+    .catalog-pager .pagination {
+        gap: .15rem;
+        padding: .25rem;
+    }
+
+    .catalog-pager .page-item > .page-link {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+
+    .catalog-pager .page-link.page-step {
+        min-width: 2.25rem;
+        padding: 0 .4rem;
     }
 }
 
@@ -1545,7 +1841,7 @@ a {
     height: 60px;
     border: 1px dashed var(--bad-border);
     border-radius: .5rem;
-    background: #fff;
+    background: var(--bad-surface);
     color: var(--bad-muted);
     font-size: 1.35rem;
 }
@@ -1609,14 +1905,18 @@ a {
    khi trang bị lật sang phải-trái (RTL), làm bộ kiểm bố cục báo lỗi oan. */
 .skip-link { position: absolute; top: .5rem; left: .5rem; transform: translateY(-150%); background: var(--bad-primary-dark); color: var(--bs-white); padding: .5rem 1rem; z-index: 2000; }
 .skip-link:focus { transform: none; }
-html { scroll-behavior: smooth; }
+/* scroll-padding-top: header khách là position: sticky nên nếu không chừa chỗ, mọi
+   liên kết neo trong trang (#chon-nhanh ở trang chủ) và cả skip-link/focus-scroll sẽ
+   dừng ngay dưới đáy header và bị header che mất tiêu đề. 5rem ≈ chiều cao header
+   (44px vùng chạm + padding) cộng một khoảng thở. */
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
 .btn, .form-control, .form-select, .nav-link, .page-link { min-height: 44px; }
 .btn-sm { min-height: 36px; }
 .variant-chip { border: 1.5px solid #d1d5db; border-radius: 999px; padding: .4rem 1rem; background: #fff; font-weight: 600; cursor: pointer; }
 .variant-chip.active, .btn-check:checked + .variant-chip { border-color: var(--bs-primary); background: #ecfdf5; color: var(--bad-primary-text); }
 .variant-chip.disabled, .btn-check:disabled + .variant-chip { opacity: .45; text-decoration: line-through; cursor: not-allowed; }
 .filter-chip { background: #ecfdf5; color: var(--bad-primary-text); border-radius: 999px; padding: .25rem .75rem; font-size: .85rem; font-weight: 600; }
-.sticky-buy { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; background: #fff; box-shadow: 0 -4px 16px rgba(0,0,0,.1); padding: .6rem 1rem; }
+.sticky-buy { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1030; background: var(--bad-surface); box-shadow: 0 -4px 16px rgba(0,0,0,.1); padding: .6rem 1rem; }
 .sticky-summary { position: sticky; top: 90px; }
 #backToTop { position: fixed; right: 1rem; bottom: 1rem; width: 44px; height: 44px; z-index: 1040; }
 /* Bảng dài (admin): giữ hàng tiêu đề khi cuộn để không mất tên cột.
@@ -1679,8 +1979,8 @@ img { max-width: 100%; height: auto; }
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #f1f5f9;
-    /* --bad-muted (#6b7280) chỉ đạt 4.41:1 trên nền #f1f5f9 (trượt AA) ⇒ dùng màu chữ đậm hơn */
+    background: var(--bad-surface-muted);
+    /* Chữ phụ dùng --bs-secondary-color (đậm hơn --bad-muted cũ) để đạt AA trên nền lõm. */
     color: var(--bs-secondary-color);
     font-size: .78rem;
 }
@@ -1751,6 +2051,30 @@ img { max-width: 100%; height: auto; }
     .has-sticky-buy { padding-bottom: 5.5rem; }
     .sticky-buy { padding-bottom: calc(.6rem + env(safe-area-inset-bottom, 0px)); }
     .sticky-buy .price { white-space: nowrap; }
+
+    /* Nút "lên đầu trang" nhảy lên trên thanh mua, không đè nút Thêm vào giỏ */
+    body:has(.sticky-buy) #backToTop {
+        bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Footer nằm ngoài .has-sticky-buy nên tự chừa chỗ cho thanh mua cố định */
+    body:has(.sticky-buy) .footer-bad {
+        padding-bottom: 6rem !important;
+    }
+}
+
+/* Màn hình rất hẹp (320px): giữ giá và nút mua trên một hàng.
+   Nếu để mặc định, chữ "Thêm vào giỏ" xuống 2 dòng và nút đè lên giá. */
+@media (max-width: 359.98px) {
+    .sticky-buy { gap: .5rem; padding-left: .75rem; padding-right: .75rem; }
+    .sticky-buy .price { font-size: 1rem; }
+    .sticky-buy .btn {
+        padding-left: .6rem;
+        padding-right: .6rem;
+        font-size: .85rem;
+        white-space: nowrap;
+    }
+    .sticky-buy .btn i { display: none; }
 }
 
 /* --- Nút lên đầu trang: chỉ hiện khi đã cuộn (app.js bật/tắt bằng .d-none) --- */
@@ -1784,5 +2108,872 @@ html [data-aos="fade-up"] {
         opacity: 1 !important;
         transform: none !important;
         transition: none !important;
+    }
+}
+
+/* =========================================================================
+   22. Thông báo nổi (SweetAlert2) – toast gọn, hộp xác nhận đồng bộ nhận diện
+   SweetAlert2 tự chèn CSS sau theme.css nên các rule dưới đây dùng selector
+   đủ đặc hiệu (body + class) để thắng style mặc định của thư viện.
+   ========================================================================= */
+
+/* --- Toast: rộng tối đa 26rem; điện thoại thu về gần full chiều ngang ------ */
+body.swal2-toast-shown .swal2-container.swal2-top,
+body.swal2-toast-shown .swal2-container.swal2-top-end {
+    width: min(26rem, calc(100vw - .5rem));
+    padding: .75rem;
+}
+
+body .swal2-toast.bad-toast {
+    padding: .7rem .85rem .8rem;
+    border: 1px solid var(--bad-border);
+    border-left: 4px solid var(--bs-primary);
+    border-radius: var(--bs-border-radius);
+    background: var(--bad-surface);
+    box-shadow: var(--bad-card-shadow-hover);
+    color: var(--bs-body-color);
+    font-family: var(--bs-body-font-family);
+}
+
+body .swal2-toast.bad-toast--error {
+    border-left-color: var(--bs-danger);
+}
+
+body .swal2-toast.bad-toast--warning {
+    border-left-color: var(--bs-warning);
+}
+
+body .swal2-toast.bad-toast--info {
+    border-left-color: #3fc3ee;
+}
+
+/* Tiêu đề toast mặc định không xuống dòng; cho phép xuống dòng để thông báo dài
+   không kéo toast rộng quá màn hình điện thoại. */
+body .swal2-toast.bad-toast .swal2-title {
+    margin: .1rem .25rem .1rem 0;
+    padding: 0;
+    color: var(--bs-body-color);
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+}
+
+body .swal2-toast.bad-toast .swal2-html-container {
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    color: var(--bad-muted);
+    font-size: .85rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+body .swal2-toast.bad-toast .swal2-timer-progress-bar {
+    background: rgba(var(--bs-primary-rgb), .4);
+}
+
+body .swal2-toast.bad-toast--error .swal2-timer-progress-bar {
+    background: rgba(var(--bs-danger-rgb), .4);
+}
+
+body .swal2-toast.bad-toast--warning .swal2-timer-progress-bar {
+    background: rgba(var(--bs-warning-rgb), .55);
+}
+
+/* --- Toast "đã thêm vào giỏ": tên sản phẩm + phiên bản + lối tắt sang giỏ --- */
+body .swal2-toast.bad-toast--cart {
+    padding: .8rem .9rem .9rem;
+}
+
+.bad-toast-cart {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    text-align: left;
+}
+
+.bad-toast-cart__icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bad-primary-dark);
+    font-size: 1rem;
+}
+
+.bad-toast-cart__body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.bad-toast-cart__eyebrow {
+    margin: 0 0 .1rem;
+    color: var(--bad-primary-text);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.bad-toast-cart__product {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: var(--bs-body-color);
+    font-size: .86rem;
+    font-weight: 600;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.bad-toast-cart__meta {
+    margin: .15rem 0 0;
+    color: var(--bad-muted);
+    font-size: .76rem;
+    line-height: 1.35;
+}
+
+.bad-toast-cart__link {
+    align-self: center;
+    flex: 0 0 auto;
+    padding: .35rem .55rem;
+    border-radius: .5rem;
+    background: rgba(var(--bs-primary-rgb), .1);
+    color: var(--bad-primary-text);
+    font-size: .78rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.bad-toast-cart__link:hover {
+    background: rgba(var(--bs-primary-rgb), .18);
+    color: var(--bad-primary-dark);
+}
+
+.bad-toast-cart__link:focus-visible {
+    outline: 2px solid var(--bad-primary-text);
+    outline-offset: 2px;
+}
+
+/* --- Toast chào mừng sau đăng nhập: avatar chữ cái + lời chào ngắn ------------- */
+body .swal2-toast.bad-toast--login {
+    padding: .8rem .9rem .9rem;
+}
+
+.bad-toast-login {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    text-align: left;
+}
+
+.bad-toast-login__avatar {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bad-primary-dark), var(--bs-primary));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+/* Dấu tích nhỏ ở góc avatar: xác nhận trạng thái đăng nhập mà không cần thêm icon lớn. */
+.bad-toast-login__check {
+    position: absolute;
+    right: -.15rem;
+    bottom: -.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 50%;
+    background: var(--bad-surface);
+    box-shadow: 0 0 0 1px var(--bad-border);
+    color: var(--bad-primary-dark);
+    font-size: .62rem;
+}
+
+.bad-toast-login__body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.bad-toast-login__eyebrow {
+    margin: 0 0 .1rem;
+    color: var(--bad-primary-text);
+    font-size: .66rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.bad-toast-login__title {
+    margin: 0;
+    color: var(--bs-body-color);
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.bad-toast-login__title strong {
+    font-weight: 700;
+}
+
+.bad-toast-login__meta {
+    margin: .12rem 0 0;
+    color: var(--bad-muted);
+    font-size: .76rem;
+    line-height: 1.35;
+}
+
+/* Nút × đóng sớm mọi toast, không phải chờ hết thời gian tự ẩn. */
+body .swal2-toast.bad-toast .bad-toast__close {
+    align-self: center;
+    flex: 0 0 auto;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: 0 0 0 .25rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: none;
+    color: var(--bad-muted);
+    font-family: var(--bs-body-font-family);
+    font-size: 1.2rem;
+    line-height: 1;
+    opacity: .8;
+    transition: background-color var(--bad-transition), color var(--bad-transition), opacity var(--bad-transition);
+}
+
+body .swal2-toast.bad-toast .bad-toast__close:hover {
+    background: var(--bad-surface-muted);
+    color: var(--bs-body-color);
+    opacity: 1;
+}
+
+body .swal2-toast.bad-toast .bad-toast__close:focus-visible {
+    outline: 2px solid var(--bad-primary-text);
+    outline-offset: 1px;
+    box-shadow: none;
+    opacity: 1;
+}
+
+/* --- Hộp xác nhận: cùng bo góc/nền/chữ với thẻ của site -------------------- */
+body .swal2-popup.bad-confirm {
+    padding-bottom: 1rem;
+    border-radius: var(--bs-border-radius-lg);
+    background: var(--bad-surface);
+    color: var(--bs-body-color);
+    font-family: var(--bs-body-font-family);
+    box-shadow: var(--bad-card-shadow-hover);
+}
+
+body .swal2-popup.bad-confirm .swal2-title {
+    font-size: 1.2rem;
+}
+
+body .swal2-popup.bad-confirm .swal2-html-container {
+    color: var(--bad-muted);
+    font-size: .95rem;
+}
+
+body .bad-confirm .swal2-confirm,
+body .bad-confirm .swal2-cancel {
+    border-radius: .6rem;
+    font-weight: 600;
+}
+
+@media (max-width: 575.98px) {
+    body .swal2-toast.bad-toast {
+        padding: .7rem .75rem .8rem;
+    }
+
+    .bad-toast-cart {
+        gap: .5rem;
+    }
+
+    .bad-toast-login {
+        gap: .6rem;
+    }
+
+    .bad-toast-login__avatar {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: .76rem;
+    }
+}
+
+/* Người bật "giảm chuyển động": toast hiện/ẩn ngay, không rung lắc */
+@media (prefers-reduced-motion: reduce) {
+    body .swal2-toast.bad-toast {
+        animation: none !important;
+    }
+}
+
+/* =========================================================================
+   25. Tinh chỉnh UI/UX toàn hệ thống (2026-11)
+   Mục tiêu: giảm nhiễu thị giác, tăng độ rõ của hành động chính, làm hero và
+   thẻ sản phẩm có cá tính hơn, đồng thời giữ nguyên toàn bộ hành vi server-side.
+   Mọi màu/khoảng cách vẫn lấy từ token --bad-*/--bs-* ở mục 1.
+   ========================================================================= */
+
+/* --- 25.1 Nền tảng: chọn chữ, thanh cuộn, chữ phụ --- */
+::selection {
+    background: rgba(var(--bs-primary-rgb), .22);
+    color: var(--bs-body-color);
+}
+
+html {
+    color-scheme: light;
+}
+
+/* --bad-muted đã được đo đạt AA trên cả nền trang lẫn nền thẻ; dùng thống nhất
+   cho mọi chữ phụ thay vì để Bootstrap tự lấy --bs-secondary-color. */
+.text-muted {
+    color: var(--bad-muted) !important;
+}
+
+/* --- 25.2 Nút: phản hồi bấm rõ hơn, không nhảy layout --- */
+.btn {
+    /* Chỉ transition đúng các thuộc tính thay đổi; tránh "transition: all". */
+    transition: transform 160ms var(--bad-ease-out),
+                box-shadow 160ms var(--bad-ease-out),
+                background-color 160ms var(--bad-ease-out),
+                border-color 160ms var(--bad-ease-out),
+                color 160ms var(--bad-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .btn:not(.btn-link):not(:disabled):hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-primary:not(:disabled):hover,
+    .btn-accent:not(:disabled):hover,
+    .btn-success:not(:disabled):hover,
+    .btn-danger:not(:disabled):hover {
+        box-shadow: 0 8px 18px rgba(16, 24, 40, .16);
+    }
+}
+
+.btn:not(.btn-link):not(:disabled):active {
+    transform: translateY(0) scale(.98);
+}
+
+/* Nút tròn chỉ có icon: dùng cho thao tác phụ trên thẻ/ảnh */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 999px;
+}
+
+/* --- 25.3 Dải thông báo trên header --- */
+.topbar-bad {
+    background: var(--bad-primary-darker);
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    color: rgba(255, 255, 255, .82);
+    font-size: .78rem;
+    letter-spacing: .01em;
+}
+
+.topbar-bad .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.25rem;
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+}
+
+.topbar-bad a {
+    color: #e2e8f0;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.topbar-bad a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.topbar-bad .topbar-bad-note,
+.topbar-bad .topbar-bad-links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem .9rem;
+}
+
+.topbar-bad .topbar-bad-note .bi {
+    color: var(--bad-accent);
+}
+
+@media (max-width: 575.98px) {
+    .topbar-bad {
+        font-size: .72rem;
+    }
+
+    .topbar-bad .topbar-bad-links {
+        display: none;
+    }
+}
+
+/* --- 25.4 Header: mục đang mở + gợi ý phím tắt tìm kiếm --- */
+.navbar-bad .nav-link[aria-current="page"] {
+    color: var(--bad-primary-text);
+    background: rgba(var(--bs-primary-rgb), .10);
+    font-weight: 600;
+}
+
+.nav-search .form-control {
+    padding-right: 2.4rem;
+    transition: background-color var(--bad-transition), border-color var(--bad-transition),
+                box-shadow var(--bad-transition), max-width 220ms var(--bad-ease-out);
+}
+
+.nav-search .search-hint {
+    position: absolute;
+    top: 50%;
+    right: .65rem;
+    transform: translateY(-50%);
+    padding: .1rem .35rem;
+    border: 1px solid var(--bad-border);
+    border-radius: .35rem;
+    background: var(--bad-surface);
+    color: var(--bad-muted);
+    font-size: .7rem;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
+@media (max-width: 991.98px) {
+    .nav-search .search-hint {
+        display: none;
+    }
+}
+
+/* --- 25.5 Hero trang chủ: bố cục editorial + ảnh sản phẩm --- */
+.hero-slide {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 21rem;
+    align-items: center;
+    gap: 2rem;
+    min-height: 20rem;
+    padding: 3rem 2.5rem;
+    overflow: hidden;
+}
+
+.hero-slide-copy {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+}
+
+/* Ảnh hero chỉ hiện từ lg: bỏ cột 21rem để phần chữ không bị bóp ở tablet. */
+@media (max-width: 991.98px) {
+    .hero-slide {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 18rem;
+        padding: 2.25rem 2rem;
+    }
+}
+
+.hero-slide .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    width: fit-content;
+    margin-bottom: .85rem;
+    padding: .25rem .6rem;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+.hero-slide .hero-kicker .bi {
+    color: var(--bad-accent);
+}
+
+.hero-slide h1,
+.hero-slide h2 {
+    letter-spacing: -.025em;
+    text-wrap: balance;
+}
+
+.hero-slide .hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    margin: 1.1rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .82);
+}
+
+.hero-slide .hero-stats li {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .35rem;
+}
+
+.hero-slide .hero-stats strong {
+    color: #fff;
+    font-size: 1rem;
+}
+
+/* Ảnh vợt đặt trong khung trắng nghiêng nhẹ: tận dụng ảnh seed có nền sáng,
+   không cần cắt nền và vẫn tách khỏi nền xanh. */
+.hero-slide .hero-media {
+    position: relative;
+    z-index: 1;
+    display: none;
+    justify-self: end;
+    width: 100%;
+    max-width: 19rem;
+}
+
+.hero-slide .hero-media-frame {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    padding: .5rem;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 1.5rem;
+    background: #fff;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, .28);
+    transform: rotate(-5deg);
+    transition: transform 400ms var(--bad-ease-out);
+}
+
+.hero-slide .hero-media-frame img {
+    width: 100%;
+    height: 100%;
+    border-radius: 1.1rem;
+    object-fit: cover;
+}
+
+.hero-slide .hero-media-tag {
+    position: absolute;
+    right: -1rem;
+    bottom: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .4rem .7rem;
+    border-radius: 999px;
+    background: var(--bad-accent);
+    color: #1f2937;
+    font-size: .76rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .22);
+    transform: rotate(3deg);
+}
+
+.hero-swiper:hover .hero-media-frame {
+    transform: rotate(-2deg) translateY(-4px);
+}
+
+@media (min-width: 992px) {
+    .hero-slide .hero-media {
+        display: block;
+    }
+}
+
+/* Điều hướng banner: chấm bên trái, mũi tên bên phải, nút tạm dừng trên cùng */
+.hero-swiper .swiper-pagination {
+    left: 2.5rem;
+    width: fit-content;
+    max-width: calc(100% - 8rem);
+    text-align: left;
+}
+
+.hero-swiper .hero-pause {
+    top: .85rem;
+    right: .85rem;
+    bottom: auto;
+}
+
+.hero-swiper .hero-nav {
+    position: absolute;
+    right: .85rem;
+    bottom: .85rem;
+    z-index: 12;
+    display: none;
+    gap: .4rem;
+}
+
+@media (min-width: 768px) {
+    .hero-swiper .hero-nav {
+        display: flex;
+    }
+}
+
+.hero-swiper .hero-nav button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .55);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .12);
+    color: #fff;
+    transition: background-color var(--bad-transition), transform var(--bad-transition);
+}
+
+.hero-swiper .hero-nav button:hover {
+    background: rgba(255, 255, 255, .24);
+}
+
+.hero-swiper .hero-nav button.swiper-button-disabled {
+    opacity: .45;
+}
+
+.hero-swiper .hero-nav button:active {
+    transform: scale(.95);
+}
+
+.hero-swiper .hero-nav button:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .hero-slide {
+        display: block;
+        min-height: 15rem;
+        padding: 1.9rem 1.25rem 2.75rem;
+    }
+
+    .hero-swiper .swiper-pagination {
+        left: 1.25rem;
+    }
+
+    .hero-slide .hero-stats {
+        gap: .35rem 1rem;
+        font-size: .76rem;
+    }
+
+    .hero-slide .hero-stats li:nth-child(3) {
+        display: none;
+    }
+}
+
+/* --- 25.6 Thẻ sản phẩm: ảnh zoom nhẹ, nút so sánh gọn trên ảnh --- */
+.product-card {
+    border: 1px solid var(--bad-border);
+}
+
+.product-card .thumb {
+    overflow: hidden;
+}
+
+.product-card .thumb img {
+    transition: transform 400ms var(--bad-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover .thumb img {
+        transform: scale(1.045);
+    }
+}
+
+.product-card .card-compare {
+    position: absolute;
+    top: .6rem;
+    right: .6rem;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    border: 1px solid var(--bad-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: var(--bad-card-shadow);
+    color: var(--bad-primary-text);
+    transition: background-color var(--bad-transition), color var(--bad-transition),
+                border-color var(--bad-transition), transform var(--bad-transition);
+}
+
+.product-card .card-compare:hover,
+.product-card .card-compare:focus-visible {
+    border-color: var(--bad-primary-dark);
+    background: var(--bad-primary-dark);
+    color: #fff;
+}
+
+.product-card .card-compare:active {
+    transform: scale(.94);
+}
+
+.product-card .card-action .btn {
+    font-size: .86rem;
+}
+
+/* --- 25.7 Ô hãng / chọn nhanh: thêm dấu mũi tên chỉ hướng --- */
+.brand-tile {
+    position: relative;
+    padding-right: 2.6rem;
+}
+
+.brand-tile::after {
+    content: "→";
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    color: var(--bad-primary-text);
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: transform var(--bad-transition);
+}
+
+.brand-tile:hover::after,
+.brand-tile:focus-visible::after {
+    transform: translateX(3px);
+}
+
+.brand-tile-initial {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+}
+
+/* --- 25.8 Chi tiết sản phẩm: nhóm nút mua --- */
+.pdp-buy-actions {
+    display: grid;
+    gap: .6rem;
+    margin-top: .25rem;
+}
+
+@media (min-width: 576px) {
+    .pdp-buy-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.pdp-buy-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+}
+
+.pdp-buy-actions .btn-accent {
+    font-weight: 700;
+}
+
+/* --- 25.9 Khu quản trị: thanh hành động dính đáy form --- */
+/* Fixed thay vì sticky: thanh nằm cuối form nên sticky chỉ hiện khi đã cuộn hết form,
+   trong khi mục tiêu là luôn bấm được Lưu ở bất kỳ vị trí nào. */
+.form-actions {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1rem;
+    left: calc(16.6667% + 1.5rem);
+    z-index: 1035;
+    display: flex;
+    gap: .5rem;
+    padding: .75rem;
+    border: 1px solid var(--bad-border);
+    border-radius: var(--bs-border-radius-lg);
+    background: rgba(var(--bad-surface-rgb), .96);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 30px rgba(16, 24, 40, .18);
+}
+
+.form-actions .btn-primary {
+    flex: 1;
+}
+
+/* Chừa chỗ cuối trang để thanh Lưu không che nội dung/form cuối cùng.
+   !important để thắng utility .p-3 (padding: 1rem !important) của Bootstrap. */
+.admin-content:has(.form-actions) {
+    padding-bottom: 6.5rem !important;
+}
+
+/* Trang form đã có thanh Lưu cố định ở đáy: ẩn nút lên đầu trang để không đè nội dung */
+body:has(.form-actions) #backToTop {
+    display: none !important;
+}
+
+@media (max-width: 991.98px) {
+    .form-actions {
+        right: .75rem;
+        bottom: .75rem;
+        left: .75rem;
+        padding: .6rem;
+    }
+
+    .form-actions .btn {
+        padding-left: .85rem;
+        padding-right: .85rem;
+    }
+}
+
+@media print {
+    .form-actions {
+        display: none;
+    }
+}
+
+/* Cột thanh toán trong bảng đơn: nhãn ngắn + trạng thái, gọn trong 2 dòng như cột Khách */
+.payment-cell {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .25rem .4rem;
+}
+
+.payment-cell .payment-method {
+    color: var(--bad-muted);
+    font-size: .8rem;
+    white-space: nowrap;
+}
+
+/* --- 25.10 Đầu trang quản trị trên điện thoại --- */
+.admin-topbar .admin-topbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-weight: 600;
+    color: var(--bad-primary-text);
+}
+
+/* --- 25.11 Biểu đồ dashboard trên màn hình hẹp --- */
+@media (max-width: 767.98px) {
+    .chart-box {
+        height: 260px;
     }
 }

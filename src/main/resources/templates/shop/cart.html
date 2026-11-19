@@ -79,7 +79,9 @@
                             <td data-label="Sản phẩm">
                                 <div class="d-flex align-items-center gap-3">
                                     <img class="cart-thumb rounded border bg-white" th:src="${line.imageUrl}"
-                                         th:alt="|Ảnh ${line.productName}|" width="72" height="72" loading="lazy">
+                                         th:alt="|Ảnh ${line.productName}|"
+                                         th:attr="data-fallback=@{/images/no-image.svg}"
+                                         width="72" height="72" loading="lazy" decoding="async">
                                     <div>
                                         <a class="fw-semibold text-decoration-none"
                                            th:href="@{/san-pham/{id}(id=${line.productId})}"

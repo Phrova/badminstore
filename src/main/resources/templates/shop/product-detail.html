@@ -93,7 +93,9 @@
 
             <!-- ===== Khối mua hàng ===== -->
             <div class="col-md-6 col-lg-5">
-                <div class="card-soft buy-box p-3 p-lg-4" data-pdp-buy>
+                <div class="card-soft buy-box p-3 p-lg-4" data-pdp-buy
+                     th:with="initialVariant=${detail.defaultVariant},
+                              initialPrice=${detail.defaultVariant != null ? detail.defaultVariant.price : detail.minPrice}">
 
                     <div class="d-flex flex-wrap gap-2 mb-2">
                         <a class="badge badge-brand text-decoration-none"
@@ -104,13 +106,25 @@
                     </div>
 
                     <h1 class="h3 mb-1" th:text="${product.name}">Tên vợt</h1>
-                    <p class="small text-muted mb-3" th:text="|Mã sản phẩm: ${product.productCode}|">Mã sản phẩm</p>
+                    <p class="small text-muted mb-3">
+                        Mã sản phẩm: <span th:text="${product.productCode}">SP-001</span>
+                        <span th:if="${initialVariant != null}">
+                            · SKU <span data-pdp-sku th:text="${initialVariant.sku}">SKU</span>
+                        </span>
+                    </p>
 
-                    <!-- Giá: server render giá thấp nhất, JS đổi theo phiên bản đang chọn -->
+                    <!-- Giá: server render đúng biến thể mặc định, JavaScript đổi theo tổ hợp đang chọn -->
                     <div class="d-flex flex-wrap align-items-baseline gap-2">
                         <span class="price pdp-price" data-pdp-price
-                              th:insert="~{fragments/common :: money(${detail.minPrice})}">0 ₫</span>
-                        <span class="price-old d-none" data-pdp-old-price></span>
+                              th:text="${initialPrice != null}
+                                       ? |${#numbers.formatInteger(initialPrice, 0, 'POINT')} ₫|
+                                       : 'Liên hệ'">0 ₫</span>
+                        <span class="price-old"
+                              data-pdp-old-price
+                              th:classappend="${initialVariant == null or !initialVariant.discounted} ? 'd-none'"
+                              th:text="${initialVariant != null and initialVariant.discounted}
+                                       ? |${#numbers.formatInteger(initialVariant.originalPrice, 0, 'POINT')} ₫|
+                                       : ''">0 ₫</span>
                     </div>
                     <p class="small text-muted mb-3" th:if="${detail.priceRange}">
                         Giá thay đổi theo phiên bản:
@@ -126,49 +140,145 @@
                         <span class="badge badge-soft-secondary" th:unless="${detail.purchasable}">
                             <i class="bi bi-slash-circle" aria-hidden="true"></i> Tạm hết hàng
                         </span>
-                        <span class="small text-muted" th:text="|${variants.size()} phiên bản (màu · trọng lượng · cỡ cán)|">0 phiên bản</span>
+                        <span class="small text-muted"
+                              th:text="|${variants.size()} phiên bản (màu · trọng lượng · cỡ cán)|">0 phiên bản</span>
                     </div>
 
                     <!--
-                      Một form duy nhất cho khối mua hàng: chọn phiên bản bằng nút (radio btn-check) + số lượng.
-                      Số lượng tối đa lấy theo tồn kho của phiên bản đang chọn (JS đồng bộ), tồn kho thật vẫn do CartService kiểm tra lại.
+                      Một form duy nhất cho khối mua hàng.
+                      – variantId ẩn luôn trỏ tới một biến thể CÓ THẬT trong CSDL; JS chọn từ ma trận bên dưới.
+                      – Ba nhóm màu / trọng lượng / cỡ cán chỉ lọc trên ma trận đó, không tự ghép tổ hợp.
+                      – productId gửi kèm để server đối chiếu biến thể thuộc đúng sản phẩm đang xem.
+                      Số lượng tối đa lấy theo tồn kho của biến thể đang chọn (JS đồng bộ);
+                      tồn kho/giá thật vẫn do CartService kiểm tra lại khi thêm vào giỏ.
+                      Thêm vào giỏ là thao tác cộng dồn, sửa/xoá được ngay trong giỏ nên KHÔNG hỏi xác nhận;
+                      kết quả báo bằng toast gọn kèm nút "Xem giỏ" (main.js).
                     -->
-                    <form data-pdp-form id="addToCartForm" th:if="${!variants.isEmpty()}" th:action="@{/gio-hang/them}" method="post"
-                          data-confirm="Thêm phiên bản đang chọn vào giỏ hàng?">
+                    <form data-pdp-form id="addToCartForm" th:if="${!variants.isEmpty()}"
+                          th:action="@{/gio-hang/them}" method="post"
+                          th:attr="data-product-name=${product.name}">
                         <input type="hidden" name="back" th:value="|/san-pham/${product.id}|">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <!--
+                          Input ẩn chưa có name để trình duyệt tắt JS không gửi một biến thể mặc định
+                          có thể không đúng lựa chọn. Khi JS chạy, nó gắn name="variantId" ngay lập tức.
+                          Trình duyệt tắt JS dùng <select> dự phòng trong <noscript> bên dưới.
+                        -->
+                        <input type="hidden" data-pdp-variant-id th:value="${detail.defaultVariantId}">
 
-                        <fieldset class="mb-3">
-                            <legend class="form-label fw-semibold mb-2">Chọn phiên bản</legend>
-                            <div class="pdp-variants">
-                                <th:block th:each="variant : ${variants}">
-                                    <input type="radio" class="btn-check" name="variantId"
-                                           th:id="|variant-${variant.id}|" th:value="${variant.id}"
-                                           th:checked="${variant.id == detail.defaultVariantId}"
-                                           th:disabled="${!variant.inStock}"
-                                           th:attr="data-stock=${variant.stockQuantity},
-                                                    data-price=${variant.price},
-                                                    data-original-price=${variant.discounted ? variant.originalPrice : null},
-                                                    data-image=${variant.imageUrl},
-                                                    data-image-alt=${'Ảnh ' + product.name + ' – phiên bản màu ' + variant.color}">
-                                    <label class="btn variant-chip variant-option"
-                                           th:for="|variant-${variant.id}|"
-                                           th:classappend="${!variant.inStock} ? 'is-out' : ''">
-                                        <span class="variant-name" th:text="${variant.color}">Màu</span>
-                                        <span class="variant-meta">
-                                            <span th:text="|${variant.weightClass} · ${variant.gripSize}|">3U · G5</span>
-                                            <span th:if="${variant.inStock}"
-                                                  th:text="| · ${#numbers.formatInteger(variant.price, 0, 'POINT')} ₫|"> · 0 ₫</span>
-                                            <span th:unless="${variant.inStock}"> · Hết hàng</span>
-                                        </span>
-                                    </label>
-                                </th:block>
+                        <!-- Ma trận biến thể thật: JS chỉ đọc đúng những dòng này, không tự sinh tổ hợp. -->
+                        <div class="d-none" data-pdp-variant-data aria-hidden="true">
+                            <span th:each="variant : ${variants}"
+                                  data-pdp-variant
+                                  th:attr="data-variant-id=${variant.id},
+                                           data-sku=${variant.sku},
+                                           data-color=${variant.color},
+                                           data-weight=${variant.weightClass},
+                                           data-grip=${variant.gripSize},
+                                           data-price=${variant.price},
+                                           data-original-price=${variant.originalPrice},
+                                           data-stock=${variant.stockQuantity},
+                                           data-image=${!#strings.isEmpty(variant.imageUrl) ? variant.imageUrl : detail.getColorImage(variant.color())}"></span>
+                        </div>
+
+                        <noscript>
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                                Trình duyệt đang tắt JavaScript nên chưa thể lọc tổ hợp tự động.
+                                Hãy chọn đúng phiên bản trong danh sách:
+                                <select class="form-select mt-2" name="variantId" aria-label="Chọn phiên bản sản phẩm">
+                                    <option th:each="variant : ${variants}" th:value="${variant.id}"
+                                            th:text="|${variant.color} · ${variant.weightClass} · ${variant.gripSize} – ${variant.stockLabel}|"
+                                            th:disabled="${!variant.inStock}">Phiên bản</option>
+                                </select>
                             </div>
-                        </fieldset>
+                        </noscript>
+
+                        <div class="pdp-selectors" th:with="defaultVariant=${detail.defaultVariant}">
+
+                            <!-- A. Màu sắc: chỉ các màu có biến thể ACTIVE thật -->
+                            <fieldset class="pdp-selector" data-pdp-group="color">
+                                <legend class="pdp-selector-legend">
+                                    <span>Màu sắc</span>
+                                    <span class="pdp-selector-current" data-pdp-selected-color
+                                          th:text="${defaultVariant != null ? defaultVariant.color : ''}">Màu</span>
+                                </legend>
+                                <div class="pdp-color-list">
+                                    <th:block th:each="color, iter : ${detail.colors}">
+                                        <input type="radio" class="btn-check" name="pdpColor"
+                                               th:id="|pdp-color-${iter.index}|" th:value="${color}"
+                                               th:checked="${defaultVariant != null and defaultVariant.color == color}"
+                                               data-pdp-color>
+                                        <label class="pdp-color-chip" th:for="|pdp-color-${iter.index}|"
+                                               th:with="colorImage=${detail.getColorImage(color)}"
+                                               th:classappend="${detail.getColorStock(color) <= 0} ? 'is-out'">
+                                            <img th:if="${colorImage != null}" class="pdp-color-chip-img"
+                                                 th:src="${colorImage}" alt="" width="28" height="28" loading="lazy">
+                                            <span class="pdp-color-chip-name" th:text="${color}">Màu</span>
+                                        </label>
+                                    </th:block>
+                                </div>
+                                <p class="pdp-selector-hint">
+                                    Màu hết hàng được đánh dấu; bạn vẫn xem được giá và SKU của màu đó.
+                                </p>
+                            </fieldset>
+
+                            <!-- B. Trọng lượng: cập nhật theo màu đang chọn -->
+                            <fieldset class="pdp-selector" data-pdp-group="weight">
+                                <legend class="pdp-selector-legend">
+                                    <span>Trọng lượng</span>
+                                    <span class="pdp-selector-current" data-pdp-selected-weight
+                                          th:text="${defaultVariant != null ? defaultVariant.weightClass : ''}">4U</span>
+                                </legend>
+                                <div class="pdp-option-list" data-pdp-weight-options>
+                                    <th:block th:each="weight, iter : ${detail.weightClasses}">
+                                        <input type="radio" class="btn-check" name="pdpWeight"
+                                               th:id="|pdp-weight-${iter.index}|" th:value="${weight}"
+                                               th:checked="${defaultVariant != null and defaultVariant.weightClass == weight}"
+                                               data-pdp-weight>
+                                        <label class="pdp-option" th:for="|pdp-weight-${iter.index}|"
+                                               th:text="${weight}">4U</label>
+                                    </th:block>
+                                </div>
+                                <p class="pdp-selector-hint">Chỉ hiện các mức trọng lượng có thật cho màu đang chọn.</p>
+                            </fieldset>
+
+                            <!-- C. Cỡ cán: chỉ mở tổ hợp màu + trọng lượng đang có -->
+                            <fieldset class="pdp-selector" data-pdp-group="grip">
+                                <legend class="pdp-selector-legend">
+                                    <span>Cỡ cán</span>
+                                    <span class="pdp-selector-current" data-pdp-selected-grip
+                                          th:text="${defaultVariant != null ? defaultVariant.gripSize : ''}">G5</span>
+                                </legend>
+                                <div class="pdp-option-list" data-pdp-grip-options>
+                                    <th:block th:each="grip, iter : ${detail.gripSizes}">
+                                        <input type="radio" class="btn-check" name="pdpGrip"
+                                               th:id="|pdp-grip-${iter.index}|" th:value="${grip}"
+                                               th:checked="${defaultVariant != null and defaultVariant.gripSize == grip}"
+                                               data-pdp-grip>
+                                        <label class="pdp-option" th:for="|pdp-grip-${iter.index}|"
+                                               th:text="${grip}">G5</label>
+                                    </th:block>
+                                </div>
+                                <p class="pdp-selector-hint">Cỡ cán chỉ mở khi tổ hợp màu + trọng lượng tương ứng tồn tại.</p>
+                            </fieldset>
+
+                            <p class="pdp-selection-status" data-pdp-selection-status role="status" aria-live="polite"
+                               th:text="${defaultVariant != null
+                                        ? 'Đang chọn: ' + defaultVariant.label + ' · SKU ' + defaultVariant.sku
+                                        : 'Chưa có phiên bản nào được bán.'}">Đang chọn</p>
+                        </div>
+
+                        <!-- Cảnh báo khi tổ hợp đang chọn hết hàng hoặc không tồn tại (JS bật/tắt) -->
+                        <div class="alert alert-warning d-none py-2 px-3 mt-3 mb-0" data-pdp-unavailable role="status">
+                            <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                            <span data-pdp-unavailable-text>Phiên bản này tạm hết hàng.</span>
+                        </div>
 
                         <!-- Chỉ khách đã đăng nhập mới thêm được vào giỏ (server cũng chặn lại) -->
                         <th:block sec:authorize="isAuthenticated()">
                             <th:block th:if="${detail.purchasable}">
-                                <div class="mb-3">
+                                <div class="mb-3 mt-3" data-pdp-quantity-block>
                                     <label class="form-label fw-semibold" for="quantity">Số lượng</label>
                                     <div class="d-flex flex-wrap align-items-center gap-3">
                                         <div class="input-group js-quantity quantity-group">
@@ -177,8 +287,9 @@
                                                 <i class="bi bi-dash-lg" aria-hidden="true"></i>
                                             </button>
                                             <input type="number" class="form-control text-center" id="quantity" name="quantity"
-                                                   value="1" min="1" th:max="${detail.maxStock}" inputmode="numeric"
-                                                   aria-label="Số lượng sản phẩm">
+                                                   value="1" min="1"
+                                                   th:max="${initialVariant != null ? initialVariant.stockQuantity : 1}"
+                                                   inputmode="numeric" aria-label="Số lượng sản phẩm">
                                             <button class="btn btn-outline-secondary js-quantity-up" type="button"
                                                     aria-label="Tăng số lượng">
                                                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
@@ -186,18 +297,19 @@
                                         </div>
                                         <p class="mb-0 small">
                                             <i class="bi bi-box-seam" aria-hidden="true"></i>
-                                            <span class="pdp-stock-text" data-pdp-stock-text role="status" aria-live="polite">
-                                                <th:block th:each="variant : ${variants}"
-                                                          th:if="${variant.id == detail.defaultVariantId}"
-                                                          th:text="|Còn ${variant.stockQuantity} sản phẩm|">Còn 0 sản phẩm</th:block>
-                                            </span>
+                                            <span class="pdp-stock-text" data-pdp-stock-text role="status" aria-live="polite"
+                                                  th:text="${initialVariant != null ? initialVariant.stockLabel : 'Tạm hết hàng'}">Còn 0 sản phẩm</span>
                                         </p>
                                     </div>
                                 </div>
 
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="bi bi-cart-plus" aria-hidden="true"></i> Thêm vào giỏ hàng
+                                <div class="pdp-buy-actions">
+                                    <button type="submit" class="btn btn-primary btn-lg" data-pdp-add-to-cart>
+                                        <i class="bi bi-cart-plus" aria-hidden="true"></i> Thêm vào giỏ
+                                    </button>
+                                    <button type="submit" class="btn btn-accent btn-lg"
+                                            name="buyNow" value="true" data-pdp-add-to-cart>
+                                        <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Mua ngay
                                     </button>
                                 </div>
                             </th:block>
@@ -360,9 +472,11 @@
                             </thead>
                             <tbody>
                             <tr th:each="variant : ${variants}">
-                                <td>
+                                <td th:with="variantImage=${!#strings.isEmpty(variant.imageUrl)
+                                                              ? variant.imageUrl
+                                                              : detail.getColorImage(variant.color)}">
                                     <span class="fw-semibold" th:text="${variant.color}">Màu</span>
-                                    <img th:if="${variant.imageUrl != null}" th:src="${variant.imageUrl}"
+                                    <img th:if="${!#strings.isEmpty(variantImage)}" th:src="${variantImage}"
                                          th:alt="|Ảnh phiên bản ${variant.color} của ${product.name}|"
                                          class="variant-thumb ms-2 rounded border bg-white" loading="lazy">
                                 </td>
@@ -508,8 +622,10 @@
              th:if="${detail.purchasable and !variants.isEmpty()}"
              th:classappend="'d-flex'">
             <span class="price mb-0" data-pdp-price-sticky
-                  th:insert="~{fragments/common :: money(${detail.minPrice})}">0 ₫</span>
-            <button type="submit" class="btn btn-primary flex-grow-1" form="addToCartForm">
+                  th:text="${detail.defaultVariant != null
+                           ? #numbers.formatInteger(detail.defaultVariant.price, 0, 'POINT') + ' ₫'
+                           : 'Liên hệ'}">0 ₫</span>
+            <button type="submit" class="btn btn-primary flex-grow-1" form="addToCartForm" data-pdp-add-to-cart>
                 <i class="bi bi-cart-plus" aria-hidden="true"></i> Thêm vào giỏ
             </button>
         </div>

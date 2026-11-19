@@ -10,13 +10,13 @@
    TỰ ĐỨNG VỮNG: nhắc lại token và lớp dùng chung NGAY TRONG .pdp.
    Nhờ vậy trang chi tiết vẫn đúng nhận diện kể cả khi theme.css đổi tên file
    hoặc thiếu sót; khi theme.css có mặt thì giá trị trùng khớp nên giao diện
-   không đổi. (Bootstrap luôn có --bs-white/--bs-danger/--bs-border-color…)
+   không đổi. Riêng --bad-surface và --bad-muted kế thừa theme.css để nền thẻ
+   và chữ phụ đổi đồng bộ với toàn site. (Bootstrap luôn có --bs-danger/
+   --bs-border-color/--bs-warning…)
    ------------------------------------------------------------------------- */
 .pdp {
-    --bad-sale: var(--bs-danger, #e63946);
-    --bad-muted: var(--bs-secondary-color, #6b7280);
-    --bad-border: var(--bs-border-color, #e6e8ee);
-    --bad-surface: var(--bs-white, #fff);
+    --bad-sale: var(--bs-danger, #cf2431);
+    --bad-border: var(--bs-border-color, #dfe4ea);
     --bad-accent: var(--bs-warning, #ffb703);
     --bad-card-shadow: 0 1px 3px rgba(16, 24, 40, .08);
 }
@@ -218,50 +218,199 @@
 .pdp .pdp-stock-text.is-low { color: var(--bad-sale); }
 .pdp .pdp-stock-text.is-out { color: var(--bad-muted); }
 
-/* Nút chọn phiên bản: tự xếp 1 cột khi khối mua hàng hẹp, 2 cột khi đủ chỗ (≥180px/nút) */
-.pdp .pdp-variants {
+/* ---------- Bộ chọn biến thể: Màu sắc → Trọng lượng → Cỡ cán ---------- */
+.pdp .pdp-selectors {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: .25rem;
+}
+
+.pdp .pdp-selector {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.pdp .pdp-selector-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .25rem .75rem;
+    margin-bottom: .5rem;
+    color: var(--bs-body-color);
+    font-size: .875rem;
+    font-weight: 600;
+}
+
+.pdp .pdp-selector-current {
+    max-width: 100%;
+    color: var(--bad-muted);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.pdp .pdp-selector-hint {
+    margin: .4rem 0 0;
+    color: var(--bad-muted);
+    font-size: .78rem;
+    line-height: 1.4;
+}
+
+.pdp .pdp-color-list,
+.pdp .pdp-option-list {
+    display: flex;
+    flex-wrap: wrap;
     gap: .5rem;
 }
 
-/* Ô chọn phiên bản: dùng chung .variant-chip trong theme.css (viền, màu khi chọn,
-   trạng thái hết hàng) rồi mở rộng thành khối 2 dòng cho trang chi tiết sản phẩm. */
-.pdp .variant-option {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .1rem;
-    text-align: left;
+/* Nút màu: ảnh màu (nếu biến thể có ảnh) + tên màu thật trong CSDL */
+.pdp .pdp-color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    max-width: 100%;
+    padding: .4rem .75rem;
+    border: 1.5px solid var(--bad-border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--bs-body-color);
+    font-size: .875rem;
+    font-weight: 600;
     line-height: 1.25;
-    padding: .6rem .85rem;
-    border-radius: var(--bs-border-radius);
-    white-space: normal;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
 }
 
-.pdp .variant-option:hover {
+.pdp .pdp-color-chip:hover {
     border-color: var(--bs-primary);
     background: #f8fffb;
 }
 
-/* Radio ẩn nhận focus bàn phím -> hiện viền focus trên nhãn (Bootstrap không tự làm
-   vì nhãn không còn class btn-outline-*) */
-.pdp .btn-check:focus-visible + .variant-option {
+.pdp .pdp-color-chip-img {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    object-fit: contain;
+}
+
+.pdp .pdp-color-chip-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Nút trọng lượng / cỡ cán */
+.pdp .pdp-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.25rem;
+    padding: .5rem .9rem;
+    border: 1.5px solid var(--bad-border);
+    border-radius: .5rem;
+    background: #fff;
+    color: var(--bs-body-color);
+    font-size: .9rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+
+.pdp .pdp-option:hover {
+    border-color: var(--bs-primary);
+    background: #f8fffb;
+}
+
+/* Đang chọn: viền xanh + nền nhạt, đủ tương phản và không phụ thuộc màu duy nhất */
+.pdp .btn-check:checked + .pdp-color-chip,
+.pdp .btn-check:checked + .pdp-option {
+    border-color: var(--bs-primary);
+    background: #ecfdf5;
+    color: var(--bad-primary-text);
+    box-shadow: inset 0 0 0 1px var(--bs-primary);
+}
+
+.pdp .btn-check:focus-visible + .pdp-color-chip,
+.pdp .btn-check:focus-visible + .pdp-option {
     outline: 3px solid rgba(var(--bs-primary-rgb), .45);
     outline-offset: 2px;
 }
 
-.pdp .variant-option .variant-name { font-weight: 600; }
-/* Bỏ opacity .85: chữ mờ làm tương phản tụt còn 3.93:1 trên nền chip nhạt (trượt AA 4.5:1).
-   Màu --bad-primary-text nguyên bản đạt 5.2:1 nên chỉ cần giữ chữ đặc, không cần mờ thêm. */
-.pdp .variant-option .variant-meta { font-size: .8rem; font-weight: 500; }
-
-/* Hết hàng: mờ nhẹ + chữ "Hết hàng" thay vì gạch ngang cả khối 2 dòng */
-.pdp .variant-option.is-out,
-.pdp .btn-check:disabled + .variant-option {
-    opacity: .55;
-    text-decoration: none;
+/* Tổ hợp không tồn tại: gạch ngang + viền đứt, không cho chọn */
+.pdp .pdp-option.is-unavailable,
+.pdp .btn-check:disabled + .pdp-option {
+    border-style: dashed;
+    background: var(--bad-surface-muted);
+    opacity: .42;
+    text-decoration: line-through;
     cursor: not-allowed;
+}
+
+/* Tổ hợp có thật nhưng tạm hết hàng: vẫn chọn được để xem giá/SKU, nhưng báo rõ */
+.pdp .pdp-option.is-out,
+.pdp .pdp-color-chip.is-out {
+    opacity: .62;
+}
+
+.pdp .pdp-option.is-out {
+    border-color: var(--bs-warning-border-subtle, #ffe69c);
+    background: #fff8e1;
+}
+
+.pdp .pdp-option.is-out::after {
+    content: "Hết";
+    margin-left: .3rem;
+    color: var(--bad-sale);
+    font-size: .62rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+}
+
+.pdp .pdp-color-chip.is-out::after {
+    content: "Hết hàng";
+    color: var(--bad-sale);
+    font-size: .62rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Dòng trạng thái tổ hợp đang chọn – luôn đọc được bằng screen reader */
+.pdp .pdp-selection-status {
+    margin: 0;
+    padding: .55rem .75rem;
+    border-radius: .5rem;
+    background: var(--bad-surface-muted);
+    color: var(--bad-muted);
+    font-size: .85rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+/* Trên màn hình hẹp: chip gọn hơn nhưng vẫn đủ vùng bấm 44px */
+@media (max-width: 575.98px) {
+    .pdp .pdp-selectors {
+        gap: .85rem;
+    }
+
+    .pdp .pdp-color-chip {
+        padding: .45rem .65rem;
+    }
+
+    .pdp .pdp-option {
+        min-width: 3rem;
+        min-height: 2.75rem;
+        padding: .5rem .8rem;
+    }
+
+    .pdp .pdp-color-chip-img {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 .pdp .quantity-group { width: 9.5rem; }

@@ -12,9 +12,14 @@
 
     <div class="page-head">
         <h1 class="page-title"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Tổng quan bán hàng</h1>
-        <a class="btn btn-sm btn-primary" th:href="@{/admin/don-hang(status='PENDING')}">
-            <i class="bi bi-inbox" aria-hidden="true"></i> Xử lý đơn chờ xác nhận
-        </a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-sm btn-outline-success" th:href="@{/admin/bao-cao/tong-quan}">
+                <i class="bi bi-file-earmark-excel" aria-hidden="true"></i> Xuất Excel
+            </a>
+            <a class="btn btn-sm btn-primary" th:href="@{/admin/don-hang(status='PENDING')}">
+                <i class="bi bi-inbox" aria-hidden="true"></i> Xử lý đơn chờ xác nhận
+            </a>
+        </div>
     </div>
 
     <!-- ===== Thẻ số liệu ===== -->
@@ -230,6 +235,8 @@
         const primaryRgb = cssVar('--bs-primary-rgb', '15, 138, 95');
         const accentColor = cssVar('--bad-accent', '#ffb703');
         const statusColors = [1, 2, 3, 4, 5, 6].map((index) => cssVar('--bad-chart-' + index, '#0f8a5f'));
+        // Trên điện thoại: giảm số nhãn trục để chữ không chồng lên nhau (Chart.js tự bỏ bớt nhãn).
+        const compactChart = window.matchMedia && window.matchMedia('(max-width: 767.98px)').matches;
 
         /** Chart.js có thể không tải được (mất mạng / CDN bị chặn).
             Khi đó ẩn canvas trống và hiện ghi chú; số liệu vẫn còn trong 2 bảng .visually-hidden phía trên. */
@@ -274,16 +281,27 @@
                     maintainAspectRatio: false,
                     interaction: { mode: 'index', intersect: false },
                     scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: compactChart ? 5 : 8
+                            },
+                            grid: { display: false }
+                        },
                         y: {
                             beginAtZero: true,
                             position: 'left',
-                            ticks: { callback: (value) => Number(value).toLocaleString('vi-VN') + ' ₫' }
+                            ticks: {
+                                maxTicksLimit: compactChart ? 4 : 6,
+                                callback: (value) => Number(value).toLocaleString('vi-VN') + ' ₫'
+                            }
                         },
                         y1: {
                             beginAtZero: true,
                             position: 'right',
                             grid: { drawOnChartArea: false },
-                            ticks: { precision: 0 }
+                            ticks: { precision: 0, maxTicksLimit: compactChart ? 4 : 6 }
                         }
                     }
                 }

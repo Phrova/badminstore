@@ -12,8 +12,12 @@
 
     <div class="page-head">
         <h1 class="page-title"><i class="bi bi-receipt" aria-hidden="true"></i> Quản lý đơn hàng</h1>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-2">
             <span class="text-muted small" th:text="|Tổng ${orders.totalElements} đơn phù hợp|">Tổng 0 đơn</span>
+            <a class="btn btn-sm btn-outline-success"
+               th:href="@{/admin/don-hang/xuat-excel(status=${statusFilter ?: ''}, keyword=${keyword ?: ''})}">
+                <i class="bi bi-file-earmark-excel" aria-hidden="true"></i> Xuất Excel
+            </a>
             <a class="btn btn-sm btn-primary" th:href="@{/admin/don-hang/tao-don}">
                 <i class="bi bi-plus-square" aria-hidden="true"></i> Tạo đơn thủ công
             </a>
@@ -80,10 +84,13 @@
                               th:text="${row.orderStatus.label}">Trạng thái</span>
                     </td>
                     <td>
-                        <div class="small" th:text="${row.paymentMethodLabel}">COD</div>
-                        <span class="status-pill"
-                              th:classappend="${row.paymentStatus != null} ? |status-${row.paymentStatus.name()}| : 'status-INACTIVE'"
-                              th:text="${row.paymentStatusLabel}">Chờ</span>
+                        <div class="payment-cell">
+                            <span class="payment-method" th:text="${row.paymentMethodShortLabel}"
+                                  th:title="${row.paymentMethodLabel}">COD</span>
+                            <span class="status-pill"
+                                  th:classappend="${row.paymentStatus != null} ? |status-${row.paymentStatus.name()}| : 'status-INACTIVE'"
+                                  th:text="${row.paymentStatusLabel}">Chờ</span>
+                        </div>
                     </td>
                     <td class="text-end">
                         <div class="d-flex justify-content-end gap-1">

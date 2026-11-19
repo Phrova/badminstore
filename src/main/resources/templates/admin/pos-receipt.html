@@ -31,6 +31,30 @@
         – tiền thừa trả khách <strong th:insert="~{fragments/common :: money(${changeAmount})}">0 ₫</strong>.
     </div>
 
+    <!-- Chuyển khoản chưa xác nhận: quầy xác nhận ngay trên phiếu, không phải sang trang đơn hàng -->
+    <div class="alert alert-warning d-print-none" role="alert"
+         th:if="${detail.paymentStatus != null and detail.paymentStatus.name() == 'PENDING'
+                 and !detail.order.orderStatus.final}">
+        <div class="d-flex gap-2">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+            <div>
+                <strong>Hoá đơn chưa được xác nhận thanh toán.</strong>
+                Kiểm tra tài khoản ngân hàng rồi xác nhận để hoá đơn được ghi nhận đã thu tiền.
+            </div>
+        </div>
+        <form th:action="@{'/admin/ban-hang/phieu/' + ${detail.order.id} + '/xac-nhan-thanh-toan'}"
+              method="post" class="mt-2" data-confirm="Xác nhận đã nhận được tiền của hoá đơn này?">
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <label class="visually-hidden" for="receiptTransactionCode">Mã giao dịch</label>
+                <input class="form-control" id="receiptTransactionCode" name="transactionCode" maxlength="50"
+                       placeholder="Mã giao dịch (nếu có), ví dụ FT26101612345">
+                <button class="btn btn-success flex-shrink-0" type="submit">
+                    <i class="bi bi-cash-coin" aria-hidden="true"></i> Xác nhận đã nhận tiền
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- Phiếu in: khổ hẹp như hoá đơn máy in nhiệt, chỉ gồm nội dung cần cho khách -->
     <div class="pos-receipt card-soft">
         <div class="card-body">
@@ -129,19 +153,15 @@
                     <td>Thanh toán:</td>
                     <td class="text-end">
                         <span th:text="${detail.paymentMethodLabel}">Tiền mặt tại quầy</span>
-                        <span class="status-pill status-PAID ms-1" th:if="${detail.paymentStatusLabel == 'Đã thanh toán'}">
-                            Đã thu tiền
-                        </span>
-                        <span class="status-pill status-PENDING ms-1" th:unless="${detail.paymentStatusLabel == 'Đã thanh toán'}"
-                              th:text="${detail.paymentStatusLabel}">Chờ thanh toán</span>
+                        <span class="status-pill ms-1"
+                              th:classappend="${detail.paymentStatus != null} ? |status-${detail.paymentStatus.name()}| : 'status-INACTIVE'"
+                              th:text="${detail.paymentStatus != null and detail.paymentStatus.name() == 'PAID'
+                                        ? 'Đã thu tiền' : detail.paymentStatusLabel}">Đã thu tiền</span>
                     </td>
                 </tr>
                 </tbody>
             </table>
 
-            <p class="small mb-1" th:if="${detail.order.note != null}">
-                <span class="fw-semibold">Ghi chú:</span> <span th:text="${detail.order.note}">Ghi chú</span>
-            </p>
             <p class="small mb-1">
                 <span class="fw-semibold">Hình thức nhận hàng:</span>
                 <span th:text="${detail.order.shippingAddress}">Khách nhận tại quầy</span>

@@ -24,66 +24,136 @@
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
                     <div class="hero-slide">
-                        <span class="badge text-bg-light text-dark align-self-start mb-2">Vợt chính hãng 100%</span>
-                        <h1 class="h3 fw-bold mb-2">Vợt cầu lông cho mọi lối chơi</h1>
-                        <p class="mb-0">
-                            Yonex · Li-Ning · Victor · Mizuno · Kumpoo · Apacs –
-                            <span th:text="|${totalProducts} mẫu vợt đang bán|">20 mẫu vợt đang bán</span>,
-                            bảo hành theo hãng và giao hàng toàn quốc.
-                        </p>
-                        <div class="hero-actions">
-                            <a class="btn btn-light" th:href="@{/san-pham}">
-                                <i class="bi bi-grid" aria-hidden="true"></i> Xem danh mục vợt
-                            </a>
-                            <a class="btn btn-outline-light" th:href="@{/so-sanh}">
-                                <i class="bi bi-bar-chart-steps" aria-hidden="true"></i> So sánh sản phẩm
-                            </a>
+                        <div class="hero-slide-copy">
+                            <span class="hero-kicker">
+                                <i class="bi bi-patch-check-fill" aria-hidden="true"></i> Vợt chính hãng 100%
+                            </span>
+                            <h1 class="h3 fw-bold mb-2">Vợt cầu lông cho mọi lối chơi</h1>
+                            <p class="mb-0">
+                                Yonex · Li-Ning · Victor · Mizuno · Kumpoo · Apacs –
+                                <span th:text="|${totalProducts} mẫu vợt đang bán|">20 mẫu vợt đang bán</span>,
+                                bảo hành theo hãng và giao hàng toàn quốc.
+                            </p>
+                            <ul class="hero-stats" aria-label="Thông tin nhanh">
+                                <li><strong>6</strong> thương hiệu</li>
+                                <li><strong th:text="${totalProducts}">20</strong> mẫu vợt</li>
+                                <li><strong>Toàn quốc</strong> giao hàng</li>
+                            </ul>
+                            <div class="hero-actions">
+                                <a class="btn btn-light" th:href="@{/san-pham}">
+                                    <i class="bi bi-grid" aria-hidden="true"></i> Xem danh mục vợt
+                                </a>
+                                <a class="btn btn-outline-light" th:href="@{/so-sanh}">
+                                    <i class="bi bi-bar-chart-steps" aria-hidden="true"></i> So sánh sản phẩm
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hero-media" aria-hidden="true">
+                            <div class="hero-media-frame">
+                                <img th:src="@{/images/rackets/yx-ax100zz-1.svg}" alt="" width="600" height="600">
+                                <span class="hero-media-tag">
+                                    <i class="bi bi-stars" aria-hidden="true"></i> Bán chạy nhất
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="swiper-slide">
                     <div class="hero-slide">
-                        <span class="badge text-bg-light text-dark align-self-start mb-2">Tư vấn miễn phí</span>
-                        <h2 class="h3 fw-bold mb-2">Tư vấn theo lối chơi</h2>
-                        <p class="mb-0">Tấn công, phòng thủ hay toàn diện? Xem thông số kỹ thuật và so sánh trực tiếp giữa các mẫu vợt.</p>
-                        <div class="hero-actions">
-                            <a class="btn btn-light" th:href="@{/san-pham}">
-                                <i class="bi bi-search" aria-hidden="true"></i> Tìm vợt phù hợp
-                            </a>
-                            <a class="btn btn-outline-light" href="#chon-nhanh">
-                                <i class="bi bi-lightning-charge" aria-hidden="true"></i> Chọn theo lối chơi
-                            </a>
+                        <div class="hero-slide-copy">
+                            <span class="hero-kicker">
+                                <i class="bi bi-lightbulb" aria-hidden="true"></i> Tư vấn miễn phí
+                            </span>
+                            <h2 class="h3 fw-bold mb-2">Tư vấn theo lối chơi</h2>
+                            <p class="mb-0">Tấn công, phòng thủ hay toàn diện? Xem thông số kỹ thuật và so sánh trực tiếp giữa các mẫu vợt.</p>
+                            <ul class="hero-stats" aria-label="Lối chơi phổ biến">
+                                <li><strong>Tấn công</strong> smash mạnh</li>
+                                <li><strong>Phòng thủ</strong> bền bỉ</li>
+                                <li><strong>Toàn diện</strong> dễ chơi</li>
+                            </ul>
+                            <div class="hero-actions">
+                                <a class="btn btn-light" th:href="@{/san-pham}">
+                                    <i class="bi bi-search" aria-hidden="true"></i> Tìm vợt phù hợp
+                                </a>
+                                <a class="btn btn-outline-light" href="#chon-nhanh">
+                                    <i class="bi bi-lightning-charge" aria-hidden="true"></i> Chọn theo lối chơi
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hero-media" aria-hidden="true">
+                            <div class="hero-media-frame">
+                                <img th:src="@{/images/rackets/vc-tkryuga2-1.svg}" alt="" width="600" height="600">
+                                <span class="hero-media-tag">
+                                    <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i> Lối chơi tấn công
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="swiper-slide">
                     <div class="hero-slide">
-                        <span class="badge text-bg-light text-dark align-self-start mb-2">Đổi trả minh bạch</span>
-                        <h2 class="h3 fw-bold mb-2">Mua an tâm, đổi trả 100%</h2>
-                        <p class="mb-0">
-                            Đơn đã giao có thể yêu cầu hoàn trả 100% giá trị ngay trên trang đơn hàng của bạn.
-                            Phí giao hàng 30.000 ₫, miễn phí cho đơn từ 5.000.000 ₫.
-                        </p>
-                        <div class="hero-actions">
-                            <a class="btn btn-light" th:href="@{/san-pham}">
-                                <i class="bi bi-grid" aria-hidden="true"></i> Chọn vợt ngay
-                            </a>
-                            <a class="btn btn-outline-light" th:href="@{/gio-hang}">
-                                <i class="bi bi-cart3" aria-hidden="true"></i> Giỏ hàng của bạn
-                            </a>
+                        <div class="hero-slide-copy">
+                            <span class="hero-kicker">
+                                <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Đổi trả minh bạch
+                            </span>
+                            <h2 class="h3 fw-bold mb-2">Mua an tâm, đổi trả 100%</h2>
+                            <p class="mb-0">
+                                Đơn đã giao có thể yêu cầu hoàn trả 100% giá trị ngay trên trang đơn hàng của bạn.
+                                Phí giao hàng 30.000 ₫, miễn phí cho đơn từ 5.000.000 ₫.
+                            </p>
+                            <ul class="hero-stats" aria-label="Chính sách giao nhận">
+                                <li><strong>30.000 ₫</strong> phí giao</li>
+                                <li><strong>0 ₫</strong> đơn từ 5 triệu</li>
+                                <li><strong>100%</strong> hoàn trả</li>
+                            </ul>
+                            <div class="hero-actions">
+                                <a class="btn btn-light" th:href="@{/san-pham}">
+                                    <i class="bi bi-grid" aria-hidden="true"></i> Chọn vợt ngay
+                                </a>
+                                <a class="btn btn-outline-light" th:href="@{/gio-hang}">
+                                    <i class="bi bi-cart3" aria-hidden="true"></i> Giỏ hàng của bạn
+                                </a>
+                            </div>
+                        </div>
+                        <div class="hero-media" aria-hidden="true">
+                            <div class="hero-media-frame">
+                                <img th:src="@{/images/rackets/ln-axf100-1.svg}" alt="" width="600" height="600">
+                                <span class="hero-media-tag">
+                                    <i class="bi bi-shield-check" aria-hidden="true"></i> Đổi trả 100%
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Tạm dừng tự chuyển banner: main.js chỉ bỏ `hidden` khi autoplay thực sự chạy.
+                 aria-pressed phản ánh trạng thái đang tạm dừng. -->
+            <button type="button" class="hero-pause" data-hero-autoplay-toggle hidden
+                    aria-label="Tạm dừng tự chuyển banner" aria-pressed="false">
+                <i class="bi bi-pause-fill" aria-hidden="true"></i>
+            </button>
+
+            <!-- Điều hướng banner: mũi tên trước/sau (Swiper gắn sự kiện trong main.js) -->
+            <div class="hero-nav">
+                <button type="button" class="hero-nav-prev" aria-label="Banner trước">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="hero-nav-next" aria-label="Banner sau">
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+            </div>
+
             <div class="swiper-pagination"></div>
         </div>
 
-        <!-- ===== 2. Dải lợi ích: 3 cam kết chính, khách nắm trong 5 giây đầu ===== -->
-        <ul class="benefit-strip list-unstyled" aria-label="Cam kết của BadStore">
-            <li data-aos="fade-up">
+        <!-- ===== 2. Dải lợi ích: 3 cam kết chính, khách nắm trong 5 giây đầu =====
+             AOS gắn ở cả danh sách (UI_GUIDE mục 5): 3 phần tử ẩn riêng lẻ vẫn tốn
+             công quan sát hơn cần thiết và lệch nhịp với hiệu ứng của khối bên trên. -->
+        <ul class="benefit-strip list-unstyled" aria-label="Cam kết của BadStore" data-aos="fade-up">
+            <li>
                 <span class="stat-icon bg-primary-subtle text-primary">
                     <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
                 </span>
@@ -92,7 +162,7 @@
                     <div class="small text-muted">Bảo hành theo hãng, mã sản phẩm ghi rõ trên từng cây vợt.</div>
                 </div>
             </li>
-            <li data-aos="fade-up" data-aos-delay="100">
+            <li>
                 <span class="stat-icon bg-info-subtle text-info">
                     <i class="bi bi-truck" aria-hidden="true"></i>
                 </span>
@@ -101,7 +171,7 @@
                     <div class="small text-muted">Phí 30.000 ₫, miễn phí cho đơn từ 5.000.000 ₫.</div>
                 </div>
             </li>
-            <li data-aos="fade-up" data-aos-delay="200">
+            <li>
                 <span class="stat-icon bg-warning-subtle text-warning">
                     <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
                 </span>
@@ -129,7 +199,7 @@
               AOS gắn ở cả hàng thay vì từng thẻ: 8 thẻ cùng một hiệu ứng sẽ tạo
               nhiều phần tử ẩn phải quan sát, dễ giật khi cuộn trên máy yếu.
             -->
-            <div class="row g-3 g-lg-4" th:if="${!featuredProducts.isEmpty()}" data-aos="fade-up">
+            <div class="row g-3 g-lg-4 catalog-grid" th:if="${!featuredProducts.isEmpty()}" data-aos="fade-up">
                 <div class="col-6 col-md-4 col-lg-3" th:each="card : ${featuredProducts}">
                     <div th:replace="~{fragments/product-card :: card(${card})}"></div>
                 </div>

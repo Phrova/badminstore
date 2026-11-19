@@ -87,7 +87,7 @@
             <!-- ===== Cột trái: hàng hoá + tiền + lịch sử ===== -->
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold">
+                    <div class="card-header fw-semibold">
                         <i class="bi bi-box-seam" aria-hidden="true"></i> Sản phẩm trong đơn
                     </div>
                     <div class="table-responsive">
@@ -106,7 +106,9 @@
                                     <div class="d-flex align-items-center gap-3">
                                         <img class="order-thumb rounded border bg-white"
                                              th:src="${item.imageUrl != null} ? ${item.imageUrl} : '/images/no-image.svg'"
-                                             th:alt="|Ảnh ${item.productName}|" width="56" height="56" loading="lazy">
+                                             th:alt="|Ảnh ${item.productName}|"
+                                             th:attr="data-fallback=@{/images/no-image.svg}"
+                                             width="56" height="56" loading="lazy" decoding="async">
                                         <div>
                                             <a class="fw-semibold text-decoration-none"
                                                th:href="@{/san-pham/{id}(id=${item.productVariant.product.id})}"
@@ -128,7 +130,7 @@
                 </div>
 
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold"><i class="bi bi-cash-coin" aria-hidden="true"></i> Thanh toán</div>
+                    <div class="card-header fw-semibold"><i class="bi bi-cash-coin" aria-hidden="true"></i> Thanh toán</div>
                     <div class="card-body">
                         <dl class="row mb-0">
                             <dt class="col-7 fw-normal text-muted">Tạm tính</dt>
@@ -156,7 +158,7 @@
                 </div>
 
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white fw-semibold">
+                    <div class="card-header fw-semibold">
                         <i class="bi bi-clock-history" aria-hidden="true"></i> Lịch sử trạng thái
                     </div>
                     <div class="card-body">
@@ -197,7 +199,7 @@
             <!-- ===== Cột phải: giao hàng + thanh toán + thao tác ===== -->
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold"><i class="bi bi-truck" aria-hidden="true"></i> Giao hàng</div>
+                    <div class="card-header fw-semibold"><i class="bi bi-truck" aria-hidden="true"></i> Giao hàng</div>
                     <div class="card-body">
                         <div class="fw-semibold" th:text="${detail.order.receiverName}">Người nhận</div>
                         <div class="text-muted">
@@ -220,7 +222,7 @@
                 </div>
 
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold"><i class="bi bi-credit-card" aria-hidden="true"></i> Thanh toán</div>
+                    <div class="card-header fw-semibold"><i class="bi bi-credit-card" aria-hidden="true"></i> Thanh toán</div>
                     <div class="card-body">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                             <span th:text="${detail.paymentMethodLabel}">Phương thức</span>
@@ -243,7 +245,7 @@
                 <!-- Thao tác của khách: huỷ đơn / yêu cầu hoàn trả (đều phải nhập lý do + xác nhận) -->
                 <div class="card border-0 shadow-sm mb-3"
                      th:if="${detail.cancellableByCustomer or detail.returnableByCustomer}">
-                    <div class="card-header bg-white fw-semibold"><i class="bi bi-tools" aria-hidden="true"></i> Thao tác đơn hàng</div>
+                    <div class="card-header fw-semibold"><i class="bi bi-tools" aria-hidden="true"></i> Thao tác đơn hàng</div>
                     <div class="card-body">
                         <form th:if="${detail.cancellableByCustomer}" th:action="@{/don-hang/{id}/huy(id=${detail.order.id})}"
                               method="post" data-confirm="Bạn chắc chắn muốn huỷ đơn hàng này?">

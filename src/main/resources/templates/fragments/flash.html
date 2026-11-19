@@ -3,13 +3,16 @@
 <body>
 
 <!--
-  Flash message (gắn bằng RedirectAttributes theo Post-Redirect-Get) hiển thị dưới dạng alert
-  và được js/main.js đọc thêm để bật toast SweetAlert2 ở góc phải trên.
-  Ba loại: thành công – lỗi – thông tin (info dùng cho ghi chú không phải lỗi).
+  Flash message (gắn bằng RedirectAttributes theo Post-Redirect-Get):
+  – lỗi/thông tin: giữ alert trong trang để khách đọc lại khi cần;
+  – thành công: main.js hiện toast gọn. Riêng thêm giỏ và đăng nhập đánh dấu
+    data-flash-toast-only để main.js bỏ alert trùng, tránh vừa toast vừa alert.
+  Không có JavaScript/SweetAlert2 thì alert vẫn hiển thị bình thường.
 -->
 <div th:fragment="flash" aria-live="polite">
     <div class="alert alert-success alert-dismissible d-flex align-items-start gap-2 shadow-sm"
-         role="alert" th:if="${successMessage}">
+         role="alert" th:if="${successMessage}"
+         th:attr="data-flash-toast-only=${(cartAddedProduct != null or loginSuccess != null) ? 'true' : null}">
         <i class="bi bi-check-circle-fill fs-5" aria-hidden="true"></i>
         <div class="flex-grow-1" th:text="${successMessage}">Thao tác thành công.</div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng thông báo"></button>
@@ -29,9 +32,21 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng thông báo"></button>
     </div>
 
-    <!-- Dữ liệu cho SweetAlert2 – main.js đọc rồi bật toast sau khi redirect -->
+    <!--
+      Dữ liệu cho SweetAlert2 – main.js đọc rồi bật toast sau khi redirect.
+      data-cart-* giúp toast "đã thêm vào giỏ" có tên, phiên bản, số lượng và nút sang giỏ.
+      data-login-* giúp toast đăng nhập có avatar chữ cái và lời chào theo vai trò.
+    -->
     <div id="flash-notifications" class="d-none"
-         th:attr="data-success=${successMessage}, data-error=${errorMessage}, data-info=${infoMessage}"></div>
+         th:attr="data-success=${successMessage},
+                  data-error=${errorMessage},
+                  data-info=${infoMessage},
+                  data-cart-name=${cartAddedProduct},
+                  data-cart-variant=${cartAddedVariant},
+                  data-cart-quantity=${cartAddedQuantity},
+                  data-login-name=${loginSuccessName},
+                  data-login-admin=${loginSuccessAdmin},
+                  data-cart-url=@{/gio-hang}"></div>
 </div>
 
 </body>

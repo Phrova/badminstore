@@ -68,6 +68,7 @@
                         <div class="form-text" id="posSearchHelp">
                             Máy quét mã vạch: quét SKU rồi Enter là sản phẩm vào hoá đơn ngay.
                             Chỉ hiện sản phẩm/biến thể đang bán, kèm tồn kho thực tế.
+                            Nhấn <kbd>F2</kbd> để quay lại ô tìm khi đang thao tác ở cột hoá đơn.
                         </div>
                     </div>
                     <div class="card-body pt-0">
@@ -199,7 +200,7 @@
                             <div class="text-center" data-pos-qr-box>
                                 <p class="small text-muted mb-2" data-pos-qr-message>Hãy thêm sản phẩm để tạo mã QR chuyển khoản.</p>
                                 <div data-pos-qr-content hidden>
-                                    <img class="img-fluid border rounded bg-white p-2" style="max-width: 230px" alt="Mã QR chuyển khoản"
+                                    <img class="img-fluid border rounded bg-white p-2 pos-qr-image" alt="Mã QR chuyển khoản"
                                          data-pos-qr-img referrerpolicy="no-referrer">
                                     <div class="small mt-1">Số tiền: <strong class="text-danger" data-pos-qr-amount>0 ₫</strong>
                                         · Nội dung: <strong data-pos-qr-code>—</strong></div>
@@ -209,13 +210,13 @@
                                     </button>
                                 </div>
                             </div>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" th:field="*{transferConfirmed}"
-                                   id="posTransferConfirmed">
-                            <label class="form-check-label" for="posTransferConfirmed">
-                                Đã nhận được tiền chuyển khoản (đánh dấu hoá đơn đã thanh toán)
-                            </label>
-                        </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" th:field="*{transferConfirmed}"
+                                       id="posTransferConfirmed">
+                                <label class="form-check-label" for="posTransferConfirmed">
+                                    Đã nhận được tiền chuyển khoản (đánh dấu hoá đơn đã thanh toán)
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer">

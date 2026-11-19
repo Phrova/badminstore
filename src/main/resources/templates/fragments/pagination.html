@@ -22,38 +22,93 @@
             url='/admin/san-pham', ariaLabel='Phân trang sản phẩm', itemLabel='sản phẩm',
             query=|keyword=${#uris.escapeQueryParam(keyword ?: '')}&status=${statusFilter ?: ''}|)}"></div>
 
-  Kiểu dáng (viên thuốc, màu xanh thương hiệu) nằm ở .catalog-pager trong static/css/theme.css.
+  Hành vi:
+    – Luôn có "Trước/Sau"; ở trang đầu/cuối hai nút này là <span> (không href) nên bàn phím
+      không Tab vào được, tránh trường hợp Enter vẫn điều hướng tới page=0 hoặc page=vượt-quá.
+    – Cửa sổ 5 số quanh trang hiện tại do Controller tính; nếu cửa sổ không chạm trang 1 / trang cuối
+      thì chèn thêm trang đầu/cuối + dấu "…" để người dùng nhảy xa được mà không phải bấm nhiều lần.
+    – Dưới 576px ẩn trang đầu/cuối và dấu "…" (đã có Trước/Sau) để thanh không bị tràn ngang.
+
+  Kiểu dáng (thanh viên thuốc, nút tròn 44px, màu xanh thương hiệu) nằm ở .catalog-pager
+  trong static/css/theme.css.
 -->
 <nav th:fragment="pager(page, pageNumbers, url, query, ariaLabel, itemLabel)"
      th:if="${page.totalPages > 1}"
      class="catalog-pager mt-4"
      th:aria-label="${ariaLabel}"
-     th:with="qs=${#strings.isEmpty(query) ? '?' : '?' + query + '&'}">
-    <ul class="pagination justify-content-center flex-wrap gap-1 mb-2">
+     th:with="qs=${#strings.isEmpty(query) ? '?' : '?' + query + '&'},
+              lastIndex=${page.totalPages - 1},
+              firstShown=${#lists.isEmpty(pageNumbers) ? 0 : pageNumbers[0]},
+              lastShown=${#lists.isEmpty(pageNumbers) ? 0 : pageNumbers[#lists.size(pageNumbers) - 1]}">
+
+    <ul class="pagination justify-content-center flex-wrap mb-0">
+
+        <!-- ===== Trang trước ===== -->
         <li class="page-item" th:classappend="${page.first} ? 'disabled'">
-            <a class="page-link" rel="prev" th:aria-disabled="${page.first}"
-               th:href="@{${url + qs + 'page=' + page.number}}">
+            <!-- Trang đầu: <span> thay cho <a> để bàn phím không Tab vào nút vô hiệu hoá -->
+            <span class="page-link page-step" th:if="${page.first}" aria-disabled="true">
                 <i class="bi bi-chevron-left" aria-hidden="true"></i>
-                <span class="d-none d-sm-inline">Trước</span>
+                <span class="page-step-label d-none d-sm-inline">Trước</span>
+            </span>
+            <a class="page-link page-step" th:unless="${page.first}" rel="prev"
+               th:href="@{${url + qs + 'page=' + page.number}}"
+               th:aria-label="|Trang trước, trang ${page.number}|">
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                <span class="page-step-label d-none d-sm-inline">Trước</span>
             </a>
         </li>
-        <li class="page-item" th:each="n : ${pageNumbers}" th:classappend="${n == page.number} ? 'active'">
-            <a class="page-link" th:text="${n + 1}"
-               th:aria-current="${n == page.number} ? 'page' : null"
+
+        <!-- ===== Trang đầu + dấu … khi cửa sổ số trang không bắt đầu từ trang 1 ===== -->
+        <li class="page-item page-edge" th:if="${firstShown > 0}">
+            <a class="page-link" aria-label="Trang 1"
+               th:href="@{${url + qs + 'page=1'}}">1</a>
+        </li>
+        <li class="page-item page-gap" th:if="${firstShown > 1}" aria-hidden="true">
+            <span class="page-link">…</span>
+        </li>
+
+        <!-- ===== Cửa sổ số trang (trang hiện tại là chữ, không phải link) ===== -->
+        <li class="page-item" th:each="n : ${pageNumbers}"
+            th:classappend="${n == page.number} ? 'active'">
+            <span class="page-link" th:if="${n == page.number}" aria-current="page"
+                  th:text="${n + 1}">1</span>
+            <a class="page-link" th:unless="${n == page.number}" th:text="${n + 1}"
+               th:aria-label="|Trang ${n + 1}|"
                th:href="@{${url + qs + 'page=' + (n + 1)}}">1</a>
         </li>
+
+        <!-- ===== Dấu … + trang cuối ===== -->
+        <li class="page-item page-gap" th:if="${lastShown < lastIndex - 1}" aria-hidden="true">
+            <span class="page-link">…</span>
+        </li>
+        <li class="page-item page-edge" th:if="${lastShown < lastIndex}">
+            <a class="page-link" th:text="${page.totalPages}"
+               th:aria-label="|Trang ${page.totalPages}|"
+               th:href="@{${url + qs + 'page=' + page.totalPages}}">20</a>
+        </li>
+
+        <!-- ===== Trang sau ===== -->
         <li class="page-item" th:classappend="${page.last} ? 'disabled'">
-            <a class="page-link" rel="next" th:aria-disabled="${page.last}"
-               th:href="@{${url + qs + 'page=' + (page.number + 2)}}">
-                <span class="d-none d-sm-inline">Sau</span>
+            <span class="page-link page-step" th:if="${page.last}" aria-disabled="true">
+                <span class="page-step-label d-none d-sm-inline">Sau</span>
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </span>
+            <a class="page-link page-step" th:unless="${page.last}" rel="next"
+               th:href="@{${url + qs + 'page=' + (page.number + 2)}}"
+               th:aria-label="|Trang sau, trang ${page.number + 2}|">
+                <span class="page-step-label d-none d-sm-inline">Sau</span>
                 <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </a>
         </li>
     </ul>
-    <p class="text-center text-muted small mb-0"
-       th:with="range=|Trang ${page.number + 1}/${page.totalPages}|"
-       th:text="${itemLabel == null} ? ${range} : |${range} – ${page.totalElements} ${itemLabel}|">
-        Trang 1/1
+
+    <!-- Dòng thông tin: trang hiện tại / tổng số trang · tổng số mục -->
+    <p class="catalog-pager-meta">
+        <span th:text="|Trang ${page.number + 1}/${page.totalPages}|">Trang 1/1</span>
+        <th:block th:if="${itemLabel != null}">
+            <span aria-hidden="true">·</span>
+            <span th:text="|${#numbers.formatInteger(page.totalElements, 0, 'POINT')} ${itemLabel}|">0 sản phẩm</span>
+        </th:block>
     </p>
 </nav>
 

@@ -9,7 +9,32 @@
   – mobile (< lg): menu gom vào offcanvas trượt từ phải;
   – badge lấy từ CartCountAdvice (cartCount) và session so sánh (compareCount).
 -->
-<header th:fragment="header" class="navbar-bad">
+<div th:fragment="header" class="site-header">
+
+    <!-- Dải thông tin nhanh: cuộn khỏi màn hình, header bên dưới mới dính lại -->
+    <div class="topbar-bad">
+        <div class="container">
+            <p class="topbar-bad-note mb-0">
+                <i class="bi bi-truck" aria-hidden="true"></i>
+                Miễn phí giao hàng cho đơn từ 5.000.000 ₫
+            </p>
+            <ul class="topbar-bad-links list-unstyled mb-0">
+                <li>
+                    <a th:href="@{/don-hang}">
+                        <i class="bi bi-receipt" aria-hidden="true"></i> Đơn hàng của tôi
+                    </a>
+                </li>
+                <li>
+                    <span>
+                        <i class="bi bi-headset" aria-hidden="true"></i>
+                        Hotline <span th:text="${shop != null} ? ${shop.hotline} : '1900 0000'">1900 0000</span>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <header class="navbar-bad">
     <nav class="navbar navbar-expand-lg p-0" aria-label="Điều hướng chính">
         <div class="container">
 
@@ -60,6 +85,7 @@
                         <input class="form-control" type="search" id="navKeyword" name="keyword" maxlength="100"
                                placeholder="Tìm vợt theo tên, hãng…"
                                th:value="${param.keyword != null} ? ${param.keyword[0]} : ''">
+                        <span class="search-hint" aria-hidden="true">/</span>
                     </form>
 
                     <ul class="navbar-nav align-items-lg-center gap-lg-2 ms-lg-auto">
@@ -119,7 +145,7 @@
                                 </li>
                                 <li sec:authorize="!hasRole('ADMIN')">
                                     <a class="dropdown-item" th:href="@{/dia-chi}">
-                                        <i class="bi bi-geo-alt" aria-hidden="true"></i> Sổ địa chỉ
+                                        <i class="bi bi-geo-alt" aria-hidden="true"></i> Địa chỉ
                                     </a>
                                 </li>
                                 <li sec:authorize="hasRole('ADMIN')">
@@ -144,7 +170,8 @@
             </div>
         </div>
     </nav>
-</header>
+    </header>
+</div>
 
 </body>
 </html>

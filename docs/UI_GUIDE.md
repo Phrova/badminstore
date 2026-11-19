@@ -7,8 +7,8 @@ Mục tiêu: nhìn như một shop thể thao thật – sạch, nhiều khoản
   - Xanh nền nút: `#0b6b4a` (chữ trắng 6.53:1 – đạt AA), hover `#0a5c40`.
   - Xanh dùng làm **màu chữ** (link, nút outline, nhãn): `#0c7852` (5.49:1 trên trắng).
   - Nhấn CTA/vàng: `#ffb703` cho nền; chữ vàng dùng `#8a6100` (5.54:1).
-  - Giá bán / giảm giá: `#d92b39` (4.82:1 trên trắng).
-  - Nền `#f7f8fa`; chữ `#1f2937`; border `--bad-border`; nền thẻ `--bad-surface`.
+  - Giá bán / giảm giá: `#cf2431` (4.69:1 trên nền trang, 5.09:1 trên nền thẻ).
+  - Nền trang `#eef1f4`; chữ `#1f2937`; border `--bad-border`; nền thẻ `--bad-surface` (`#f9fafb`).
   - Màu biểu đồ dashboard: `--bad-chart-1..6` (khai báo ở theme.css, JS đọc bằng `getComputedStyle`).
 - Font **Be Vietnam Pro** (hỗ trợ tiếng Việt đẹp), nạp bằng Google Fonts: weights 400/500/600/700.
 - Icon: Bootstrap Icons. Không trộn nhiều bộ icon. Icon trang trí luôn có `aria-hidden="true"`; nút/liên kết chỉ có icon phải có `aria-label`.
@@ -21,10 +21,10 @@ Mục tiêu: nhìn như một shop thể thao thật – sạch, nhiều khoản
 - Một trang chỉ có 1 nút CTA chính (xanh/vàng); các nút phụ dùng `btn-outline-*`.
 
 ## 3. Trang khách – bố cục chuẩn
-- **Trang chủ:** navbar dính trên cùng (logo, ô tìm kiếm, giỏ hàng có badge số lượng, đăng nhập) → banner Swiper (3 slide, có CTA) → dải lợi ích (Chính hãng / Giao nhanh / Đổi trả) → "Sản phẩm mới" → "Theo hãng" (Yonex, Li-Ning, Victor...) → footer.
+- **Trang chủ:** dải thông báo mỏng `.topbar-bad` (miễn phí ship + hotline, cuộn khỏi màn hình) → navbar dính trên cùng (logo, ô tìm kiếm có gợi ý phím `/`, giỏ hàng có badge, đăng nhập) → banner Swiper 3 slide 2 cột (chữ + ảnh vợt trong khung nghiêng `.hero-media`, mũi tên `.hero-nav`, nút tạm dừng) → dải lợi ích (Chính hãng / Giao nhanh / Đổi trả) → "Sản phẩm mới" → "Theo hãng" (Yonex, Li-Ning, Victor...) → footer.
 - **Danh sách:** sidebar lọc bên trái (hãng, loại, khoảng giá, độ cứng thân) – mobile chuyển thành offcanvas; sắp xếp ở phía trên; phân trang dưới; hiện số kết quả.
-- **Product card:** ảnh vuông nền trắng `object-fit: contain`, tên tối đa 2 dòng, nhãn hãng, giá (đỏ) + giá gạch ngang, nút "Thêm vào giỏ"; hết hàng thì làm mờ + nhãn "Hết hàng".
-- **Chi tiết:** ảnh lớn + thumbnail bên trái; bên phải: tên, hãng, giá, chọn biến thể (màu/U/G) bằng nút chọn, số lượng (+/−), tồn kho, nút Thêm vào giỏ / Mua ngay; bên dưới tab: Mô tả – Thông số kỹ thuật (bảng) – Đánh giá (sao + bình luận).
+- **Product card:** ảnh vuông nền trắng `object-fit: contain`, tên tối đa 2 dòng, nhãn hãng, giá (đỏ) + giá gạch ngang, một nút chính "Chọn phiên bản"/"Xem chi tiết"; hết hàng thì làm mờ + nhãn "Hết hàng". Thao tác phụ "So sánh" là nút tròn `.card-compare` nổi góc phải ảnh (không chiếm thêm một hàng nút).
+- **Chi tiết:** ảnh lớn + thumbnail bên trái; bên phải: tên, hãng, giá, chọn biến thể (màu/U/G) bằng nút chọn, số lượng (+/−), tồn kho, cặp nút Thêm vào giỏ / Mua ngay; bên dưới tab: Mô tả – Thông số kỹ thuật (bảng) – Đánh giá (sao + bình luận).
 - **Giỏ hàng/Thanh toán:** 2 cột (danh sách | tóm tắt đơn dính bên phải); thanh bước Giỏ hàng → Thanh toán → Hoàn tất; tóm tắt luôn hiện tạm tính, voucher, phí ship, tổng.
 - **Đơn của tôi:** thẻ đơn + `status-pill` màu theo trạng thái, timeline trạng thái trong chi tiết.
 - **Tiêu đề trang:** dùng class `.page-title` (giỏ hàng, thanh toán, đơn hàng, địa chỉ, so sánh và toàn bộ khu admin) –
@@ -35,7 +35,7 @@ Mục tiêu: nhìn như một shop thể thao thật – sạch, nhiều khoản
 - Layout: sidebar xanh đậm bên trái + thanh trên; nội dung nền sáng, mỗi khối là `card-soft`.
 - Dashboard: 4 `stat-card` (doanh thu, đơn mới, đơn chờ xác nhận, sắp hết hàng) + biểu đồ doanh thu (Chart.js line) + đơn theo trạng thái (doughnut) + bảng đơn mới nhất.
 - Bảng danh sách: tìm kiếm + lọc ở đầu, hành động dạng nút icon nhỏ, trạng thái dùng `status-pill`.
-- Form: chia 2 cột, nhóm trường có tiêu đề, nút Lưu/Huỷ ở cuối, lỗi hiện dưới từng ô.
+- Form: chia 2 cột, nhóm trường có tiêu đề, lỗi hiện dưới từng ô. Nút Lưu/Huỷ nằm trong thanh `.form-actions` cố định đáy màn hình (form dài vẫn lưu được ở mọi vị trí); theme.css tự chừa padding cuối trang và ẩn nút "lên đầu trang" để không đè thanh Lưu.
 
 ## 5. Tương tác (tạo cảm giác "xịn")
 - SweetAlert2: xác nhận trước khi xoá/huỷ/đổi trạng thái; toast thành công/thất bại sau khi redirect.
@@ -44,11 +44,25 @@ Mục tiêu: nhìn như một shop thể thao thật – sạch, nhiều khoản
   Người bật "giảm chuyển động" (prefers-reduced-motion) được xem nội dung ngay, không hiệu ứng.
   `theme.css` ghi đè biên độ dịch chuyển từ 100px (mặc định AOS) xuống **16px** để lúc chờ hiệu ứng
   thẻ sản phẩm không bị đẩy chồng lên phân trang/nút bên dưới (giảm layout shift).
-- Hover nổi nhẹ ở card; nút có trạng thái loading (disable + spinner) khi submit.
+- Hover nổi nhẹ ở card; nút có trạng thái loading (disable + spinner) khi submit. `app.js` dùng `event.submitter`
+  nên form có nhiều nút (Thêm vào giỏ / Mua ngay) hiện loading đúng nút vừa bấm.
+- Phím `/` đưa focus vào ô tìm kiếm trên header (gợi ý `.search-hint`); bỏ qua khi con trỏ đang ở trong ô nhập.
+- "Mua ngay" là cùng form thêm vào giỏ với `name="buyNow" value="true"`: server thêm hàng rồi redirect thẳng
+  `/thanh-toan`, không cần JS riêng. Nút phải có `data-pdp-add-to-cart` để bị vô hiệu hoá khi phiên bản hết hàng.
+- Thẻ sản phẩm: "So sánh" là nút tròn `.card-compare` đặt trên ảnh, nằm trên `stretched-link`; nút chính duy nhất
+  dẫn sang trang chi tiết để chọn đúng phiên bản.
+- Phân trang dùng chung `fragments/pagination.html` (`.catalog-pager`): thanh viên thuốc, nút tròn 44px,
+  trang hiện tại là `<span aria-current="page">`; Trước/Sau khi vô hiệu hoá cũng là `<span>` (không Tab được).
+  Cửa sổ 5 số quanh trang hiện tại, tự thêm trang đầu/cuối + dấu `…` khi cần; dưới 576px ẩn trang đầu/cuối
+  và dấu `…`, chỉ giữ Trước/Sau + 5 số để không tràn ngang. Dòng dưới ghi `Trang X/Y · N mục`.
 - Giỏ hàng là luồng Post-Redirect-Get: badge ở navbar cập nhật sau khi trang tải lại (không AJAX).
 - Validate 2 lớp: HTML5 (`required`, `min`, `maxlength`, `pattern`) + Bean Validation; lỗi hiện dưới từng ô
-  (`is-invalid` + `th:errors`), ô lỗi có `aria-invalid="true"`.
+  (`is-invalid` + `th:errors`), ô lỗi có `aria-invalid="true"`. `app.js` tự đưa focus về ô sai
+  đầu tiên khi server render lại trang, nên không cần thêm JS ở từng form.
 - Vùng nội dung tự đổi (kết quả POS, tồn kho theo phiên bản, mã giảm giá) cần `role="status"`/`aria-live`.
+- Nội dung tự chuyển quá 5 giây phải có cách dừng (WCAG 2.2.2): banner trang chủ dùng nút
+  `.hero-pause` + `data-hero-autoplay-toggle`; `main.js` tự ẩn nút khi autoplay tắt
+  (người dùng bật "giảm chuyển động") để không còn nút chết.
 
 ## 6. Ảnh & nội dung
 - Ảnh sản phẩm nền trắng/trong suốt, cùng tỉ lệ; nén < 300KB; luôn có `alt`. Lưu vào `uploads/` hoặc `static/images/`, **không hotlink** ảnh từ web khác (dễ hỏng khi demo).

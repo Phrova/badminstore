@@ -189,9 +189,10 @@
                     </form>
                 </div>
 
-                <!-- Chip các điều kiện đang lọc (mẫu docs/UX_UPGRADE.md mục 5) – khách luôn biết mình đã lọc gì -->
+                <!-- Chip các điều kiện đang lọc (mẫu docs/UX_UPGRADE.md mục 5) – khách luôn biết mình đã lọc gì.
+                     role="group" để aria-label có hiệu lực (aria-label trên div trần bị trình đọc bỏ qua). -->
                 <div class="d-flex flex-wrap align-items-center gap-2 mb-3" th:if="${activeCount > 0}"
-                     aria-label="Bộ lọc đang áp dụng">
+                     role="group" aria-label="Bộ lọc đang áp dụng">
                     <span class="text-muted small">Đang lọc:</span>
 
                     <span class="filter-chip" th:if="${filter.keyword != null and !#strings.isEmpty(filter.keyword)}"
@@ -232,10 +233,12 @@
                     </a>
                 </div>
 
-                <!-- ===== Lưới sản phẩm: 2 cột ở điện thoại, 3 cột ở tablet, 4 cột ở màn hình lớn ===== -->
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-lg-4"
-                     th:if="${page.totalElements > 0}">
-                    <div class="col" th:each="card : ${page.content}" data-aos="fade-up">
+                <!-- ===== Lưới sản phẩm: 2 cột ở điện thoại, 3 cột ở tablet, 4 cột ở màn hình lớn =====
+                     AOS gắn ở cả hàng (UI_GUIDE mục 5): mỗi thẻ một hiệu ứng khiến hàng chục
+                     phần tử cùng bị theo dõi, cuộn bị giật trên máy yếu. -->
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-lg-4 catalog-grid"
+                     th:if="${page.totalElements > 0}" data-aos="fade-up">
+                    <div class="col" th:each="card : ${page.content}">
                         <div th:replace="~{fragments/product-card :: card(${card})}"></div>
                     </div>
                 </div>

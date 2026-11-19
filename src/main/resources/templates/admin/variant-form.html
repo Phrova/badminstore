@@ -116,7 +116,7 @@
                             <input class="form-control" id="imageFile" name="imageFile" type="file"
                                    accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">
                             <div class="form-text">
-                                JPG, PNG, WEBP, GIF hoặc SVG – tối đa 2 MB. Ảnh này dùng cho giỏ hàng,
+                                JPG, PNG, WEBP, GIF hoặc SVG – tối đa 5 MB. Ảnh này dùng cho giỏ hàng,
                                 đơn hàng và bộ chọn phiên bản ở trang khách.
                             </div>
                         </div>
@@ -147,7 +147,7 @@
                                  th:errors="*{price}">Giá không hợp lệ</div>
                         </div>
                         <div class="col-sm-6">
-                            <label class="form-label" for="originalPrice">Giá gạch ngang (₫)</label>
+                            <label class="form-label" for="originalPrice">Giá gốc (₫)</label>
                             <input class="form-control" id="originalPrice" th:field="*{originalPrice}" type="number"
                                    th:classappend="${#fields.hasErrors('originalPrice')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('originalPrice')}"
                                    min="0" step="1000" placeholder="5.290.000 = 5290000">
@@ -174,7 +174,7 @@
                                  th:errors="*{status}">Chưa chọn trạng thái</div>
                         </div>
                     </div>
-                    <div class="card-footer d-flex gap-2">
+                    <div class="form-actions">
                         <button class="btn btn-primary flex-grow-1" type="submit">
                             <i class="bi bi-save" aria-hidden="true"></i> Lưu biến thể
                         </button>

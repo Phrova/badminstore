@@ -1,8 +1,8 @@
-# Cấu hình chạy ở máy cá nhân.
+# Cấu hình riêng của máy (không commit). Mẫu: .env.example hoặc docs/HUONG_DAN_CHAY.md mục 3.
 spring:
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=BadminStore;encrypt=true;trustServerCertificate=true
-    username: sa
+    username: test
     password: 123456
 
 app:

@@ -53,7 +53,7 @@
                        th:value="${summary.voucher != null} ? ${summary.voucher.code} : ${form.voucherCode}">
 
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <span class="fw-semibold"><i class="bi bi-geo-alt text-primary" aria-hidden="true"></i> Địa chỉ nhận hàng</span>
                         <a class="small" th:href="@{/dia-chi(next='/thanh-toan')}">
                             <i class="bi bi-plus-circle" aria-hidden="true"></i> Thêm địa chỉ mới
@@ -73,13 +73,22 @@
                             <input class="form-check-input" type="radio" name="addressId"
                                    th:id="|address-${address.id}|" th:value="${address.id}" required
                                    th:checked="${form.addressId != null and form.addressId == address.id}"
-                                   th:attr="data-district-id=${address.districtId},data-ward-code=${address.wardCode}">
+                                   th:attr="data-district-id=${address.districtId},
+                                            data-province-id=${address.provinceId},
+                                            data-ward-code=${address.wardCode},
+                                            data-province-name=${address.provinceName},
+                                            data-ward-name=${address.wardName},
+                                            data-address-detail=${address.addressDetail},
+                                            data-receiver-name=${address.receiverName},
+                                            data-receiver-phone=${address.receiverPhone},
+                                            data-new-address=${address.districtId == null and address.provinceId != null}">
                             <span>
                                 <span class="fw-semibold" th:text="${address.receiverName}">Người nhận</span>
                                 <span class="text-muted" th:text="| · ${address.receiverPhone}|">SĐT</span>
                                 <span class="badge badge-soft-success ms-1" th:if="${address.defaultAddress}">Mặc định</span>
-                                <span class="badge badge-soft-info ms-1" th:if="${address.districtId != null}"
-                                      title="Địa chỉ có mã quận của GHN nên tính được phí giao hàng thật">
+                                <span class="badge badge-soft-info ms-1"
+                                      th:if="${address.districtId != null or (ghnNewAddress and address.provinceId != null and address.wardCode != null)}"
+                                      title="Địa chỉ có mã GHN nên tính được phí giao hàng thật">
                                     <i class="bi bi-truck" aria-hidden="true"></i> GHN
                                 </span>
                                 <span class="d-block text-muted small" th:text="${address.fullAddress}">Địa chỉ</span>
@@ -91,7 +100,7 @@
                 </div>
 
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold">
+                    <div class="card-header fw-semibold">
                         <i class="bi bi-credit-card text-primary" aria-hidden="true"></i> Phương thức thanh toán
                     </div>
                     <div class="card-body">
@@ -117,7 +126,7 @@
                 </div>
 
                 <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white fw-semibold">
+                    <div class="card-header fw-semibold">
                         <i class="bi bi-chat-left-text text-primary" aria-hidden="true"></i> Ghi chú cho đơn hàng
                     </div>
                     <div class="card-body">
@@ -142,9 +151,9 @@
         <div class="col-lg-4 order-1 order-lg-2">
             <div class="card border-0 shadow-sm summary-card" data-ghn-fee-preview
                  th:attr="data-subtotal=${summary.cart.subtotal},data-discount=${summary.discountAmount},
-                          data-default-fee=${summary.shippingFee},data-free-shipping=${summary.freeShipping},
+                          data-default-fee=${shopShippingFee},data-free-shipping=${summary.freeShipping},
                           data-weight=${ghnWeightGram},data-ghn-shipping=${ghnShippingEnabled}">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center gap-2">
+                <div class="card-header d-flex justify-content-between align-items-center gap-2">
                     <span class="fw-semibold"><i class="bi bi-receipt text-primary" aria-hidden="true"></i> Đơn hàng của bạn</span>
                     <!-- Trên điện thoại tóm tắt thu gọn; tổng tiền vẫn luôn hiện bên dưới -->
                     <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button"
@@ -192,7 +201,9 @@
                             <li class="d-flex align-items-center gap-2 mb-2"
                                 th:each="line : ${summary.cart.lines}">
                                 <img class="summary-thumb rounded border" th:src="${line.imageUrl}"
-                                     th:alt="|Ảnh ${line.productName}|" width="48" height="48" loading="lazy">
+                                     th:alt="|Ảnh ${line.productName}|"
+                                     th:attr="data-fallback=@{/images/no-image.svg}"
+                                     width="48" height="48" loading="lazy" decoding="async">
                                 <div class="flex-grow-1">
                                     <div class="small fw-semibold" th:text="${line.productName}">Tên vợt</div>
                                     <div class="small text-muted" th:text="|${line.variantLabel} × ${line.quantity}|">Phiên bản</div>
@@ -209,7 +220,8 @@
                         <div class="summary-row">
                             <span class="text-muted">
                                 Phí vận chuyển
-                                <span class="badge badge-soft-info d-none" data-shipping-source>
+                                <span class="badge badge-soft-info" data-shipping-source
+                                      th:classappend="${summary.ghnShippingFee} ? '' : 'd-none'">
                                     <i class="bi bi-truck" aria-hidden="true"></i> theo GHN
                                 </span>
                             </span>
