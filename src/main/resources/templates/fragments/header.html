@@ -11,6 +11,10 @@
 -->
 <div th:fragment="header" class="site-header">
 
+    <!-- CSS/JS riêng nút giao diện, nạp trong fragment như cách account-orders.css -->
+<link rel="stylesheet" th:href="@{/css/theme-toggle.css}">
+<script th:src="@{/js/theme-toggle.js}" defer></script>
+
     <!-- Dải thông tin nhanh: cuộn khỏi màn hình, header bên dưới mới dính lại -->
     <div class="topbar-bad">
         <div class="container">
@@ -69,11 +73,16 @@
 
                 <div class="offcanvas-body">
                     <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/}"><i class="bi bi-house-door" aria-hidden="true"></i> Trang chủ</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/san-pham}"><i class="bi bi-grid" aria-hidden="true"></i> Sản phẩm</a>
+                                  <li class="nav-item">
+                            <!-- Đoạn chuyển gọn: 1 pill chứa cả 2 đích, mục đang đứng tô nền nổi -->
+                            <div class="nav-seg" role="group" aria-label="Trang chủ và sản phẩm">
+                                <a class="nav-seg-opt" th:href="@{/}" data-tip="Trang chủ">
+                                    <i class="bi bi-house-door" aria-hidden="true"></i><span class="seg-label">Trang chủ</span>
+                                </a>
+                                <a class="nav-seg-opt" th:href="@{/san-pham}" data-tip="Sản phẩm">
+                                    <i class="bi bi-grid" aria-hidden="true"></i><span class="seg-label">Sản phẩm</span>
+                                </a>
+                            </div>
                         </li>
                     </ul>
 
@@ -87,6 +96,22 @@
                                th:value="${param.keyword != null} ? ${param.keyword[0]} : ''">
                         <span class="search-hint" aria-hidden="true">/</span>
                     </form>
+
+                    <!-- Nút sáng/tối: pill iOS, hover nở ra 2 lựa chọn, nhớ lựa chọn qua localStorage -->
+<div class="theme-switch">
+    <div class="theme-switch-pill" tabindex="0" role="group" aria-label="Chuyển giao diện sáng hoặc tối">
+        <i class="bi bi-sun-fill theme-switch-ico" aria-hidden="true"></i>
+        <span>Giao diện</span>
+        <span class="theme-switch-opts">
+            <button type="button" class="theme-switch-opt" data-theme-choice="light" aria-pressed="false">
+                <i class="bi bi-sun-fill" aria-hidden="true"></i> Sáng
+            </button>
+            <button type="button" class="theme-switch-opt" data-theme-choice="dark" aria-pressed="false">
+                <i class="bi bi-moon-stars-fill" aria-hidden="true"></i> Tối
+            </button>
+        </span>
+    </div>
+</div>
 
                     <ul class="navbar-nav align-items-lg-center gap-lg-2 ms-lg-auto">
                         <!-- So sánh sản phẩm: danh sách nằm trong session, khách vãng lai vẫn dùng được -->

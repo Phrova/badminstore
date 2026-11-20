@@ -111,10 +111,10 @@
                 color var(--bad-transition);
 }
 
+/* Nâng + quầng sáng: để theme.css (mục 28.1) lo chung cho MỌI thẻ.
+   Ở đây chỉ đổi màu chữ, tránh 2 nơi cùng chỉnh transform/bóng rồi đè nhau. */
 .home-page .brand-tile:hover,
 .home-page .brand-tile:focus-visible {
-    transform: translateY(-3px);
-    box-shadow: var(--bad-card-shadow-hover);
     color: var(--bad-primary-text);
 }
 
@@ -176,3 +176,7 @@
         flex: 1 1 auto;
     }
 }
+
+/* Dải lợi ích: tách khỏi banner một khoảng thở, viền nhẹ để nổi khối riêng */
+.home-page .benefit-strip { margin-top: 1.25rem; }
+.home-page .benefit-strip > li { border: 1px solid var(--bad-border); }

@@ -16,9 +16,25 @@
             : 'top-end';
     }
 
-    /** Xếp hàng thông báo để cái sau không đè mất cái trước. */
+    var currentToastKey = '';
+
+    function toastKey(options) {
+        return (options.icon || '') + '|' + (options.title || '') + '|' + (options.html || '');
+    }
+
+    /** Xếp hàng thông báo; bỏ qua bản trùng đang hiện hoặc đang chờ (chống spam từ MỌI nguồn). */
     function queueToast(options) {
         if (!window.Swal) {
+            return;
+        }
+        var key = toastKey(options);
+        if (key === currentToastKey) {
+            return;
+        }
+        var queued = toastQueue.some(function (item) {
+            return toastKey(item) === key;
+        });
+        if (queued) {
             return;
         }
         toastQueue.push(options);
@@ -31,8 +47,10 @@
         }
         toastOpen = true;
         var options = toastQueue.shift();
+        currentToastKey = toastKey(options);
         Swal.fire(options).then(function () {
             toastOpen = false;
+            currentToastKey = '';
             drainToastQueue();
         });
     }
@@ -205,9 +223,6 @@
             showCancelButton: true,
             confirmButtonText: 'Đồng ý',
             cancelButtonText: 'Huỷ bỏ',
-            // Lấy màu từ token theme.css: nền xanh đậm + chữ trắng đạt 6.53:1
-            confirmButtonColor: cssVar('--bad-primary-dark', '#0b6b4a'),
-            cancelButtonColor: cssVar('--bad-muted', '#5f6975'),
             reverseButtons: true,
             customClass: {
                 popup: 'bad-confirm',
@@ -218,34 +233,40 @@
     }
 
     /**
-     * Sau khi khách đồng ý: khoá nút gửi + gắn vòng xoay để biết máy chủ đang xử lý.
-     * Chỉ khoá nút KHÔNG có name (nút có name sẽ bị bỏ khỏi dữ liệu form khi disable).
+     * Sau khi khách đồng ý: khoá TẤT CẢ nút gửi + gắn vòng xoay.
+     * form.submit() KHÔNG gửi giá trị nút bấm → nếu nút đã bấm có name,
+     * giữ giá trị đó bằng input ẩn rồi mới disable (không mất dữ liệu, chống bấm đúp).
+     * Lưu innerHTML gốc vào data-old để app.js khôi phục khi bấm Back (bfcache).
      */
-    function setFormLoading(form) {
+    function setFormLoading(form, submitter) {
+        if (submitter && submitter.name) {
+            var proxy = document.createElement('input');
+            proxy.type = 'hidden';
+            proxy.name = submitter.name;
+            proxy.value = submitter.value;
+            proxy.setAttribute('data-loading-proxy', '');
+            form.appendChild(proxy);
+        }
         form.querySelectorAll('button[type="submit"]').forEach(function (button) {
-            var spinner = document.createElement('span');
-            spinner.className = 'spinner-border spinner-border-sm me-1';
-            spinner.setAttribute('aria-hidden', 'true');
-            button.prepend(spinner);
-            if (!button.name) {
-                button.disabled = true;
-            }
+            button.dataset.old = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Đang xử lý...';
         });
     }
 
     function initConfirmations() {
         document.querySelectorAll('form[data-confirm]').forEach(function (form) {
             form.addEventListener('submit', function (event) {
-                // app.js (nạp sau) đánh dấu '1', main.js đánh dấu 'true' ⇒ chỉ cần kiểm tra truthy
-                // để không hiện hộp thoại xác nhận lần thứ hai khi cả hai script cùng nạp.
+                // app.js đánh dấu '1', main.js đánh dấu 'true' ⇒ chỉ cần truthy là đủ.
                 if (form.dataset.confirmed || !window.Swal) {
                     return;
                 }
                 event.preventDefault();
+                var submitter = event.submitter || null;
                 askConfirm(form.dataset.confirm).then(function (result) {
                     if (result.isConfirmed) {
                         form.dataset.confirmed = 'true';
-                        setFormLoading(form);
+                        setFormLoading(form, submitter);
                         form.submit();
                     }
                 });

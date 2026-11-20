@@ -1,0 +1,64 @@
+/* =====================================================
+   BadStore – Nút chuyển giao diện sáng/tối
+   Dùng cho: fragments/header.html (mọi trang có header)
+
+   Hành vi (khớp theme-toggle.js):
+   - Hover hoặc focus bàn phím → bảng lựa chọn nở ra.
+   - Click chuột vào lựa chọn: JS nhả focus, bảng VẪN mở nhờ :hover
+     → bấm Sáng/Tối qua lại liên tục được; rời chuột là tự thu.
+   - KHÔNG có rule đóng cưỡng bức sau khi chọn (cờ --picked cũ đã bỏ):
+     rule đó từng làm bảng biến mất ngay dưới chuột, không bấm đổi tiếp được.
+   ===================================================== */
+
+/* ============ 1. Nút & bảng lựa chọn ============ */
+.theme-switch { position: relative; display: inline-flex; align-items: center; }
+
+.theme-switch-pill {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .45rem .9rem; cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, .08);
+    border-radius: var(--bs-border-radius-pill, 999px);
+    background: rgba(255, 255, 255, .72);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    box-shadow: var(--bad-card-shadow, 0 1px 2px rgba(0, 0, 0, .06));
+    font-size: .85rem; font-weight: 600; color: inherit;
+    transition: box-shadow .25s cubic-bezier(.32, .72, .28, 1);
+}
+/* --bad-primary KHÔNG tồn tại trong theme.css → dùng đúng token --bs-primary */
+.theme-switch-pill:focus-visible { outline: 2px solid var(--bs-primary, #0f8a5f); outline-offset: 2px; }
+
+/* max-width thay vì display để trượt mở mượt, không giật bố cục */
+.theme-switch-opts {
+    display: inline-flex; gap: .25rem; overflow: hidden;
+    max-width: 0; opacity: 0;
+    transition: max-width .3s cubic-bezier(.32, .72, .28, 1), opacity .2s;
+}
+.theme-switch:hover .theme-switch-opts,
+.theme-switch:focus-within .theme-switch-opts { max-width: 220px; opacity: 1; }
+
+.theme-switch-opt {
+    border: 0; background: transparent; color: inherit;
+    border-radius: var(--bs-border-radius-pill, 999px);
+    padding: .3rem .75rem; font-size: .82rem; font-weight: 600;
+    display: inline-flex; align-items: center; gap: .35rem;
+    white-space: nowrap; transition: background .2s, color .2s;
+}
+.theme-switch-opt:hover { background: rgba(0, 0, 0, .06); }
+/* Lựa chọn đang áp dụng: nền xanh đậm của theme (chữ trắng 6.53:1, đạt AA).
+   Trước đây dùng --bad-primary (không tồn tại) → rơi về #198754, chữ trắng chỉ ~3.9:1. */
+.theme-switch-opt[aria-pressed="true"] { background: var(--bad-primary-dark, #0b6b4a); color: #fff; }
+
+/* ============ 2. Riêng chế độ tối ============ */
+html.theme-dark .theme-switch-pill {
+    background: rgba(21, 32, 27, .8);
+    border-color: rgba(255, 255, 255, .12);
+}
+html.theme-dark .theme-switch-opt:hover { background: rgba(255, 255, 255, .08); }
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-switch-pill, .theme-switch-opts, .theme-switch-opt { transition: none; }
+}
+
+/* Control gốc của trình duyệt (input, scrollbar) đổi theo chế độ tối */
+html.theme-dark { color-scheme: dark; }

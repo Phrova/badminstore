@@ -2977,3 +2977,244 @@ body:has(.form-actions) #backToTop {
         height: 260px;
     }
 }
+
+   /* =========================================================================
+   26. Chế độ tối: đổi TOKEN, không đổi từng phần tử
+   Nút chuyển (theme-toggle.js) đặt data-bs-theme="dark" lên <html>.
+   Vì theme.css nạp SAU bootstrap và ghi đè biến ở :root nên bản dark phải
+   dùng html[data-bs-theme="dark"] (đặc hiệu 0,1,1) để thắng :root (0,1,0)
+   bất kể thứ tự nạp; nhờ vậy chữ và nền đổi cùng một nguồn, hết lệch màu.
+   Cặp màu đo trên nền trang #101613: chữ chính 13.1:1, chữ phụ 7.2:1,
+   link 8.4:1 – đều đạt WCAG AA như bản sáng.
+   ========================================================================= */
+html[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    /* Nền – thẻ – viền: ba bậc tối để vẫn tách lớp như bản sáng */
+    --bs-body-bg: #101613;
+    --bs-body-bg-rgb: 16, 22, 19;
+    --bs-secondary-bg: #1d2822;
+    --bs-secondary-bg-rgb: 29, 40, 34;
+    --bs-tertiary-bg: #22302a;
+    --bs-tertiary-bg-rgb: 34, 48, 42;
+    --bs-light: #22302a;
+    --bs-light-rgb: 34, 48, 42;
+    --bs-body-color: #e8efe9;
+    --bs-emphasis-color: #e8efe9;
+    --bs-secondary-color: #a7b8ae;
+    --bs-tertiary-color: #8fa39a;
+    --bs-border-color: #2c3a33;
+    --bs-border-color-translucent: rgba(255, 255, 255, .12);
+
+    /* Link nhạt hơn bản sáng: #0c7852 trên nền tối chỉ đạt 2.9:1 (trượt AA) */
+    --bs-link-color: #7ed0a5;
+    --bs-link-color-rgb: 126, 208, 165;
+    --bs-link-hover-color: #a5e2c2;
+    --bs-link-hover-color-rgb: 165, 226, 194;
+
+    /* Token riêng BadStore: giữ nguyên họ màu, nâng độ sáng cho nền tối */
+    --bad-surface: #1e2923;   /* nâng sáng một bậc: #18211c nhìn gắt trên màn tối */
+    --bad-surface-rgb: 30, 41, 35;
+    --bad-surface-muted: #26332c;
+    --bad-border: #35453d;
+    --bad-muted: #a7b8ae;
+    --bad-primary-text: #7ed0a5;
+    --bad-success-text: #86d3a2;
+    --bad-warning-text: #ffd166;
+    --bad-sale: #ff8f98;             /* đỏ giá trên nền tối: 7.4:1 */
+    --bad-card-shadow: 0 1px 3px rgba(0, 0, 0, .5);
+    --bad-card-shadow-hover: 0 12px 28px rgba(0, 0, 0, .55);
+
+    /* Nút xanh GIỮ NGUYÊN nền đậm: chữ trắng trên #0b6b4a vẫn 6.53:1,
+       đổi sang nền nhạt hơn sẽ trượt tương phản nút bấm. */
+    --bad-chart-1: #f59e0b;
+    --bad-chart-2: #60a5fa;
+    --bad-chart-3: #818cf8;
+    --bad-chart-4: #4ade80;
+    --bad-chart-5: #f87171;
+    --bad-chart-6: #c084fc;
+}
+
+/* --- Vài chỗ hard-code màu sáng trong mục 25 cần bản tối riêng --- */
+/* Chip chọn phiên bản / chip lọc: nền trắng hard-code nên phải đổi tay */
+html[data-bs-theme="dark"] .variant-chip { background: #1d2822; border-color: #3a4a42; color: var(--bs-body-color); }
+html[data-bs-theme="dark"] .variant-chip.active,
+html[data-bs-theme="dark"] .btn-check:checked + .variant-chip { background: rgba(var(--bs-primary-rgb), .18); border-color: var(--bs-primary); color: #a5e2c2; }
+html[data-bs-theme="dark"] .filter-chip { background: rgba(var(--bs-primary-rgb), .18); color: #a5e2c2; }
+html[data-bs-theme="dark"] .catalog-pager .page-link.page-step { background: var(--bad-surface); }
+html[data-bs-theme="dark"] .pos-result-out { border-color: #4a5a52; }
+html[data-bs-theme="dark"] .pos-line-error { background: rgba(248, 113, 113, .12); }
+/* Khung ảnh sản phẩm GIỮ nền trắng: ảnh vợt là SVG nền trong, khung trắng
+   giúp ảnh rõ trên nền tối (cùng lý do .hero-media-frame không đổi). */
+
+   /* =========================================================================
+   27. Kính mờ iOS cho lớp phủ nổi (toast + hộp xác nhận SweetAlert2)
+   Chỉ phần tử NỔI trên nền mờ mới dùng backdrop-filter: phía sau có nội
+   dung để làm mờ. Các bề mặt thường vẫn giữ nền đặc theo token mục 1–26
+   để chữ đạt tương phản (checklist UI_GUIDE).
+   ========================================================================= */
+body .swal2-toast.bad-toast,
+body .swal2-popup.bad-confirm {
+    background: rgba(255, 255, 255, .72);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, .55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), var(--bad-card-shadow-hover);
+}
+html[data-bs-theme="dark"] body .swal2-toast.bad-toast,
+html[data-bs-theme="dark"] body .swal2-popup.bad-confirm {
+    background: rgba(30, 41, 35, .72);
+    border-color: rgba(255, 255, 255, .14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), var(--bad-card-shadow-hover);
+}
+/* Chữ giữ màu đặc: nền mờ không được kéo chữ mờ theo */
+body .swal2-toast.bad-toast .swal2-title,
+body .swal2-popup.bad-confirm .swal2-title { color: var(--bs-body-color); }
+
+/* =========================================================================
+   28. Tinh chỉnh hover & nút hộp thoại (đợt UI 11/2026)
+   - Thẻ: nâng mạnh hơn + nghiêng rất nhẹ + quầng sáng xanh, thay vì chỉ
+     dịch 3px rồi đứng yên (cảm giác "thiếu lực" khi rê chuột).
+   - Nav header: viên thuốc nở NGANG khi hover; không đổi padding dọc nên
+     chiều cao navbar giữ nguyên, không giật bố cục.
+   - SweetAlert2: nút xác nhận/huỷ kiểu kính mờ. Selector luôn bắt đầu bằng
+     body .swal2-… nên KHÔNG ảnh hưởng .btn thường của site.
+   ========================================================================= */
+
+/* --- 28.1 Thẻ sản phẩm / ô hãng / ô chọn nhanh: nâng + nghiêng + phát sáng --- */
+.product-card, .brand-tile {
+    transition: transform var(--bad-transition), box-shadow var(--bad-transition),
+                border-color var(--bad-transition);
+}
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover,
+    .card.product-card:hover,
+    .quick-tile:hover,
+    .brand-tile:hover {
+        transform: translateY(-6px) scale(1.02) rotate(-.45deg) !important;
+        box-shadow: var(--bad-card-shadow-hover),
+                    0 0 0 1px rgba(var(--bs-primary-rgb), .28),
+                    0 12px 34px rgba(var(--bs-primary-rgb), .20) !important;
+    }
+}
+
+/* Giảm chuyển động: không nâng/nghiêng, chỉ đổi bóng (không phải chuyển động). */
+@media (prefers-reduced-motion: reduce) {
+    .product-card:hover,
+    .card.product-card:hover,
+    .quick-tile:hover,
+    .brand-tile:hover {
+        transform: none !important;
+    }
+}
+
+/* --- 28.2 Nav header nở ngang kiểu iOS --- */
+.navbar-bad .nav-link {
+    border-radius: 999px;
+    transition: padding-left var(--bad-transition), padding-right var(--bad-transition),
+                background-color var(--bad-transition), color var(--bad-transition);
+}
+.navbar-bad .nav-link:hover,
+.navbar-bad .nav-link:focus-visible {
+    padding-left: .95rem;
+    padding-right: .95rem;
+}
+
+/* --- 28.3 Nút SweetAlert2 kính mờ (chỉ trong popup, không đụng .btn site) --- */
+body .swal2-popup .swal2-confirm,
+body .swal2-popup .swal2-cancel {
+    border-radius: 999px;
+    padding: .6rem 1.5rem;
+    font-weight: 600;
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+    transition: transform var(--bad-transition), background-color var(--bad-transition),
+                box-shadow var(--bad-transition);
+}
+body .swal2-popup .swal2-confirm {
+    background: linear-gradient(135deg, rgba(11, 107, 74, .92), rgba(10, 92, 64, .92));
+    border: 1px solid rgba(255, 255, 255, .28);
+    color: #fff;
+}
+body .swal2-popup .swal2-cancel {
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .3);
+    color: var(--bs-body-color);
+}
+body .swal2-popup .swal2-confirm:hover {
+    background: linear-gradient(135deg, rgba(10, 92, 64, .95), rgba(9, 80, 55, .95));
+    transform: translateY(-1px);
+}
+body .swal2-popup .swal2-cancel:hover { background: rgba(255, 255, 255, .26); transform: translateY(-1px); }
+/* Nút × đóng toast: vòng kính mờ nhỏ cho cùng họ */
+body .swal2-toast.bad-toast .bad-toast__close {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .14);
+    backdrop-filter: blur(8px);
+}
+body .swal2-toast.bad-toast .bad-toast__close:hover { background: rgba(255, 255, 255, .28); }
+
+/* =========================================================================
+   29. Đoạn chuyển Trang chủ / Sản phẩm: pill gọn thay hai liên kết chữ
+   - Cả hai ĐÍCH luôn nhìn thấy nên không đoán trạng thái như nút đổi chế độ;
+     mục đang đứng do app.js đánh dấu theo đường dẫn rồi tô nền nổi.
+   - Dưới lg chỉ còn icon: tooltip kính mờ hiện tên đích để chạm vẫn hiểu.
+   ========================================================================= */
+.nav-seg {
+    display: inline-flex;
+    gap: .25rem;
+    padding: .25rem;
+    border-radius: 999px;
+    background: var(--bad-surface-muted);
+}
+.nav-seg-opt {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .9rem;
+    border-radius: 999px;
+    color: var(--bs-body-color);
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--bad-transition), color var(--bad-transition);
+}
+.nav-seg-opt:hover { background: rgba(var(--bs-primary-rgb), .10); color: var(--bad-primary-text); }
+.nav-seg-opt.active {
+    background: var(--bad-surface);
+    color: var(--bad-primary-text);
+    box-shadow: var(--bad-card-shadow);
+}
+@media (max-width: 991.98px) {
+    .nav-seg-opt .seg-label { display: none; }
+    .nav-seg-opt { padding: .35rem .6rem; }
+    .nav-seg-opt::after {
+        content: attr(data-tip);
+        position: absolute;
+        top: calc(100% + .45rem);
+        left: 50%;
+        transform: translateX(-50%) translateY(-4px);
+        opacity: 0;
+        pointer-events: none;
+        padding: .25rem .6rem;
+        border-radius: .6rem;
+        background: rgba(255, 255, 255, .78);
+        backdrop-filter: blur(12px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, .55);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), var(--bad-card-shadow);
+        color: var(--bs-body-color);
+        font-size: .75rem;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: opacity var(--bad-transition), transform var(--bad-transition);
+    }
+    .nav-seg-opt:hover::after,
+    .nav-seg-opt:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+    html[data-bs-theme="dark"] .nav-seg-opt::after {
+        background: rgba(30, 41, 35, .82);
+        border-color: rgba(255, 255, 255, .14);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), var(--bad-card-shadow);
+    }
+}
