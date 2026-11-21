@@ -71,7 +71,7 @@
                     </div>
 
                     <!-- Dòng 2: người nhận – số sản phẩm – thanh toán -->
-                    <div class="row g-3 small mt-1">
+                    <div class="row g-3 mt-1 order-meta">
                         <div class="col-12 col-md-4">
                             <div class="text-muted">Người nhận</div>
                             <div class="fw-semibold" th:text="${row.receiverName}">Tên người nhận</div>
@@ -92,7 +92,7 @@
                     </div>
 
                     <!-- Gợi ý bước tiếp theo của đơn: khách biết mình cần chờ gì -->
-                    <p class="small text-muted mb-0 mt-2" th:switch="${row.orderStatus.name()}">
+                    <p class="small text-muted mb-0 mt-2 order-next-hint glass-panel glass-panel--tint" th:switch="${row.orderStatus.name()}">
                         <span th:case="'PENDING'">
                             <i class="bi bi-hourglass-split" aria-hidden="true"></i>
                             BadStore đang kiểm tra tồn kho và sẽ xác nhận đơn của bạn.
