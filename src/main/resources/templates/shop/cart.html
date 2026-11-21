@@ -61,7 +61,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="table-responsive">
                     <!-- cart-table: dưới 768px mỗi dòng hàng là một thẻ (không cuộn ngang) -->
-                    <table class="table align-middle mb-0 cart-table">
+                    <table class="table table-glass align-middle mb-0 cart-table">
                         <caption class="px-3 pt-3 text-muted small">
                             Giá bán và tồn kho được kiểm tra lại ngay tại thời điểm bạn đặt hàng.
                         </caption>
@@ -102,14 +102,14 @@
                             </td>
                             <td class="text-center" data-label="Số lượng">
                                 <form th:action="@{/gio-hang/cap-nhat}" method="post" class="cart-qty-form mx-auto"
-                                      data-confirm="Cập nhật số lượng của sản phẩm này?">
+                                    >
                                     <input type="hidden" name="cartItemId" th:value="${line.cartItemId}">
                                     <div class="input-group input-group-sm quantity-group js-quantity mx-auto">
                                         <button class="btn btn-outline-secondary js-quantity-down" type="button"
                                                 th:disabled="${!line.available}" aria-label="Giảm số lượng">−</button>
-                                        <input type="number" class="form-control text-center" name="quantity"
-                                               th:value="${line.quantity}" min="1" th:max="${line.maxQuantity}"
-                                               th:disabled="${!line.available}" aria-label="Số lượng sản phẩm">
+                        <input type="number" class="form-control text-center" name="quantity"
+       th:value="${line.quantity}" min="1" step="1" required th:max="${line.maxQuantity}"
+       th:disabled="${!line.available}" aria-label="Số lượng sản phẩm">
                                         <button class="btn btn-outline-secondary js-quantity-up" type="button"
                                                 th:disabled="${!line.available}" aria-label="Tăng số lượng">+</button>
                                     </div>

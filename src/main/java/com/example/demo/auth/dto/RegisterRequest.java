@@ -26,7 +26,7 @@ public class RegisterRequest {
     @Size(max = 100, message = "Họ tên tối đa 100 ký tự")
     private String fullName;
 
-    @Pattern(regexp = "^$|^(0|\\+84)\\d{8,10}$", message = "Số điện thoại không hợp lệ (ví dụ: 0912345678)")
+    @Pattern(regexp = "^$|^(0|\\+84)\\d{9,10}$", message = "Số điện thoại không hợp lệ (ví dụ: 0912345678 hoặc +84912345678)")
     private String phone;
 
     /** BCrypt chỉ dùng 72 byte đầu của mật khẩu nên chặn luôn ở 72 ký tự. */

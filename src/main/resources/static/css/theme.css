@@ -3218,3 +3218,267 @@ body .swal2-toast.bad-toast .bad-toast__close:hover { background: rgba(255, 255,
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), var(--bad-card-shadow);
     }
 }
+
+/* =========================================================================
+   30. Hoàn thiện chế độ tối + quầng sáng thẻ (2026-11)
+   Lỗi gốc: chế độ tối đổi chữ sang xanh NHẠT nhưng nhiều nền vẫn hard-code
+   màu NHẠT của bản sáng → chữ nhạt trên nền nhạt (badge hãng, ô Y/L/V…).
+   Nguyên tắc: nền đậm + chữ sáng cho bản tối, ngược lại cho bản sáng.
+   ========================================================================= */
+
+/* 30.1 Token "subtle" phải đổi theo chế độ. Trước đây bản tối giữ nguyên nền nhạt
+   → ô chữ cái đầu hãng, khối home-cta, trạng thái đang chọn… đều nhạt nhoà. */
+:root {
+    /* Quầng sáng hover: bản sáng vừa đủ trên nền xám nhạt */
+    --bad-card-glow: 0 0 0 1px rgba(15, 138, 95, .28), 0 12px 34px rgba(15, 138, 95, .2);
+}
+html[data-bs-theme="dark"] {
+    --bs-primary-bg-subtle: #12291f;
+    --bs-primary-border-subtle: #245239;
+    --bs-primary-text-emphasis: #a5e2c2;
+    /* Bản tối: xanh 20% trên nền gần đen = vô hình → nâng lên xanh SÁNG, đậm hơn */
+    --bad-card-glow: 0 0 0 1px rgba(126, 208, 165, .5), 0 10px 38px rgba(126, 208, 165, .26);
+}
+
+/* 30.2 Hover thẻ – rule cuối, thắng AOS (khoá transform) và .card.border-0.shadow-sm
+   (khoá bóng). Bóng lấy token nên tự đổi theo sáng/tối. */
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover,
+    .card.product-card:hover,
+    .quick-tile:hover,
+    .brand-tile:hover {
+        transform: translateY(-6px) scale(1.02) rotate(-.45deg) !important;
+        box-shadow: var(--bad-card-shadow-hover), var(--bad-card-glow) !important;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .product-card:hover, .card.product-card:hover, .quick-tile:hover, .brand-tile:hover {
+        transform: none !important;
+    }
+}
+
+/* 30.3 Các mảng nhạt hard-code còn sót → bản tối nền đậm + chữ sáng */
+html[data-bs-theme="dark"] .badge-brand { background: rgba(15, 138, 95, .22); color: #a5e2c2; }
+html[data-bs-theme="dark"] .quick-tile .quick-tile-icon { background: rgba(15, 138, 95, .22); color: #a5e2c2; }
+
+/* Badge loại vợt (text-bg-light): nền đã tối nhưng chữ vẫn đen → đọc không được */
+html[data-bs-theme="dark"] .badge.text-bg-light {
+    color: var(--bs-body-color) !important;
+    background-color: var(--bad-surface-muted) !important;
+    border-color: var(--bad-border) !important;
+}
+
+/* Badge mềm: hết "lỗ trắng" trên nền tối */
+html[data-bs-theme="dark"] .badge-soft-primary   { color: #a5e2c2; background: rgba(15, 138, 95, .2); }
+html[data-bs-theme="dark"] .badge-soft-success   { color: #86d3a2; background: rgba(22, 163, 74, .18); }
+html[data-bs-theme="dark"] .badge-soft-warning   { color: #ffd166; background: rgba(255, 193, 7, .14); }
+html[data-bs-theme="dark"] .badge-soft-danger    { color: #ff8f98; background: rgba(207, 36, 49, .2); }
+html[data-bs-theme="dark"] .badge-soft-secondary { color: #a7b8ae; background: rgba(167, 184, 174, .14); }
+html[data-bs-theme="dark"] .badge-soft-info      { color: #6edff6; background: rgba(13, 202, 240, .16); }
+
+/* Nhãn trạng thái đơn / sản phẩm / thanh toán / voucher */
+html[data-bs-theme="dark"] .status-DELIVERED,
+html[data-bs-theme="dark"] .status-ACTIVE,
+html[data-bs-theme="dark"] .status-PAID      { background: rgba(22, 163, 74, .18); color: #86d3a2; }
+html[data-bs-theme="dark"] .status-CONFIRMED,
+html[data-bs-theme="dark"] .status-UPCOMING  { background: rgba(37, 99, 235, .2); color: #93c5fd; }
+html[data-bs-theme="dark"] .status-SHIPPING  { background: rgba(79, 70, 229, .22); color: #a5b4fc; }
+html[data-bs-theme="dark"] .status-CANCELLED,
+html[data-bs-theme="dark"] .status-LOCKED,
+html[data-bs-theme="dark"] .status-FAILED    { background: rgba(207, 36, 49, .2); color: #ff8f98; }
+html[data-bs-theme="dark"] .status-RETURNED,
+html[data-bs-theme="dark"] .status-REFUNDED  { background: rgba(126, 34, 206, .22); color: #d8b4fe; }
+html[data-bs-theme="dark"] .status-PENDING,
+html[data-bs-theme="dark"] .status-DRAFT     { background: rgba(255, 193, 7, .14); color: #ffd166; }
+html[data-bs-theme="dark"] .status-INACTIVE,
+html[data-bs-theme="dark"] .status-HIDDEN,
+html[data-bs-theme="dark"] .status-EXPIRED,
+html[data-bs-theme="dark"] .status-USED_UP   { background: rgba(167, 184, 174, .14); color: #a7b8ae; }
+
+/* Ô lọc đang chọn / hover: nền nhạt hard-code → bản tối dùng xanh trong suốt */
+html[data-bs-theme="dark"] .filter-option:hover,
+html[data-bs-theme="dark"] .filter-option:has(.form-check-input:checked) {
+    background: rgba(15, 138, 95, .16);
+}
+
+/* =========================================================================
+   31. Hệ thống kính mờ iOS DÙNG CHUNG (glass-panel / btn-glass / table-glass)
+   Chỉ phần tử nổi hoặc khối nhấn mới dùng kính; nền thường vẫn đặc theo token.
+   Chữ luôn màu đặc, đo tương phản cả sáng lẫn tối.
+   ========================================================================= */
+
+/* --- Khối kính nền --- */
+.glass-panel,
+.card.glass-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, .68), rgba(255, 255, 255, .42));
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, .6);
+    border-radius: var(--bs-border-radius);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65), var(--bad-card-shadow);
+}
+/* Khối nhấn: viền + ánh xanh thương hiệu (trạng thái đơn, bước đơn, thống kê) */
+.glass-panel--tint,
+.card.glass-panel--tint {
+    border-color: rgba(15, 138, 95, .35);
+    background: linear-gradient(135deg, rgba(15, 138, 95, .1), rgba(255, 255, 255, .5));
+}
+html[data-bs-theme="dark"] .glass-panel,
+html[data-bs-theme="dark"] .card.glass-panel {
+    background: linear-gradient(135deg, rgba(126, 208, 165, .1), rgba(30, 41, 35, .6));
+    border-color: rgba(126, 208, 165, .22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), var(--bad-card-shadow);
+}
+html[data-bs-theme="dark"] .glass-panel--tint,
+html[data-bs-theme="dark"] .card.glass-panel--tint {
+    border-color: rgba(126, 208, 165, .4);
+    background: linear-gradient(135deg, rgba(126, 208, 165, .16), rgba(30, 41, 35, .62));
+}
+
+/* --- Nút kính: giữ nguyên chiều cao/bo góc của .btn (đúng cặp với nút thường) --- */
+.btn-glass {
+    background: rgba(255, 255, 255, .4);
+    backdrop-filter: blur(10px) saturate(160%);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, .6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
+    color: var(--bs-body-color);
+}
+.btn-glass--primary {
+    background: rgba(15, 138, 95, .12);
+    border-color: rgba(15, 138, 95, .4);
+    color: var(--bad-primary-text);
+}
+.btn-glass--danger {
+    background: rgba(207, 36, 49, .1);
+    border-color: rgba(207, 36, 49, .4);
+    color: var(--bad-sale);
+}
+.btn-glass:hover { background: rgba(255, 255, 255, .6); color: var(--bs-body-color); }
+.btn-glass--primary:hover { background: rgba(15, 138, 95, .2); color: var(--bad-primary-dark); }
+.btn-glass--danger:hover { background: rgba(207, 36, 49, .18); color: #b0222f; }
+html[data-bs-theme="dark"] .btn-glass {
+    background: rgba(126, 208, 165, .1);
+    border-color: rgba(126, 208, 165, .25);
+    color: var(--bs-body-color);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+html[data-bs-theme="dark"] .btn-glass--primary {
+    background: rgba(126, 208, 165, .16);
+    border-color: rgba(126, 208, 165, .45);
+    color: #a5e2c2;
+}
+html[data-bs-theme="dark"] .btn-glass--danger {
+    background: rgba(255, 143, 152, .14);
+    border-color: rgba(255, 143, 152, .45);
+    color: #ff8f98;
+}
+html[data-bs-theme="dark"] .btn-glass:hover { background: rgba(126, 208, 165, .2); color: var(--bs-body-color); }
+html[data-bs-theme="dark"] .btn-glass--primary:hover { background: rgba(126, 208, 165, .26); color: #c9efdb; }
+html[data-bs-theme="dark"] .btn-glass--danger:hover { background: rgba(255, 143, 152, .24); color: #ffb3ba; }
+
+/* --- Bảng kính: nền trong, tiêu đề nhuộm màu, hàng hover nhẹ --- */
+.table-glass {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-border-color: var(--bad-border);
+}
+.table-glass thead th,
+.card .table-glass thead th {
+    background: rgba(15, 138, 95, .08);
+    color: var(--bad-primary-text);
+    border-bottom: 1px solid var(--bad-border);
+}
+.table-glass tbody tr,
+.card .table-glass tbody tr { background: rgba(255, 255, 255, .38); }
+.table-glass tbody tr:hover,
+.card .table-glass tbody tr:hover { background: rgba(15, 138, 95, .07); }
+html[data-bs-theme="dark"] .table-glass thead th,
+html[data-bs-theme="dark"] .card .table-glass thead th {
+    background: rgba(126, 208, 165, .1);
+    color: #a5e2c2;
+}
+html[data-bs-theme="dark"] .table-glass tbody tr,
+html[data-bs-theme="dark"] .card .table-glass tbody tr { background: rgba(30, 41, 35, .5); }
+html[data-bs-theme="dark"] .table-glass tbody tr:hover,
+html[data-bs-theme="dark"] .card .table-glass tbody tr:hover { background: rgba(126, 208, 165, .08); }
+
+/* Lỗi chữ tiêu đề bảng xám đậm trên nền tối (Đơn hàng / So sánh): đổi theo token */
+html[data-bs-theme="dark"] .card .table thead th {
+    background: var(--bad-surface-muted);
+    color: var(--bad-muted);
+}
+
+/* --- Checkout: dòng hàng kính + giá đóng khung + ảnh to hơn --- */
+.summary-thumb { width: 64px; height: 64px; flex: 0 0 64px; }
+.summary-lines > li {
+    padding: .5rem .6rem;
+    border: 1px solid rgba(15, 138, 95, .22);
+    border-radius: .65rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .35));
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+}
+.summary-lines > li > span {
+    padding: .2rem .5rem;
+    border: 1px solid rgba(15, 138, 95, .35);
+    border-radius: .5rem;
+    background: rgba(15, 138, 95, .08);
+    white-space: nowrap;
+}
+html[data-bs-theme="dark"] .summary-lines > li {
+    border-color: rgba(126, 208, 165, .25);
+    background: linear-gradient(135deg, rgba(126, 208, 165, .1), rgba(30, 41, 35, .55));
+}
+html[data-bs-theme="dark"] .summary-lines > li > span {
+    border-color: rgba(126, 208, 165, .4);
+    background: rgba(126, 208, 165, .12);
+}
+
+/* --- Chữ gợi ý thu gọn: mở khi hover HOẶC focus/chạm vào khối cha --- */
+.checkout-hint {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: max-height .25s var(--bad-ease-out, ease), opacity .2s ease, margin .25s ease;
+}
+.pick-card:hover .checkout-hint,
+.pick-card:focus-within .checkout-hint,
+.summary-card:hover .checkout-hint,
+.summary-card:focus-within .checkout-hint {
+    max-height: 8rem;
+    opacity: 1;
+    margin-top: .35rem;
+}
+@media (prefers-reduced-motion: reduce) {
+    .checkout-hint { transition: none; }
+}
+
+/* =========================================================================
+   32. Bộ số lượng DÙNG CHUNG (giỏ hàng + chi tiết sản phẩm):
+   nút − / + tròn kính mờ, ô nhập gọn lại một chút.
+   ========================================================================= */
+.quantity-group .btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    min-height: 0;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 138, 95, .1);
+    border: 1px solid rgba(15, 138, 95, .35);
+    color: var(--bad-primary-text);
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+}
+.quantity-group .btn:hover:not(:disabled) { background: rgba(15, 138, 95, .2); color: var(--bad-primary-dark); }
+.quantity-group .form-control { height: 2.25rem; padding: .25rem .4rem; }
+html[data-bs-theme="dark"] .quantity-group .btn {
+    background: rgba(126, 208, 165, .14);
+    border-color: rgba(126, 208, 165, .4);
+    color: #a5e2c2;
+}
+html[data-bs-theme="dark"] .quantity-group .btn:hover:not(:disabled) { background: rgba(126, 208, 165, .26); color: #c9efdb; }

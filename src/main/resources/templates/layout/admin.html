@@ -12,6 +12,9 @@
 
     <!-- CSS riêng khu quản trị (đặt SAU theme.css để ghi đè khi cần) -->
     <link rel="stylesheet" th:href="@{/css/admin.css}">
+        <link rel="stylesheet" th:href="@{/css/theme-toggle.css}">
+    <!-- Không defer: áp chế độ đã lưu TRƯỚC khi vẽ body → không nháy sáng -->
+    <script th:src="@{/js/theme-toggle.js}"></script>
 </head>
 <body class="bg-body-tertiary">
 
@@ -54,6 +57,20 @@
                 </span>
 
                 <div class="ms-auto d-flex align-items-center gap-2">
+                                        <div class="theme-switch">
+                        <button class="theme-switch-pill" type="button" aria-label="Đổi giao diện sáng / tối">
+                            <i class="bi theme-switch-ico bi-sun-fill" aria-hidden="true"></i>
+                            <span class="d-none d-md-inline">Giao diện</span>
+                        </button>
+                        <div class="theme-switch-opts" role="group" aria-label="Chọn giao diện">
+                            <button class="theme-switch-opt" type="button" data-theme-choice="light" aria-pressed="false">
+                                <i class="bi bi-sun-fill" aria-hidden="true"></i> Sáng
+                            </button>
+                            <button class="theme-switch-opt" type="button" data-theme-choice="dark" aria-pressed="false">
+                                <i class="bi bi-moon-stars-fill" aria-hidden="true"></i> Tối
+                            </button>
+                        </div>
+                    </div>
                     <a class="btn btn-sm btn-outline-primary d-none d-md-inline-flex" th:href="@{/}">
                         <i class="bi bi-shop" aria-hidden="true"></i> Xem cửa hàng
                     </a>

@@ -106,7 +106,7 @@
                     </div>
 
                     <h1 class="h3 mb-1" th:text="${product.name}">Tên vợt</h1>
-                    <p class="small text-muted mb-3">
+                    <p class="small text-muted mb-2">
                         Mã sản phẩm: <span th:text="${product.productCode}">SP-001</span>
                         <span th:if="${initialVariant != null}">
                             · SKU <span data-pdp-sku th:text="${initialVariant.sku}">SKU</span>
@@ -114,7 +114,7 @@
                     </p>
 
                     <!-- Giá: server render đúng biến thể mặc định, JavaScript đổi theo tổ hợp đang chọn -->
-                    <div class="d-flex flex-wrap align-items-baseline gap-2">
+                    <div class="d-flex flex-wrap align-items-baseline gap-2 mb-2">
                         <span class="price pdp-price" data-pdp-price
                               th:text="${initialPrice != null}
                                        ? |${#numbers.formatInteger(initialPrice, 0, 'POINT')} ₫|
@@ -197,7 +197,7 @@
                         <div class="pdp-selectors" th:with="defaultVariant=${detail.defaultVariant}">
 
                             <!-- A. Màu sắc: chỉ các màu có biến thể ACTIVE thật -->
-                            <fieldset class="pdp-selector" data-pdp-group="color">
+                            <fieldset class="pdp-selector glass-panel" data-pdp-group="color">
                                 <legend class="pdp-selector-legend">
                                     <span>Màu sắc</span>
                                     <span class="pdp-selector-current" data-pdp-selected-color
@@ -222,9 +222,9 @@
                                     Màu hết hàng được đánh dấu; bạn vẫn xem được giá và SKU của màu đó.
                                 </p>
                             </fieldset>
-
+  <div class="pdp-selector-pair">
                             <!-- B. Trọng lượng: cập nhật theo màu đang chọn -->
-                            <fieldset class="pdp-selector" data-pdp-group="weight">
+                            <fieldset class="pdp-selector glass-panel" data-pdp-group="weight">
                                 <legend class="pdp-selector-legend">
                                     <span>Trọng lượng</span>
                                     <span class="pdp-selector-current" data-pdp-selected-weight
@@ -244,7 +244,7 @@
                             </fieldset>
 
                             <!-- C. Cỡ cán: chỉ mở tổ hợp màu + trọng lượng đang có -->
-                            <fieldset class="pdp-selector" data-pdp-group="grip">
+                            <fieldset class="pdp-selector glass-panel" data-pdp-group="grip">
                                 <legend class="pdp-selector-legend">
                                     <span>Cỡ cán</span>
                                     <span class="pdp-selector-current" data-pdp-selected-grip
@@ -262,7 +262,7 @@
                                 </div>
                                 <p class="pdp-selector-hint">Cỡ cán chỉ mở khi tổ hợp màu + trọng lượng tương ứng tồn tại.</p>
                             </fieldset>
-
+</div>
                             <p class="pdp-selection-status" data-pdp-selection-status role="status" aria-live="polite"
                                th:text="${defaultVariant != null
                                         ? 'Đang chọn: ' + defaultVariant.label + ' · SKU ' + defaultVariant.sku
@@ -286,10 +286,10 @@
                                                     aria-label="Giảm số lượng">
                                                 <i class="bi bi-dash-lg" aria-hidden="true"></i>
                                             </button>
-                                            <input type="number" class="form-control text-center" id="quantity" name="quantity"
-                                                   value="1" min="1"
-                                                   th:max="${initialVariant != null ? initialVariant.stockQuantity : 1}"
-                                                   inputmode="numeric" aria-label="Số lượng sản phẩm">
+                                 <input type="number" class="form-control text-center" id="quantity" name="quantity"
+       value="1" min="1" step="1" required
+       th:max="${initialVariant != null ? initialVariant.stockQuantity : 1}"
+       inputmode="numeric" aria-label="Số lượng sản phẩm">
                                             <button class="btn btn-outline-secondary js-quantity-up" type="button"
                                                     aria-label="Tăng số lượng">
                                                 <i class="bi bi-plus-lg" aria-hidden="true"></i>
@@ -416,7 +416,7 @@
                 <div class="tab-pane fade" id="thong-so" role="tabpanel" aria-labelledby="thong-so-tab" tabindex="0">
                     <h2 class="h6 section-title">Thông số cây vợt</h2>
                     <div class="table-responsive">
-                        <table class="table table-sm mb-0">
+                        <table class="table table-sm table-glass mb-0">
                             <caption class="px-3 text-muted small">Thông số do hãng công bố, có thể sai lệch nhỏ giữa các lô hàng.</caption>
                             <tbody>
                             <tr><th scope="row" class="pdp-spec-key">Hãng</th><td th:text="${product.brand.name}">Hãng</td></tr>
@@ -455,7 +455,7 @@
 
                     <h2 class="h6 section-title mt-4">Phiên bản &amp; giá bán</h2>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover table-glass align-middle mb-0">
                             <caption class="px-3 pb-3 text-muted small">
                                 Giá và tồn kho của từng phiên bản. Phiên bản hết hàng vẫn hiển thị để bạn tham khảo.
                             </caption>
@@ -531,7 +531,7 @@
                     </div>
 
                     <!-- Khách đã nhận hàng và còn lượt đánh giá thì hiện form -->
-                    <div class="border rounded bg-light p-3 p-md-4 mb-4" sec:authorize="isAuthenticated()" th:if="${reviewable}">
+                    <div class="border rounded glass-panel p-3 p-md-4 mb-4" sec:authorize="isAuthenticated()" th:if="${reviewable}">
                         <p class="fw-semibold mb-2">Chia sẻ cảm nhận của bạn về mẫu vợt này</p>
                         <form th:action="@{/danh-gia}" method="post" data-confirm="Gửi đánh giá này?">
                             <input type="hidden" name="productId" th:value="${product.id}">

@@ -230,7 +230,7 @@
     }
 }
 
-/* ============ 4. Tài khoản của tôi ============ */
+/* ============ 5. Tài khoản của tôi ============ */
 /* Ảnh đại diện / chữ cái đầu: tròn, cùng kích thước để trang không nhảy khi có ảnh */
 .account-page .account-avatar {
     display: inline-flex;
@@ -275,3 +275,48 @@
     width: 1.25rem;
     text-align: center;
 }
+
+/* =========================================================================
+   Bổ sung dùng chung (gộp MỘT lần – hai khối trùng trước đó đã xoá):
+   cột thông tin đơn to hơn, khung kính gợi ý bước tiếp theo,
+   cặp badge vai trò/trạng thái cân giữa, ô thống kê kính mờ.
+   ========================================================================= */
+.orders-page .order-meta > div > .text-muted {
+    font-size: .8rem;
+    letter-spacing: .02em;
+}
+.orders-page .order-meta .fw-semibold { font-size: 1.05rem; }
+
+.orders-page .order-next-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    padding: .6rem .8rem;
+    margin-top: .75rem !important;
+    color: var(--bs-body-color);
+}
+.orders-page .order-next-hint .bi { color: var(--bad-primary-text); }
+html[data-bs-theme="dark"] .orders-page .order-next-hint .bi { color: #a5e2c2; }
+
+/* Hàng badge là FLEX nên vertical-align vô tác dụng; căn giữa + cùng số đo hộp */
+.account-page .account-badges { align-items: center; }
+.account-page .account-badges .badge,
+.account-page .account-badges .status-pill {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    padding: .4rem .75rem;
+    font-size: .78rem;
+}
+
+/* Ô "1 đơn hàng / 1 địa chỉ": kính mờ + nâng nhẹ khi hover */
+.account-page .account-stat {
+    padding: .6rem .5rem;
+    border-radius: .65rem;
+    transition: transform var(--bad-transition), box-shadow var(--bad-transition);
+}
+.account-page .account-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--bad-card-shadow-hover);
+}
+.account-page .account-stat .h5 { color: var(--bad-primary-text); }

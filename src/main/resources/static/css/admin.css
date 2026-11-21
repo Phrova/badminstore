@@ -82,3 +82,29 @@
         align-content: flex-start;
     }
 }
+
+/* --- 4. Nút sáng/tối trong topbar: bảng lựa chọn nổi, không đẩy tràn thanh --- */
+.admin-topbar .theme-switch-opts {
+    position: absolute;
+    top: calc(100% + .4rem);
+    right: 0;
+    z-index: 1035;
+    padding: .25rem;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+}
+.admin-topbar .theme-switch:hover .theme-switch-opts,
+.admin-topbar .theme-switch:focus-within .theme-switch-opts {
+    background: rgba(255, 255, 255, .88);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border-color: rgba(255, 255, 255, .6);
+    box-shadow: var(--bad-card-shadow-hover);
+}
+html[data-bs-theme="dark"] .admin-topbar .theme-switch:hover .theme-switch-opts,
+html[data-bs-theme="dark"] .admin-topbar .theme-switch:focus-within .theme-switch-opts {
+    background: rgba(30, 41, 35, .92);
+    border-color: rgba(126, 208, 165, .25);
+}

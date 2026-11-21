@@ -26,8 +26,8 @@ public class ProfileForm {
     @Size(max = 100, message = "Email tối đa 100 ký tự")
     private String email;
 
-    @Pattern(regexp = "^$|^(0|\\+84)\\d{8,10}$",
-            message = "Số điện thoại không hợp lệ (ví dụ: 0912345678)")
+    @Pattern(regexp = "^$|^(0|\\+84)\\d{9,10}$",
+            message = "Số điện thoại không hợp lệ (ví dụ: 0912345678 hoặc +84912345678)")
     @Size(max = 20, message = "Số điện thoại tối đa 20 ký tự")
     private String phone;
 }

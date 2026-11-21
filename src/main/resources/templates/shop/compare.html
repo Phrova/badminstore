@@ -27,12 +27,12 @@
             </p>
         </div>
         <div class="d-flex gap-2" th:if="${!items.isEmpty()}">
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/san-pham}">
+            <a class="btn btn-sm btn-glass btn-glass--primary" th:href="@{/san-pham}">
                 <i class="bi bi-plus-lg" aria-hidden="true"></i> Thêm sản phẩm khác
             </a>
             <form th:action="@{/so-sanh/xoa-het}" method="post"
                   data-confirm="Xoá toàn bộ danh sách so sánh?">
-                <button class="btn btn-sm btn-outline-danger" type="submit">
+                <button class="btn btn-sm btn-glass btn-glass--danger" type="submit">
                     <i class="bi bi-x-circle" aria-hidden="true"></i> Xoá tất cả
                 </button>
             </form>
@@ -60,7 +60,7 @@
             <p class="text-muted small d-md-none mb-2">
                 <i class="bi bi-arrows-move" aria-hidden="true"></i> Kéo ngang bảng để xem đủ các mẫu vợt đang so sánh.
             </p>
-            <table class="table table-bordered align-middle mb-0 compare-table">
+            <table class="table table-glass align-middle mb-0 compare-table">
                 <thead class="table-light">
                 <tr>
                     <th scope="col" class="compare-criteria">Tiêu chí</th>
@@ -140,15 +140,15 @@
                 <tr>
                     <th scope="row" class="text-muted fw-normal">Thao tác</th>
                     <td class="text-center" th:each="item : ${items}">
-                        <div class="d-flex flex-column gap-1 align-items-center">
-                            <a class="btn btn-sm btn-primary"
+                        <div class="d-flex flex-wrap gap-1 justify-content-center">
+                            <a class="btn btn-sm btn-glass btn-glass--primary"
                                th:href="@{/san-pham/{id}(id=${item.product.id})}">
                                 <i class="bi bi-eye" aria-hidden="true"></i> Xem chi tiết
                             </a>
                             <form th:action="@{/so-sanh/xoa}" method="post"
                                   th:data-confirm="${'Bỏ ' + item.product.name + ' khỏi danh sách so sánh?'}">
                                 <input type="hidden" name="productId" th:value="${item.product.id}">
-                                <button class="btn btn-sm btn-outline-danger" type="submit">
+                                <button class="btn btn-sm btn-glass btn-glass--danger" type="submit">
                                     <i class="bi bi-x-lg" aria-hidden="true"></i> Bỏ
                                 </button>
                             </form>

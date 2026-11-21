@@ -112,10 +112,10 @@
                                th:classappend="${method.name() == 'COD'} ? 'bi-cash-coin' : 'bi-bank'"></i>
                             <span>
                                 <span class="fw-semibold" th:text="${method.label}">Phương thức</span>
-                                <span class="d-block text-muted small" th:if="${method.name() == 'COD'}">
+                                <span class="d-block text-muted small checkout-hint" th:if="${method.name() == 'COD'}">
                                     Thanh toán bằng tiền mặt khi nhận hàng.
                                 </span>
-                                <span class="d-block text-muted small" th:if="${method.name() == 'BANK_TRANSFER'}">
+                                <span class="d-block text-muted small checkout-hint" th:if="${method.name() == 'BANK_TRANSFER'}">
                                     Quét mã QR chuyển khoản ngay sau khi đặt hàng; BadStore xác nhận và gửi hàng sau khi nhận được tiền.
                                 </span>
                             </span>
@@ -232,7 +232,7 @@
                             </span>
                         </div>
 
-                        <p class="small text-muted mb-2"
+                        <p class="small text-muted checkout-hint"
                            th:if="${!summary.freeShipping and summary.amountToFreeShipping.signum() > 0}">
                             Mua thêm <span th:insert="~{fragments/common :: money(${summary.amountToFreeShipping})}">0 ₫</span>
                             để được miễn phí vận chuyển.
@@ -253,16 +253,16 @@
                         <span class="fs-5 price-current" data-order-total
                               th:insert="~{fragments/common :: money(${summary.totalAmount})}">0 ₫</span>
                     </div>
-                    <p class="small text-muted mb-0 mt-2" th:if="${ghnShippingEnabled}">
+                    <p class="small text-muted mb-0 checkout-hint" th:if="${ghnShippingEnabled}">
                         <i class="bi bi-truck text-primary" aria-hidden="true"></i>
                         Phí giao hàng tính theo địa chỉ GHN đã chọn; BadStore tính lại lần cuối khi bạn đặt hàng.
                     </p>
-                    <p class="small text-muted mb-0 mt-2" th:if="${ghnEnabled and !ghnShippingEnabled}">
+                    <p class="small text-muted mb-0 checkout-hint" th:if="${ghnEnabled and !ghnShippingEnabled}">
                         <i class="bi bi-truck text-primary" aria-hidden="true"></i>
                         Địa chỉ lấy theo GHN; shop chưa khai báo kho lấy hàng nên phí giao hàng đang tính
                         theo mức mặc định của BadStore.
                     </p>
-                    <p class="small text-muted mb-0 mt-2" th:unless="${ghnEnabled}">
+                    <p class="small text-muted mb-0 checkout-hint" th:unless="${ghnEnabled}">
                         <i class="bi bi-shield-check text-success" aria-hidden="true"></i>
                         BadStore kiểm tra lại giá và tồn kho ngay khi bạn bấm đặt hàng.
                     </p>

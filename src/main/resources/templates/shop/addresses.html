@@ -96,7 +96,7 @@
                             <label class="form-label" for="receiverPhone">Số điện thoại <span class="text-danger">*</span></label>
                             <input class="form-control" id="receiverPhone" type="tel" th:field="*{receiverPhone}"
                                    th:classappend="${#fields.hasErrors('receiverPhone')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('receiverPhone')}"
-                                   required pattern="0\d{9,10}" maxlength="20" autocomplete="tel">
+                                   required pattern="^(0|\+84)\d{9,10}$" maxlength="20" autocomplete="tel">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('receiverPhone')}"
                                  th:errors="*{receiverPhone}">Số điện thoại không hợp lệ</div>
                         </div>

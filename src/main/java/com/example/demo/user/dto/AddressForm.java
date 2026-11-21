@@ -20,7 +20,7 @@ public class AddressForm {
     private String receiverName;
 
     @NotBlank(message = "Vui lòng nhập số điện thoại người nhận.")
-    @Pattern(regexp = "0\\d{9,10}", message = "Số điện thoại phải bắt đầu bằng 0 và gồm 10–11 chữ số.")
+    @Pattern(regexp = "^(0|\\+84)\\d{9,10}$", message = "Số điện thoại không hợp lệ (ví dụ: 0912345678 hoặc +84912345678).")
     private String receiverPhone;
 
     @NotBlank(message = "Vui lòng nhập tỉnh/thành phố.")

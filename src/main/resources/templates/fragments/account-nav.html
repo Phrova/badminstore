@@ -21,7 +21,7 @@
             <h2 class="h5 fw-bold mt-3 mb-1" th:text="${user.fullName}">Họ tên khách hàng</h2>
             <p class="text-muted small mb-2 text-break" th:text="${user.email}">email@example.com</p>
 
-            <div class="d-flex flex-wrap justify-content-center gap-2">
+            <div class="d-flex flex-wrap justify-content-center gap-2 account-badges">
                 <span class="badge"
                       th:classappend="${user.role.name() == 'ADMIN'} ? 'text-bg-primary' : 'text-bg-secondary'"
                       th:text="${user.role.label}">Khách hàng</span>
@@ -31,14 +31,14 @@
 
             <div class="row g-2 mt-3 pt-3 border-top">
                 <div class="col-6">
-                    <a class="d-block text-decoration-none" th:href="@{/don-hang}"
+                    <a class="d-block text-decoration-none account-stat glass-panel" th:href="@{/don-hang}"
                        th:aria-label="|Xem ${orderCount} đơn hàng của tôi|">
                         <span class="h5 d-block mb-0 text-primary" th:text="${orderCount}">0</span>
                         <span class="small text-muted">Đơn hàng</span>
                     </a>
                 </div>
                 <div class="col-6">
-                    <a class="d-block text-decoration-none" th:href="@{/dia-chi}"
+                    <a class="d-block text-decoration-none account-stat glass-panel" th:href="@{/dia-chi}"
                        th:aria-label="|Xem ${addressCount} địa chỉ giao hàng|">
                         <span class="h5 d-block mb-0 text-primary" th:text="${addressCount}">0</span>
                         <span class="small text-muted">Địa chỉ</span>
