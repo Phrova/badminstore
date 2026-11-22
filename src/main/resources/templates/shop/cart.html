@@ -17,7 +17,26 @@
         </ol>
     </nav>
 
-    <h1 class="page-title mb-3"><i class="bi bi-cart3 text-primary" aria-hidden="true"></i> Giỏ hàng của bạn</h1>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="page-title mb-0"><i class="bi bi-cart3 text-primary" aria-hidden="true"></i> Giỏ hàng của bạn</h1>
+        <!-- Bộ lọc client (cart.js bật khi chạy JS; không JS thì ẩn, bảng hiện đủ) -->
+        <div class="d-flex flex-wrap gap-2" data-cart-tools hidden>
+            <label class="visually-hidden" for="cartFilterKeyword">Lọc theo tên hoặc SKU</label>
+            <input class="form-control form-control-sm cart-filter-input" type="search" id="cartFilterKeyword"
+                   placeholder="Lọc tên / SKU…" maxlength="100" data-cart-filter-keyword>
+                  <th:block th:if="${cart.hasIssues}">
+                <label class="visually-hidden" for="cartFilterStatus">Lọc theo tình trạng</label>
+                <select class="form-select form-select-sm cart-filter-input" id="cartFilterStatus" data-cart-filter-status>
+                    <option value="">Tất cả tình trạng</option>
+                    <option value="ok">Còn hàng</option>
+                    <option value="issue">Hết hàng / lỗi</option>
+                </select>
+            </th:block>
+            <button class="btn btn-sm btn-glass" type="button" data-cart-select-toggle aria-pressed="false">
+                <i class="bi bi-check2-square" aria-hidden="true"></i> Chọn nhiều
+            </button>
+        </div>
+    </div>
 
     <!-- Thanh bước mua hàng: Giỏ hàng (đang ở) → Thanh toán → Hoàn tất -->
     <ol class="checkout-steps" aria-label="Các bước mua hàng">
@@ -58,8 +77,20 @@
                 </div>
             </div>
 
+            <!-- Thanh xoá nhóm: cart.js điền id các dòng được chọn vào form này -->
+            <div class="cart-bulk-bar glass-panel d-flex flex-wrap align-items-center gap-2 mb-2" data-cart-bulk hidden>
+                <span class="small fw-semibold" data-cart-bulk-count>Đã chọn 0</span>
+                <form th:action="@{/gio-hang/xoa-nhieu}" method="post" class="ms-auto"
+                      data-confirm="Xoá các sản phẩm đã chọn khỏi giỏ hàng?">
+                    <div data-cart-bulk-ids></div>
+                    <button type="submit" class="btn btn-sm btn-glass btn-glass--danger" data-cart-bulk-submit disabled>
+                        <i class="bi bi-trash3" aria-hidden="true"></i> Xoá đã chọn
+                    </button>
+                </form>
+            </div>
+
             <div class="card border-0 shadow-sm">
-                <div class="table-responsive">
+                <div class="table-responsive table-glass-wrap">
                     <!-- cart-table: dưới 768px mỗi dòng hàng là một thẻ (không cuộn ngang) -->
                     <table class="table table-glass align-middle mb-0 cart-table">
                         <caption class="px-3 pt-3 text-muted small">
@@ -67,15 +98,36 @@
                         </caption>
                         <thead class="table-light">
                         <tr>
+                            <th scope="col" class="cart-col-check">
+                                <input class="form-check-input" type="checkbox" data-cart-check-all
+                                       aria-label="Chọn tất cả dòng đang hiện" hidden>
+                            </th>
                             <th scope="col">Sản phẩm</th>
-                            <th scope="col" class="text-end">Đơn giá</th>
+                            <th scope="col" class="text-end" aria-sort="none">
+                                <button type="button" class="cart-sort-btn" data-cart-sort="price">
+                                    Đơn giá <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
+                                </button>
+                            </th>
                             <th scope="col" class="text-center">Số lượng</th>
-                            <th scope="col" class="text-end">Thành tiền</th>
+                            <th scope="col" class="text-end" aria-sort="none">
+                                <button type="button" class="cart-sort-btn" data-cart-sort="total">
+                                    Thành tiền <i class="bi bi-arrow-down-up" aria-hidden="true"></i>
+                                </button>
+                            </th>
                             <th scope="col"><span class="visually-hidden">Thao tác</span></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="line : ${cart.lines}" th:classappend="${!line.available} ? 'table-warning'">
+                        <tr th:each="line : ${cart.lines}" th:classappend="${!line.available} ? 'table-warning'"
+                            data-cart-row
+                            th:attr="data-price=${line.price},data-total=${line.lineTotal},
+                                     data-available=${line.available} ? '1' : '0',
+                                     data-search=${#strings.toLowerCase(line.productName + ' ' + line.sku)}">
+                            <td class="cart-col-check" data-label="Chọn">
+                                <input class="form-check-input" type="checkbox" data-cart-check
+                                       th:value="${line.cartItemId}"
+                                       th:attr="aria-label=|Chọn ${line.productName}|">
+                            </td>
                             <td data-label="Sản phẩm">
                                 <div class="d-flex align-items-center gap-3">
                                     <img class="cart-thumb rounded border bg-white" th:src="${line.imageUrl}"
@@ -101,20 +153,21 @@
                                       th:insert="~{fragments/common :: money(${line.originalPrice})}">0 ₫</span>
                             </td>
                             <td class="text-center" data-label="Số lượng">
-                                <form th:action="@{/gio-hang/cap-nhat}" method="post" class="cart-qty-form mx-auto"
-                                    >
+                                <form th:action="@{/gio-hang/cap-nhat}" method="post" class="cart-qty-form mx-auto">
                                     <input type="hidden" name="cartItemId" th:value="${line.cartItemId}">
                                     <div class="input-group input-group-sm quantity-group js-quantity mx-auto">
                                         <button class="btn btn-outline-secondary js-quantity-down" type="button"
                                                 th:disabled="${!line.available}" aria-label="Giảm số lượng">−</button>
-                        <input type="number" class="form-control text-center" name="quantity"
-       th:value="${line.quantity}" min="1" step="1" required th:max="${line.maxQuantity}"
-       th:disabled="${!line.available}" aria-label="Số lượng sản phẩm">
+                                        <input type="number" class="form-control text-center" name="quantity"
+                                               th:value="${line.quantity}" min="1" step="1" required
+                                               th:max="${line.maxQuantity}"
+                                               th:disabled="${!line.available}" aria-label="Số lượng sản phẩm">
                                         <button class="btn btn-outline-secondary js-quantity-up" type="button"
                                                 th:disabled="${!line.available}" aria-label="Tăng số lượng">+</button>
                                     </div>
-                                    <button type="submit" class="btn btn-sm btn-outline-primary mt-2 w-100"
-                                            th:disabled="${!line.available}">
+                                    <!-- data-cart-update: cart.js ẩn nút khi số lượng chưa đổi (không JS thì luôn hiện) -->
+                                    <button type="submit" class="btn btn-sm btn-glass btn-glass--primary mt-2 w-100"
+                                            data-cart-update th:disabled="${!line.available}">
                                         <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Cập nhật
                                     </button>
                                 </form>
@@ -126,25 +179,34 @@
                                 <form th:action="@{/gio-hang/xoa}" method="post"
                                       data-confirm="Xoá sản phẩm này khỏi giỏ hàng?">
                                     <input type="hidden" name="cartItemId" th:value="${line.cartItemId}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    <button type="submit" class="btn btn-sm btn-glass btn-glass--danger btn-round"
                                             th:attr="aria-label=|Xoá ${line.productName} khỏi giỏ hàng|">
                                         <i class="bi bi-trash" aria-hidden="true"></i>
                                     </button>
                                 </form>
                             </td>
                         </tr>
+                        <tr data-cart-empty hidden>
+                            <td colspan="6" class="text-center text-muted py-4">Không có dòng nào khớp bộ lọc.</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- Phân trang client (cart.js dựng nút; không JS thì ẩn) -->
+            <nav class="catalog-pager mt-3" data-cart-pager hidden aria-label="Phân trang giỏ hàng">
+                <ul class="pagination justify-content-center flex-wrap mb-0"></ul>
+                <p class="catalog-pager-meta" data-cart-pager-meta></p>
+            </nav>
+
             <div class="d-flex flex-wrap justify-content-between gap-2 mt-3">
-                <a class="btn btn-outline-secondary btn-sm" th:href="@{/san-pham}">
+                <a class="btn btn-sm btn-glass" th:href="@{/san-pham}">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i> Tiếp tục mua sắm
                 </a>
                 <form th:action="@{/gio-hang/xoa-tat-ca}" method="post"
                       data-confirm="Xoá toàn bộ sản phẩm trong giỏ hàng?">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <button type="submit" class="btn btn-sm btn-glass btn-glass--danger">
                         <i class="bi bi-trash3" aria-hidden="true"></i> Xoá tất cả
                     </button>
                 </form>
@@ -159,16 +221,28 @@
                         <i class="bi bi-receipt text-primary" aria-hidden="true"></i> Tóm tắt đơn hàng
                     </h2>
 
-                    <!-- Ô nhập voucher: kiểm tra và áp dụng ở bước thanh toán -->
-                    <form method="get" th:action="@{/thanh-toan}" class="mb-3">
-                        <label class="form-label small fw-semibold" for="cartVoucher">Mã giảm giá</label>
-                        <div class="d-flex gap-2">
-                            <input class="form-control text-uppercase" id="cartVoucher" name="voucher"
-                                   maxlength="50" placeholder="Nhập mã giảm giá" autocomplete="off" spellcheck="false">
-                            <button type="submit" class="btn btn-outline-primary flex-shrink-0">Áp dụng</button>
-                        </div>
-                        <div class="form-text">Mã sẽ được kiểm tra ở bước thanh toán.</div>
-                    </form>
+                    <!-- Voucher: nút mở modal kính; không JS thì ô nhập thường bên dưới -->
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                        <span class="small fw-semibold">
+                            <i class="bi bi-ticket-perforated" aria-hidden="true"></i> Mã giảm giá
+                        </span>
+                        <button class="btn btn-sm btn-glass btn-glass--primary" type="button"
+                                data-bs-toggle="modal" data-bs-target="#voucherModal">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i> Nhập mã
+                        </button>
+                    </div>
+                    <noscript>
+                        <form method="get" th:action="@{/thanh-toan}" class="mb-3">
+                            <label class="form-label small fw-semibold" for="cartVoucherNs">Mã giảm giá</label>
+                            <div class="d-flex gap-2">
+                                <input class="form-control text-uppercase" id="cartVoucherNs" name="voucher"
+                                       maxlength="50" placeholder="Nhập mã giảm giá" autocomplete="off" spellcheck="false">
+                                <button type="submit" class="btn btn-outline-primary flex-shrink-0">Áp dụng</button>
+                            </div>
+                        </form>
+                    </noscript>
+
+              
 
                     <div class="summary-row">
                         <span class="text-muted">Số sản phẩm</span>
@@ -188,7 +262,6 @@
                         <span class="price fs-5" th:insert="~{fragments/common :: money(${cart.subtotal})}">0 ₫</span>
                     </div>
 
-                    <!-- Còn hàng đủ thì cho sang bước thanh toán; có dòng lỗi thì chặn và nhắc xử lý -->
                     <a class="btn btn-primary btn-lg w-100 mt-3" th:href="@{/thanh-toan}"
                        th:unless="${cart.hasIssues}">
                         <i class="bi bi-bag-check" aria-hidden="true"></i> Tiến hành đặt hàng
@@ -216,6 +289,35 @@
         </div>
     </div>
 
+          <div class="modal fade" id="voucherModal" tabindex="-1" aria-labelledby="voucherModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title h6" id="voucherModalLabel">
+                                        <i class="bi bi-ticket-perforated" aria-hidden="true"></i> Nhập mã giảm giá
+                                    </h2>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                </div>
+                                <form method="get" th:action="@{/thanh-toan}">
+                                    <div class="modal-body">
+                                        <label class="form-label small" for="cartVoucher">Mã giảm giá</label>
+                                        <input class="form-control text-uppercase" id="cartVoucher" name="voucher"
+                                               maxlength="50" placeholder="Ví dụ: SALE10" autocomplete="off"
+                                               spellcheck="false" required>
+                                        <div class="form-text">Mã sẽ được kiểm tra ở bước thanh toán.</div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-glass" data-bs-dismiss="modal">Huỷ</button>
+                                        <button type="submit" class="btn btn-glass btn-glass--primary">Áp dụng</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+</th:block>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/cart.js}" defer></script>
 </th:block>
 
 </body>

@@ -20,7 +20,9 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.demo.catalog.service.ProductService;
+import com.example.demo.catalog.service.ProductService;
+import java.util.Set;
+import java.util.stream.Collectors;
 import com.example.demo.cart.service.CartService;
 
 /**
@@ -39,6 +41,23 @@ public class CartServiceImpl implements CartService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductImageRepository productImageRepository;
     private final UserRepository userRepository;
+
+    @Override
+    @Transactional
+    public int removeItems(Integer userId, java.util.List<Integer> cartItemIds) {
+        // Chỉ xoá id thật sự nằm trong giỏ của khách → id lạ bị bỏ qua, không xoá nhầm người khác.
+        Set<Integer> owned = getCart(userId).getLines().stream()
+                .map(CartLine::getCartItemId)
+                .collect(Collectors.toSet());
+        int removed = 0;
+        for (Integer id : cartItemIds) {
+            if (id != null && owned.contains(id)) {
+                removeItem(userId, id);
+                removed++;
+            }
+        }
+        return removed;
+    }
 
     /** Giỏ hàng đầy đủ của khách (đã gắn ảnh đại diện cho từng dòng). */
     @Override

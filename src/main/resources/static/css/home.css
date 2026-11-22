@@ -1,4 +1,7 @@
-/* =========================================================================
+                        <tr th:each="line : ${cart.lines}" th:classappend="${!line.available} ? 'table-warning'"
+                            th:attr="data-cart-row='',data-price=${line.price},data-total=${line.lineTotal},
+                                     data-available=${line.available} ? '1' : '0',
+                                     data-search=${#strings.toLowerCase(line.productName + ' ' + line.sku)}">/* =========================================================================
    Trang chủ BadStore – CSS riêng, nạp SAU theme.css trong shop/home.html.
    Mọi rule đều scope trong .home-page nên không ảnh hưởng trang khác.
    Màu / bo góc / bóng lấy từ token --bad-* và --bs-* của theme.css (UI_GUIDE):

@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Giỏ hàng của khách (yêu cầu đăng nhập – xem SecurityConfig).
@@ -28,6 +31,27 @@ public class CartController {
     private static final String PRODUCT_PATH_PREFIX = "/san-pham/";
 
     private final CartService cartService;
+
+    /** Xoá các dòng được chọn (checkbox) trong trang giỏ hàng. */
+    @PostMapping("/xoa-nhieu")
+    public String removeMany(@AuthenticationPrincipal CustomUserDetails currentUser,
+                             @RequestParam(name = "cartItemIds", required = false) List<Integer> cartItemIds,
+                             RedirectAttributes redirectAttributes) {
+        if (cartItemIds == null || cartItemIds.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Chưa chọn sản phẩm nào để xoá.");
+            return "redirect:/gio-hang";
+        }
+        List<Integer> ids = cartItemIds.stream()
+                .filter(Objects::nonNull).distinct().limit(100)
+                .collect(Collectors.toList());
+        int removed = cartService.removeItems(currentUser.getUserId(), ids);
+        if (removed > 0) {
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xoá " + removed + " sản phẩm khỏi giỏ hàng.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không có sản phẩm hợp lệ để xoá.");
+        }
+        return "redirect:/gio-hang";
+    }
 
     @GetMapping
     public String view(@AuthenticationPrincipal CustomUserDetails currentUser, Model model) {

@@ -15,6 +15,9 @@ public interface CartService {
 
     public static final int MAX_QUANTITY_PER_LINE = 20;
 
+    /** Xoá nhiều dòng đã chọn trong MỘT transaction; bỏ qua id không thuộc giỏ của khách. */
+    int removeItems(Integer userId, java.util.List<Integer> cartItemIds);
+
     CartView getCart(Integer userId);
 
     int countItems(Integer userId);

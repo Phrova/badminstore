@@ -617,3 +617,35 @@ html[data-bs-theme="dark"] .pdp #danh-gia .alert-success {
     background: linear-gradient(135deg, rgba(126, 208, 165, .12), rgba(30, 41, 35, .6));
     border-color: rgba(126, 208, 165, .35);
 }
+
+/* =========================================================================
+   Đợt 4: khối điểm đánh giá + từng review thành thẻ kính mờ.
+   ========================================================================= */
+.pdp .pdp-rating {
+    background: linear-gradient(135deg, rgba(15, 138, 95, .1), rgba(255, 255, 255, .5));
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(15, 138, 95, .25);
+}
+.pdp .review-item {
+    padding: .9rem 1rem;
+    border: 1px solid rgba(15, 138, 95, .2);
+    border-radius: .75rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .3));
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+}
+.pdp .review-item + .review-item {
+    margin-top: .75rem;
+    padding-top: .9rem;
+    border-top: 1px solid rgba(15, 138, 95, .2);
+}
+html[data-bs-theme="dark"] .pdp .pdp-rating {
+    background: linear-gradient(135deg, rgba(126, 208, 165, .12), rgba(30, 41, 35, .6));
+    border-color: rgba(126, 208, 165, .3);
+}
+html[data-bs-theme="dark"] .pdp .review-item {
+    background: linear-gradient(135deg, rgba(126, 208, 165, .08), rgba(30, 41, 35, .55));
+    border-color: rgba(126, 208, 165, .22);
+}
+html[data-bs-theme="dark"] .pdp .review-item + .review-item { border-top-color: rgba(126, 208, 165, .22); }

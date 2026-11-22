@@ -34,7 +34,7 @@
 
             <!-- ===== Cột trái: bộ lọc (desktop là sidebar dính, mobile thu gọn sau nút "Bộ lọc") ===== -->
             <aside class="col-lg-3">
-                <button class="btn btn-outline-secondary w-100 d-lg-none mb-2" type="button"
+                <button class="btn btn-glass w-100 d-lg-none mb-2" type="button"
                         data-bs-toggle="collapse" data-bs-target="#catalogFilter"
                         aria-expanded="false" aria-controls="catalogFilter">
                     <i class="bi bi-funnel" aria-hidden="true"></i> Bộ lọc sản phẩm
@@ -44,7 +44,7 @@
 
                 <!-- Form lọc gửi bằng GET để lọc xong copy được URL, F5 không hỏi lại.
                      Bỏ trống một ô = không lọc theo tiêu chí đó. -->
-                <form id="catalogFilter" class="collapse d-lg-block filter-card card-soft p-3 p-lg-4"
+                <form id="catalogFilter" class="collapse d-lg-block filter-card card-soft glass-panel p-3 p-lg-4"
                       method="get" th:action="@{/san-pham}" th:object="${filter}"
                       data-auto-submit aria-label="Bộ lọc sản phẩm">
 

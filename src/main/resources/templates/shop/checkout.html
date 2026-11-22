@@ -55,7 +55,7 @@
                 <div class="card border-0 shadow-sm mb-3">
                     <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <span class="fw-semibold"><i class="bi bi-geo-alt text-primary" aria-hidden="true"></i> Địa chỉ nhận hàng</span>
-                        <a class="small" th:href="@{/dia-chi(next='/thanh-toan')}">
+                        <a class="btn btn-sm btn-glass btn-glass--primary" th:href="@{/dia-chi(next='/thanh-toan')}">
                             <i class="bi bi-plus-circle" aria-hidden="true"></i> Thêm địa chỉ mới
                         </a>
                     </div>
@@ -163,13 +163,19 @@
                     </button>
                 </div>
 
-                <!-- Ô nhập voucher -->
+                <!-- Voucher: nút mở modal kính; không JS thì ô nhập thường -->
                 <div class="card-body pb-2">
                     <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
                         <span class="small fw-semibold">
                             <i class="bi bi-ticket-perforated" aria-hidden="true"></i> Mã giảm giá
                         </span>
-                        <a class="small" th:if="${summary.voucher != null}" th:href="@{/thanh-toan}">Bỏ mã</a>
+                        <span class="d-flex align-items-center gap-2">
+                            <a class="small" th:if="${summary.voucher != null}" th:href="@{/thanh-toan}">Bỏ mã</a>
+                            <button class="btn btn-sm btn-glass btn-glass--primary" type="button"
+                                    data-bs-toggle="modal" data-bs-target="#voucherModal">
+                                <i class="bi bi-plus-lg" aria-hidden="true"></i> Nhập mã
+                            </button>
+                        </span>
                     </div>
 
                     <div class="alert alert-warning py-2 small" role="alert" th:if="${summary.voucherError != null}">
@@ -184,14 +190,15 @@
                         (<span th:insert="~{fragments/common :: money(${summary.discountAmount})}">0 ₫</span>).
                     </div>
 
-                    <!-- Áp mã là thao tác chỉ đọc (không ghi CSDL) nên dùng GET, không cần CSRF -->
-                    <form method="get" th:action="@{/thanh-toan}" class="d-flex gap-2">
-                        <label class="visually-hidden" for="voucher">Mã giảm giá</label>
-                        <input class="form-control text-uppercase" id="voucher" name="voucher" maxlength="50"
-                               placeholder="Nhập mã giảm giá" autocomplete="off" spellcheck="false"
-                               th:value="${param.voucher != null} ? ${param.voucher[0]} : ''">
-                        <button type="submit" class="btn btn-outline-primary flex-shrink-0">Áp dụng</button>
-                    </form>
+                    <noscript>
+                        <form method="get" th:action="@{/thanh-toan}" class="d-flex gap-2 mb-2">
+                            <label class="visually-hidden" for="voucherNs">Mã giảm giá</label>
+                            <input class="form-control text-uppercase" id="voucherNs" name="voucher" maxlength="50"
+                                   placeholder="Nhập mã giảm giá" autocomplete="off" spellcheck="false"
+                                   th:value="${param.voucher != null} ? ${param.voucher[0]} : ''">
+                            <button type="submit" class="btn btn-outline-primary flex-shrink-0">Áp dụng</button>
+                        </form>
+                    </noscript>
                 </div>
 
                 <div class="collapse d-lg-block" id="checkoutSummary">
@@ -267,6 +274,32 @@
                         BadStore kiểm tra lại giá và tồn kho ngay khi bạn bấm đặt hàng.
                     </p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal voucher đặt ở cấp trang (KHÔNG nằm trong thẻ kính) để không bị kẹt vị trí -->
+    <div class="modal fade" id="voucherModal" tabindex="-1" aria-labelledby="voucherModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title h6" id="voucherModalLabel">
+                        <i class="bi bi-ticket-perforated" aria-hidden="true"></i> Nhập mã giảm giá
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <form method="get" th:action="@{/thanh-toan}">
+                    <div class="modal-body">
+                        <label class="form-label small" for="voucher">Mã giảm giá</label>
+                        <input class="form-control text-uppercase" id="voucher" name="voucher" maxlength="50"
+                               placeholder="Ví dụ: SALE10" autocomplete="off" spellcheck="false" required
+                               th:value="${param.voucher != null} ? ${param.voucher[0]} : ''">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-glass" data-bs-dismiss="modal">Huỷ</button>
+                        <button type="submit" class="btn btn-glass btn-glass--primary">Áp dụng</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -331,11 +331,11 @@
                     <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
                         <form th:action="@{/so-sanh/them}" method="post">
                             <input type="hidden" name="productId" th:value="${product.id}">
-                            <button class="btn btn-outline-primary" type="submit">
+                            <button class="btn btn-glass btn-glass--primary" type="submit">
                                 <i class="bi bi-bar-chart-steps" aria-hidden="true"></i> Thêm vào so sánh
                             </button>
                         </form>
-                        <a class="btn btn-link" th:href="@{/so-sanh}"
+                        <a class="btn btn-sm btn-glass" th:href="@{/so-sanh}"
                            th:if="${compareCount != null and compareCount > 0}"
                            th:text="|Xem danh sách so sánh (${compareCount})|">Xem danh sách so sánh</a>
                     </div>

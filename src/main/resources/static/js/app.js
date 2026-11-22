@@ -2,7 +2,7 @@
  * BadStore – hành vi UX dùng chung (nạp bằng th:src="@{/js/app.js}" defer).
  * main.js nạp TRƯỚC: data-confirm, toast flash (badToast), Swiper, AOS, GHN…
  * app.js: khoá nút submit, window.toast() chống lặp, backToTop, ảnh dự phòng,
- *         phím "/", email CHỈ kiểm tra khi submit (không toast khi rời ô).
+ *         phím "/", kiểm tra định dạng CHỈ khi submit (không toast khi rời ô).
  */
 (function () {
   'use strict';
@@ -14,12 +14,10 @@
     var b = e.submitter || form.querySelector('[type=submit]');
     if (!b || b.hasAttribute('data-no-loading')) return;
     setTimeout(function () {
-      // Kiểm tra LẠI tại đây: handler chạy sau (email sai, xác nhận…) có thể đã chặn submit.
-      // Không kiểm tra lại → nút kẹt "Đang xử lý..." mãi mãi khi form bị chặn.
+      // Kiểm tra LẠI: handler chạy sau (validate, xác nhận…) có thể đã chặn submit.
       if (e.defaultPrevented || !b.isConnected || b.dataset.old) return;
       b.dataset.old = b.innerHTML;
-      // Nút có name: tạo input ẩn giữ đúng giá trị rồi mới disable → không mất dữ liệu,
-      // và nút vẫn bị khoá thật (trước đây nút có name không khoá → bấm đúp gửi 2 lần).
+      // Nút có name: giữ giá trị bằng input ẩn rồi mới disable → không mất dữ liệu.
       if (b.name) {
         var h = document.createElement('input');
         h.type = 'hidden';
@@ -46,7 +44,6 @@
   });
 
   // 2) Toast dùng chung + CHỐNG LẶP: cùng nội dung trong 2.5s chỉ hiện 1 lần.
-  //    Đây là chốt chặn cuối: dù ai gọi toast nhiều lần, khách chỉ thấy 1.
   var lastToast = { key: '', at: 0 };
   window.toast = function (title, icon) {
     icon = icon || 'success';
@@ -55,7 +52,7 @@
     if (key === lastToast.key && now - lastToast.at < 2500) return;
     lastToast = { key: key, at: now };
     if (window.badToast) { window.badToast(icon, title); return; }
-    if (!window.Swal) return; // CDN lỗi: bỏ qua, không ném lỗi làm chết script khác
+    if (!window.Swal) return;
     Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, showCloseButton: true, closeButtonAriaLabel: 'Đóng thông báo', timer: 2200, timerProgressBar: true });
   };
 
@@ -109,16 +106,16 @@
   });
 
   // 8) Kiểm tra định dạng CHỈ khi submit: email, SĐT, số lượng, mật khẩu, mã giảm giá.
-  //    Rời ô: cắt khoảng trắng thầm lặng (KHÔNG cắt mật khẩu). Gõ lại: xoá viền đỏ.
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  // Quy ước SĐT chung toàn site: 0 hoặc +84, theo sau 9–10 chữ số.
   var PHONE_RE = /^(0|\+84)\d{9,10}$/;
+
   function baoLoi(input, message) {
     input.classList.add('is-invalid');
     input.setAttribute('aria-invalid', 'true');
     window.toast(message, 'warning');
     input.focus();
   }
+
   function loiSoLuong(input) {
     var v = (input.value || '').trim();
     if (!v) return input.required ? 'Vui lòng nhập số lượng' : '';
@@ -128,16 +125,18 @@
     if (input.max !== '' && n > Number(input.max)) return 'Số lượng tối đa là ' + input.max + ' (theo tồn kho)';
     return '';
   }
+
   function loiDinhDang(input) {
     if (input.type === 'number') return loiSoLuong(input);
     var v = (input.value || '').trim();
+    if (input.name === 'voucher') return (!v && input.required) ? 'Vui lòng nhập mã giảm giá' : '';
     if (input.type === 'password') {
       if (!v) return input.required ? 'Vui lòng nhập mật khẩu' : '';
       if (input.minLength > 0 && v.length < input.minLength) return 'Mật khẩu phải từ ' + input.minLength + ' ký tự';
       if (input.maxLength > 0 && v.length > input.maxLength) return 'Mật khẩu tối đa ' + input.maxLength + ' ký tự';
       return '';
     }
-    if (!v) return ''; // ô trống: để required xử lý
+    if (!v) return '';
     if (input.type === 'email' && !EMAIL_RE.test(v)) {
       return 'Email chưa đúng định dạng (ví dụ: ten@mien.com)';
     }
@@ -150,10 +149,13 @@
     }
     return '';
   }
+
   function laOCanKiemTra(o) {
     return o && o.matches && (o.matches('input[type="email"]') || o.matches('input[type="tel"]')
-      || o.matches('input[type="number"]') || o.matches('input[type="password"]'));
+      || o.matches('input[type="number"]') || o.matches('input[name="voucher"]')
+      || o.matches('input[type="password"]'));
   }
+
   document.addEventListener('focusout', function (e) {
     var o = e.target;
     // Chỉ email/SĐT được cắt khoảng trắng; mật khẩu giữ nguyên từng ký tự.
@@ -161,19 +163,23 @@
       o.value = o.value.trim();
     }
   });
+
   document.addEventListener('input', function (e) {
     if (!laOCanKiemTra(e.target)) return;
     e.target.classList.remove('is-invalid');
     e.target.removeAttribute('aria-invalid');
   });
+
   document.addEventListener('submit', function (e) {
     var form = e.target;
-    // Mã giảm giá: chuẩn hoá trim + HOA trước khi gửi (khớp quy ước tra cứu ở server).
+    // Mã giảm giá: chuẩn hoá trim + HOA trước khi gửi.
     var vouchers = form.querySelectorAll ? form.querySelectorAll('input[name="voucher"]') : [];
     for (var k = 0; k < vouchers.length; k++) {
       vouchers[k].value = vouchers[k].value.trim().toUpperCase();
     }
-    var inputs = form.querySelectorAll ? form.querySelectorAll('input[type="email"], input[type="tel"], input[type="number"], input[type="password"]') : [];
+    var inputs = form.querySelectorAll
+      ? form.querySelectorAll('input[type="email"], input[type="tel"], input[type="number"], input[name="voucher"], input[type="password"]')
+      : [];
     for (var i = 0; i < inputs.length; i++) {
       var msg = loiDinhDang(inputs[i]);
       if (msg) {
@@ -182,7 +188,7 @@
         return;
       }
     }
-    // Cặp mật khẩu: đăng ký (password) và đổi mật khẩu (newPassword) đều được so khớp.
+    // Cặp mật khẩu: đăng ký (password) và đổi mật khẩu (newPassword).
     var pw = form.querySelector ? form.querySelector('input[name="password"], input[name="newPassword"]') : null;
     var cf = form.querySelector ? form.querySelector('input[name="confirmPassword"]') : null;
     if (pw && cf && cf.value !== pw.value) {
@@ -198,6 +204,7 @@
       baoLoi(npw, 'Mật khẩu mới phải khác mật khẩu hiện tại');
     }
   });
+
   // Form KHÔNG novalidate: trình duyệt chặn trước submit → thay bong bóng bằng 1 toast.
   document.addEventListener('invalid', function (e) {
     var o = e.target;
@@ -215,7 +222,7 @@
       else if (p.tooShort) msg = 'Mật khẩu phải từ ' + o.minLength + ' ký tự';
       else if (p.tooLong) msg = 'Mật khẩu tối đa ' + o.maxLength + ' ký tự';
     } else {
-      if (!o.value.trim()) return;
+      if (!o.value.trim() && o.name !== 'voucher') return;
       msg = loiDinhDang(o);
     }
     if (!msg) return;
@@ -256,8 +263,7 @@
     }
   });
 
-  // 10) Nav Trang chủ / Sản phẩm: tô mục theo đường dẫn.
-  //     So đúng ranh giới '/' để "/san-pham" không tô nhầm cho "/san-pham-abc".
+  // 10) Nav Trang chủ / Sản phẩm: tô mục theo đường dẫn (so đúng ranh giới '/').
   var path = location.pathname.replace(/\/+$/, '') || '/';
   document.querySelectorAll('.nav-seg-opt').forEach(function (a) {
     var href = (a.getAttribute('href') || '').replace(/\/+$/, '') || '/';
