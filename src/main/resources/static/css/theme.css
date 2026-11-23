@@ -4025,3 +4025,71 @@ html .btn-check:checked + .variant-chip {
     html .account-page .account-nav .list-group-item::after,
     html .account-page .account-stat::after { transition: none; transform: translateX(-130%); }
 }
+
+/* =========================================================================
+   39. Sửa vòng đời animation toast.
+   Lỗi gốc: mục 37 gán `animation` ngay trên class nền .bad-toast nên ĐÈ mất
+   animation ẩn của SweetAlert2 (.swal2-hide). Trình duyệt không phát
+   animationend → SweetAlert2 không bao giờ gỡ popup → toast kẹt vĩnh viễn,
+   bấm × cũng không tắt, và nhịp nhún lúc hiện bị mất.
+   Cách sửa: chỉ gán animation khi Swal gắn class show/hide tương ứng.
+   ========================================================================= */
+body .swal2-toast.bad-toast { animation: none; }
+
+body .swal2-toast.bad-toast.swal2-show,
+body .swal2-toast.bad-toast.swal2-toast-show {
+    animation: glassToastIn .42s var(--ios-spring-bounce) both;
+}
+body .swal2-toast.bad-toast.swal2-hide,
+body .swal2-toast.bad-toast.swal2-toast-hide {
+    animation: glassToastOut .2s var(--ios-ease) forwards;
+}
+
+/* Giảm chuyển động: vẫn phải chạy animation ẩn thật nhanh để Swal gỡ popup,
+   không được đặt animation:none ở trạng thái hide (sẽ kẹt lại như lỗi cũ). */
+@media (prefers-reduced-motion: reduce) {
+    body .swal2-toast.bad-toast.swal2-show,
+    body .swal2-toast.bad-toast.swal2-toast-show { animation-duration: .01s; }
+    body .swal2-toast.bad-toast.swal2-hide,
+    body .swal2-toast.bad-toast.swal2-toast-hide { animation-duration: .01s; }
+}
+
+/* =========================================================================
+   39. Gợi ý sửa email gõ nhầm + vòng đời animation toast.
+   Toast: chỉ gán animation khi Swal gắn class show/hide; gán ở class nền sẽ
+   đè animation ẩn → không có animationend → toast kẹt vĩnh viễn.
+   ========================================================================= */
+.email-suggest {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .45rem;
+    margin-top: .4rem;
+    padding: .45rem .6rem;
+    border-radius: .6rem;
+    font-size: .82rem;
+    line-height: 1.4;
+    color: var(--bs-body-color);
+    background-image: var(--lg-sheen), var(--lg-tint);
+    border: 1px solid var(--lg-tint-edge);
+    box-shadow: var(--lg-specular);
+    animation: glassPanelIn .3s var(--ios-spring-bounce) backwards;
+}
+.email-suggest .bi { color: var(--bad-warning-text); }
+.email-suggest strong { color: var(--bad-primary-text); overflow-wrap: anywhere; }
+html[data-bs-theme="dark"] .email-suggest strong { color: #a5e2c2; }
+.email-suggest .btn { margin-left: auto; }
+
+body .swal2-toast.bad-toast { animation: none; }
+body .swal2-toast.bad-toast.swal2-show,
+body .swal2-toast.bad-toast.swal2-toast-show { animation: glassToastIn .42s var(--ios-spring-bounce) both; }
+body .swal2-toast.bad-toast.swal2-hide,
+body .swal2-toast.bad-toast.swal2-toast-hide { animation: glassToastOut .2s var(--ios-ease) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+    .email-suggest { animation: none; }
+    body .swal2-toast.bad-toast.swal2-show,
+    body .swal2-toast.bad-toast.swal2-toast-show,
+    body .swal2-toast.bad-toast.swal2-hide,
+    body .swal2-toast.bad-toast.swal2-toast-hide { animation-duration: .01s; }
+}
