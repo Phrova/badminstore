@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.demo.common.exception.BusinessException;
 
 /**
  * API nội bộ cho giao diện lấy dữ liệu địa chỉ GHN và phí vận chuyển tạm tính.
@@ -76,14 +77,40 @@ public class AddressApiController {
                                    @RequestParam(name = "receiverPhone", required = false) String receiverPhone,
                                    @RequestParam(name = "quantity", defaultValue = "1") int quantity,
                                    @RequestParam(name = "weight", required = false) Integer weight) {
+        // Kiểm tra tham số TRƯỚC khi tính khối lượng: mọi giá trị ở đây do client gửi lên,
+        // không được dùng để tính toán hay làm khoá cache trước khi đã chặn giá trị vô lý.
+        if (quantity < 1 || quantity > 200) {
+            throw new BusinessException("Số lượng không hợp lệ.");
+        }
+        if (weight != null && (weight < 1 || weight > 100_000)) {
+            throw new BusinessException("Khối lượng không hợp lệ.");
+        }
+        if (districtId != null && districtId <= 0) {
+            throw new BusinessException("Mã quận/huyện không hợp lệ.");
+        }
+        if (provinceId != null && provinceId <= 0) {
+            throw new BusinessException("Mã tỉnh/thành không hợp lệ.");
+        }
+        // wardCode nằm trong khoá cache phí: giới hạn ký tự + độ dài để không ai
+        // tạo vô hạn khoá cache khác nhau bằng cách đổi chuỗi tuỳ ý.
+        String ward = trimToNull(wardCode);
+        if (ward != null && !ward.matches("[A-Za-z0-9]{1,20}")) {
+            throw new BusinessException("Mã phường/xã không hợp lệ.");
+        }
+        requireMaxLength(provinceName, 100, "Tên tỉnh/thành");
+        requireMaxLength(wardName, 100, "Tên phường/xã");
+        requireMaxLength(addressDetail, 255, "Địa chỉ chi tiết");
+        requireMaxLength(receiverName, 100, "Tên người nhận");
+        requireMaxLength(receiverPhone, 20, "Số điện thoại");
+
         int weightGram = weight == null ? ghnAddressService.shippingWeight(quantity) : weight;
         BigDecimal fee;
         if (districtId != null) {
             // Địa chỉ cũ vẫn dùng API tính phí theo quận/huyện.
-            fee = ghnAddressService.feeOrNull(districtId, wardCode, weightGram);
+            fee = ghnAddressService.feeOrNull(districtId, ward, weightGram);
         } else if (StringUtils.hasText(provinceName) && StringUtils.hasText(wardName)) {
             // Địa chỉ 2 cấp mới dùng preview đơn vì API fee cũ không nhận province/ward mới.
-            fee = ghnAddressService.feeOrNull(provinceId, provinceName, wardCode, wardName,
+            fee = ghnAddressService.feeOrNull(provinceId, provinceName, ward, wardName,
                     addressDetail, receiverName, receiverPhone, weightGram);
         } else {
             fee = null;
@@ -98,6 +125,21 @@ public class AddressApiController {
         result.put("weightGram", weightGram);
         result.put("warehouse", ghnAddressService.warehouseAddress());
         return result;
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    /** Giới hạn độ dài chuỗi client gửi kèm (khớp @Size trong AddressForm). */
+    private void requireMaxLength(String value, int max, String label) {
+        if (value != null && value.length() > max) {
+            throw new BusinessException(label + " tối đa " + max + " ký tự.");
+        }
     }
 
     private Map<String, Object> option(Object id, String name) {

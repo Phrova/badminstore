@@ -25,7 +25,8 @@ import tools.jackson.databind.json.JsonMapper;
  * {@link GhnResponse} và bọc MỌI lỗi HTTP/JSON/mạng thành {@link GhnApiException}.
  *
  * Không chứa quy tắc nghiệp vụ (trạng thái đơn, COD, chọn đơn) và không bao giờ ghi token
- * vào log/thông báo. {@link GhnClient} dùng lớp này rồi mới thêm cache/mock/nghiệp vụ.
+ * vào log/thông báo. {@link com.example.demo.shipping.service.GhnClient} dùng lớp này
+ * rồi mới thêm cache/mock/nghiệp vụ.
  */
 class GhnApiClient {
 
@@ -88,8 +89,10 @@ class GhnApiClient {
             throw new GhnApiException("GHN không trả dữ liệu khi " + action + ".");
         }
         if (!response.success()) {
+            Integer code = response.code();
+            boolean retryable = code != null && retryableCode(code);
             throw new GhnApiException("GHN từ chối yêu cầu " + action + ": " + response.errorMessage(),
-                    null, response.code(), response.codeMessage(), retryableCode(response.code()), null);
+                    null, code, response.codeMessage(), retryable, null);
         }
         return response.data();
     }

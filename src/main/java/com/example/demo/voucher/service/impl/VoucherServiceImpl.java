@@ -16,7 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.demo.voucher.service.VoucherService;
 
 /**
@@ -49,8 +50,15 @@ public class VoucherServiceImpl implements VoucherService {
      * Lấy voucher và kiểm tra dùng được cho đơn có tạm tính {@code subtotal}.
      * Sai bất kỳ điều kiện nào ⇒ BusinessException với thông báo tiếng Việt cụ thể.
      */
+    /**
+     * noRollbackFor: hàm này chạy TRONG transaction của CheckoutService.preview().
+     * Nếu để mặc định, mỗi lần mã sai sẽ đánh dấu transaction là "rollback-only";
+     * preview() bắt lỗi rồi vẫn trả kết quả → lúc commit ném UnexpectedRollbackException → trang 500.
+     * Mã sai là tình huống NGHIỆP VỤ bình thường, không được đầu độc transaction của nơi gọi.
+     * placeOrder() vẫn rollback đúng vì lỗi được ném tiếp ra ngoài, không bị bắt lại.
+     */
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, noRollbackFor = BusinessException.class)
     public Voucher requireUsable(String rawCode, BigDecimal subtotal) {
         String code = normalizeCode(rawCode);
         if (code == null) {

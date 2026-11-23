@@ -63,7 +63,10 @@ public class GhnShippingServiceImpl implements GhnShippingService {
     @Override
     @Transactional
     public GhnOrderResult pushOrder(Integer orderId) {
-        Order order = requireOrder(orderId);
+        // Khoá dòng đơn trước khi kiểm tra: hai lần bấm liên tiếp phải xếp hàng,
+        // lần thứ hai thấy đã có mã vận đơn và bị chặn thay vì tạo vận đơn trùng.
+        Order order = orderRepository.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đơn hàng cần thao tác với GHN."));
         if (!ghnClient.isShippingAvailable()) {
             throw new BusinessException("Chưa cấu hình đủ GHN để tạo vận đơn: cần bật GHN, có token và shop-id. "
                     + "Kiểm tra lại cấu hình app.ghn rồi thử lại.");

@@ -1,5 +1,6 @@
 package com.example.demo.checkout.controller;
 
+import com.example.demo.cart.service.CartService;
 import com.example.demo.checkout.dto.CheckoutForm;
 import com.example.demo.checkout.dto.CheckoutSummary;
 import com.example.demo.order.entity.Order;
@@ -39,6 +40,7 @@ public class CheckoutController {
     private final CheckoutService checkoutService;
     private final AddressService addressService;
     private final GhnAddressService ghnAddressService;
+    private final CartService cartService;
 
     @GetMapping
     public String view(@AuthenticationPrincipal CustomUserDetails currentUser,
@@ -46,16 +48,17 @@ public class CheckoutController {
                        Model model,
                        RedirectAttributes redirectAttributes) {
         Integer userId = currentUser.getUserId();
-        UserAddress defaultAddress = checkoutService.defaultAddress(userId).orElse(null);
-        Integer addressId = defaultAddress == null ? null : defaultAddress.getId();
-        // Phí ship tính luôn theo địa chỉ mặc định để trang hiển thị đúng ngay từ lần render đầu.
-        CheckoutSummary summary = checkoutService.preview(userId, voucherCode, addressId);
-
-        if (summary.cart().isEmpty()) {
+        // Giỏ trống: chặn TRƯỚC khi tính voucher/phí GHN — không gọi API vô ích
+        // và không có nguy cơ lỗi 500 trước khi kịp báo "giỏ trống".
+        if (cartService.getCart(userId).isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Giỏ hàng của bạn đang trống nên chưa thể thanh toán.");
             return "redirect:/gio-hang";
         }
+        UserAddress defaultAddress = checkoutService.defaultAddress(userId).orElse(null);
+        Integer addressId = defaultAddress == null ? null : defaultAddress.getId();
+        // Phí ship tính luôn theo địa chỉ mặc định để trang hiển thị đúng ngay từ lần render đầu.
+        CheckoutSummary summary = checkoutService.preview(userId, voucherCode, addressId);
 
         model.addAttribute("summary", summary);
         model.addAttribute("addresses", addressService.list(userId));
