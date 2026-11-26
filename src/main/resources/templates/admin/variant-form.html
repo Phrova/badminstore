@@ -57,7 +57,7 @@
                         </div>
                         <div class="col-sm-6">
                             <label class="form-label" for="color">Màu sắc <span class="text-danger">*</span></label>
-                            <input class="form-control" id="color" th:field="*{color}"
+                                                         <input class="form-control" id="color" th:field="*{color}" data-quick="color" data-capitalize
                                    th:classappend="${#fields.hasErrors('color')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('color')}"
                                    maxlength="50" required placeholder="Xanh đen">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('color')}"
@@ -140,24 +140,24 @@
                     <div class="card-body row g-3">
                         <div class="col-sm-6">
                             <label class="form-label" for="price">Giá bán (₫) <span class="text-danger">*</span></label>
-                            <input class="form-control" id="price" th:field="*{price}" type="number"
+                                                      <input class="form-control" id="price" th:field="*{price}" type="text" inputmode="decimal"
                                    th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('price')}"
-                                   min="0" step="1000" required placeholder="4690000">
+                                   data-money data-quick="price" required placeholder="vd: 1m, 500k, 4690000">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}"
                                  th:errors="*{price}">Giá không hợp lệ</div>
                         </div>
                         <div class="col-sm-6">
                             <label class="form-label" for="originalPrice">Giá gốc (₫)</label>
-                            <input class="form-control" id="originalPrice" th:field="*{originalPrice}" type="number"
+                                                                              <input class="form-control" id="originalPrice" th:field="*{originalPrice}" type="text" inputmode="decimal"
                                    th:classappend="${#fields.hasErrors('originalPrice')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('originalPrice')}"
-                                   min="0" step="1000" placeholder="5.290.000 = 5290000">
+                                   data-money data-hint="Bỏ trống nếu không giảm giá; nếu nhập phải ≥ giá bán." placeholder="vd: 5.29m hoặc 5290000">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('originalPrice')}"
                                  th:errors="*{originalPrice}">Giá gốc không hợp lệ</div>
-                            <div class="form-text">Bỏ trống nếu không giảm giá; nếu nhập phải ≥ giá bán.</div>
+                 
                         </div>
                         <div class="col-sm-6">
                             <label class="form-label" for="stockQuantity">Tồn kho (chiếc) <span class="text-danger">*</span></label>
-                            <input class="form-control" id="stockQuantity" th:field="*{stockQuantity}" type="number"
+                                                 <input class="form-control" id="stockQuantity" th:field="*{stockQuantity}" type="number" data-quick="stock"
                                    th:classappend="${#fields.hasErrors('stockQuantity')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('stockQuantity')}"
                                    min="0" max="100000" required>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('stockQuantity')}"
