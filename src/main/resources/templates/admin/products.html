@@ -9,6 +9,7 @@
 <body>
 
 <th:block layout:fragment="content">
+<div class="vglass">
 
     <div class="page-head">
         <h1 class="page-title"><i class="bi bi-box-seam" aria-hidden="true"></i> Quản lý sản phẩm</h1>
@@ -106,10 +107,10 @@
                                th:attr="aria-label=|Sửa ${row.product.name}|" title="Sửa thông tin sản phẩm">
                                 <i class="bi bi-pencil-square" aria-hidden="true"></i>
                             </a>
-                            <a class="btn btn-sm btn-outline-dark"
+                                                        <a class="btn btn-sm btn-outline-primary"
                                th:href="@{/admin/san-pham/{id}/bien-the(id=${row.product.id})}"
                                th:attr="aria-label=|Biến thể và ảnh của ${row.product.name}|" title="Biến thể &amp; ảnh">
-                                <i class="bi bi-boxes" aria-hidden="true"></i>
+                                <i class="bi bi-boxes" aria-hidden="true"></i> Biến thể
                             </a>
                             <form th:action="@{/admin/san-pham/{id}/doi-trang-thai(id=${row.product.id})}"
                                   method="post" class="d-inline"
@@ -152,6 +153,7 @@
             url='/admin/san-pham', ariaLabel='Phân trang sản phẩm', itemLabel='sản phẩm',
             query=|keyword=${#uris.escapeQueryParam(keyword ?: '')}&brandId=${brandFilter ?: ''}&categoryId=${categoryFilter ?: ''}&status=${statusFilter ?: ''}|)}"></div>
 
+</div>
 </th:block>
 
 </body>

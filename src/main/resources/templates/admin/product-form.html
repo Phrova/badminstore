@@ -9,7 +9,7 @@
 <body>
 
 <th:block layout:fragment="content">
-
+<div class="vglass">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/admin}">Tổng quan</a></li>
@@ -52,7 +52,7 @@
                         </div>
                         <div class="col-sm-7">
                             <label class="form-label" for="name">Tên sản phẩm <span class="text-danger">*</span></label>
-                            <input class="form-control" id="name" th:field="*{name}"
+                                                        <input class="form-control" id="name" th:field="*{name}" data-quick="name" data-capitalize
                                    th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('name')}"
                                    maxlength="200" required placeholder="Vợt cầu lông Yonex Astrox 100 ZZ">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}"
@@ -178,6 +178,6 @@
     </form>
 
 </th:block>
-
+</div>
 </body>
 </html>

@@ -9,6 +9,7 @@
 <body>
 
 <th:block layout:fragment="content">
+<div class="vglass">
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -45,9 +46,18 @@
 
     <!-- ===================== BIẾN THỂ ===================== -->
     <div class="card-soft mb-4">
-        <div class="card-header fw-semibold">
-            <i class="bi bi-boxes" aria-hidden="true"></i> Biến thể (giá bán &amp; tồn kho)
-            <span class="text-muted small" th:text="|– ${variants.size()} biến thể|">– 0 biến thể</span>
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>
+                <i class="bi bi-boxes" aria-hidden="true"></i> Biến thể (giá bán &amp; tồn kho)
+                <span class="text-muted small" th:text="|– ${variants.size()} biến thể|">– 0 biến thể</span>
+            </span>
+            <form th:if="${!variants.isEmpty()}" method="post" class="d-inline mb-0"
+                  th:action="@{/admin/san-pham/{id}/bien-the/xoa-tat-ca(id=${product.id})}"
+                  th:data-confirm="${'Xoá TẤT CẢ ' + variants.size() + ' biến thể của ' + product.name + '? Biến thể đã có trong đơn hàng sẽ được giữ lại. Không thể hoàn tác.'}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">
+                    <i class="bi bi-trash3" aria-hidden="true"></i> Xoá tất cả biến thể
+                </button>
+            </form>
         </div>
 
         <!-- Cập nhật giá hàng loạt (mục 13 mức Khá): các ô tích trong bảng gắn vào form này
@@ -128,8 +138,11 @@
                               th:text="${variant.stockQuantity}">0</span>
                     </td>
                     <td>
-                        <span class="status-pill" th:if="${variant.status.name() == 'ACTIVE'}"
+                                            <span class="status-pill" th:if="${variant.status.name() == 'ACTIVE'}"
                               th:classappend="status-ACTIVE">Đang bán</span>
+                        <div class="small text-muted" th:if="${variant.status.name() == 'ACTIVE' and variant.stockQuantity == 0}">
+                            Hết hàng – khách không mua được
+                        </div>
                         <span class="status-pill" th:unless="${variant.status.name() == 'ACTIVE'}"
                               th:classappend="status-INACTIVE">Ngừng bán</span>
                     </td>
@@ -239,6 +252,7 @@
         </div>
     </div>
 
+</div>
 </th:block>
 
 </body>

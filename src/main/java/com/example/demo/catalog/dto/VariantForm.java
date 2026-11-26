@@ -52,7 +52,7 @@ public class VariantForm {
     private boolean removeImage;
 
     @NotNull(message = "Vui lòng nhập giá bán.")
-    @DecimalMin(value = "0", message = "Giá bán không được âm.")
+    @DecimalMin(value = "1", message = "Giá bán phải lớn hơn 0 ₫.")
     private BigDecimal price;
 
     /** Giá gốc: bỏ trống nếu không giảm giá. */

@@ -62,6 +62,8 @@ public class AdminProductServiceImpl implements AdminProductService {
     private static final BigDecimal THOUSAND = BigDecimal.valueOf(1000);
     private static final BigDecimal MAX_DISCOUNT_PERCENT = BigDecimal.valueOf(90);
     private static final int MAX_BULK_VARIANTS = 40;
+    private static final BigDecimal MAX_VARIANT_PRICE = new BigDecimal("100000000");
+    private static final int MAX_VARIANT_STOCK = 100_000;
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
@@ -283,6 +285,11 @@ public class AdminProductServiceImpl implements AdminProductService {
                 }
                 requireFreeSku(variant);
                 requireFreeCombination(variant, false);
+                String imageUrl = row.getImageUrl() == null ? "" : row.getImageUrl().trim();
+                if (imageUrl.length() > 500) {
+                    throw new BusinessException("Đường dẫn ảnh tối đa 500 ký tự.");
+                }
+                applyVariantImage(variant, row, null);
                 prepared.add(variant);
             } catch (BusinessException ex) {
                 throw new BusinessException(label + ex.getMessage());
@@ -291,8 +298,37 @@ public class AdminProductServiceImpl implements AdminProductService {
         return productVariantRepository.saveAll(prepared);
     }
 
-    // ==================== CẬP NHẬT GIÁ HÀNG LOẠT ====================
+    /**
+     * Xoá TẤT CẢ biến thể của sản phẩm trong một lần. Biến thể đã có trong đơn hàng
+     * được GIỮ LẠI (luật cũ của deleteVariant) – admin chuyển "Ngừng bán" nếu muốn ẩn.
+     */
+    @Override
+    @Transactional
+    public int deleteVariantsBulk(Integer productId) {
+        requireProduct(productId);
+        List<ProductVariant> variants =
+                productVariantRepository.findByProductIdOrderByColorAscWeightClassAscGripSizeAsc(productId);
+        if (variants.isEmpty()) {
+            throw new BusinessException("Sản phẩm này chưa có biến thể nào để xoá.");
+        }
+        int deleted = 0;
+        for (ProductVariant variant : variants) {
+            if (orderItemRepository.existsByProductVariantId(variant.getId())) {
+                continue;
+            }
+            String imageUrl = variant.getImageUrl();
+            productVariantRepository.delete(variant);
+            deleteVariantImageIfUnused(imageUrl, variant.getId());
+            deleted++;
+        }
+        if (deleted == 0) {
+            throw new BusinessException("Không xoá được biến thể nào: tất cả đã có trong đơn hàng. "
+                    + "Hãy chuyển sang \"Ngừng bán\" để ẩn khỏi trang khách.");
+        }
+        return deleted;
+    }
 
+    // ==================== CẬP NHẬT GIÁ HÀNG LOẠT ====================
     /**
      * Cập nhật giá cho NHIỀU biến thể được tích chọn (mục 13 – mức Khá, thay cho bảng promotion):
      * – DISCOUNT: lấy Giá gốc (hoặc giá đang bán) làm giá gốc, đặt giá bán = giá gốc giảm %;
@@ -494,6 +530,9 @@ public class AdminProductServiceImpl implements AdminProductService {
         if (color == null || color.isEmpty()) {
             throw new BusinessException("Vui lòng nhập màu sắc của biến thể.");
         }
+        if (!color.matches("[\\p{L}\\p{N} .\\-/]+")) {
+            throw new BusinessException("Màu sắc chỉ gồm chữ, số, khoảng trắng và . - / – bỏ ký tự lạ như ? ! @ nhé.");
+        }
         if (!WEIGHT_CLASSES.contains(weightClass)) {
             throw new BusinessException("Trọng lượng chỉ nhận 2U, 3U, 4U hoặc 5U.");
         }
@@ -502,14 +541,20 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
 
         BigDecimal price = form.getPrice();
-        if (price == null || price.signum() < 0) {
-            throw new BusinessException("Giá bán không được âm.");
+        if (price == null || price.signum() <= 0) {
+            throw new BusinessException("Giá bán phải lớn hơn 0 ₫.");
         }
         price = price.setScale(0, RoundingMode.HALF_UP);
+        if (price.compareTo(MAX_VARIANT_PRICE) > 0) {
+            throw new BusinessException("Giá bán tối đa 100.000.000 ₫ – bạn nhập lại giúp nhé.");
+        }
 
         BigDecimal originalPrice = form.getOriginalPrice();
         if (originalPrice != null) {
             originalPrice = originalPrice.setScale(0, RoundingMode.HALF_UP);
+            if (originalPrice.compareTo(MAX_VARIANT_PRICE) > 0) {
+                throw new BusinessException("Giá gốc tối đa 100.000.000 ₫ – bạn nhập lại giúp nhé.");
+            }
             if (originalPrice.signum() == 0) {
                 originalPrice = null;
             } else if (originalPrice.compareTo(price) < 0) {
@@ -518,6 +563,9 @@ public class AdminProductServiceImpl implements AdminProductService {
         }
         if (form.getStockQuantity() < 0) {
             throw new BusinessException("Tồn kho không được âm.");
+        }
+        if (form.getStockQuantity() > MAX_VARIANT_STOCK) {
+            throw new BusinessException("Tồn kho tối đa " + MAX_VARIANT_STOCK + " chiếc mỗi biến thể.");
         }
 
         variant.setColor(color);

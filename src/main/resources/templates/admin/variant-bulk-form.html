@@ -9,6 +9,7 @@
 <body>
 
 <th:block layout:fragment="content">
+<div class="vglass">
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -23,8 +24,7 @@
 
     <div class="page-head">
         <h1 class="page-title">
-            <i class="bi bi-lightning-charge" aria-hidden="true"></i>
-            <span th:text="|Thêm nhiều biến thể cho &quot;${product.name}&quot;|">Thêm nhiều biến thể</span>
+            <i class="bi bi-lightning-charge" aria-hidden="true"></i> Thêm nhiều biến thể
         </h1>
         <a class="btn btn-sm btn-outline-secondary"
            th:href="@{/admin/san-pham/{id}/bien-the(id=${product.id})}">
@@ -36,53 +36,61 @@
         <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> <span th:text="${formError}">Lý do lỗi</span>
     </div>
 
-    <!-- ===== Sinh dòng tự động: màu × trọng lượng × cỡ cán ===== -->
-    <div class="card-soft mb-3">
+    <!-- ===== Sinh dòng tự động ===== -->
+    <div class="card-soft">
         <div class="card-header fw-semibold">
             <i class="bi bi-magic" aria-hidden="true"></i> Tạo nhanh theo tổ hợp
         </div>
-        <div class="card-body row g-3">
-            <div class="col-lg-6">
+        <div class="card-body row g-4">
+            <div class="col-lg-4">
                 <label class="form-label" for="genColors">Màu sắc (phẩy hoặc xuống dòng để ngăn cách)</label>
-                <textarea class="form-control" id="genColors" rows="2"
+                <textarea class="form-control" id="genColors" rows="4"
                           placeholder="Đỏ đô, Xanh đen, Trắng"></textarea>
                 <div class="form-text">Tổ hợp đã tồn tại của sản phẩm sẽ tự bị bỏ qua.</div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <span class="form-label d-block">Trọng lượng</span>
-                <div class="form-check form-check-inline" th:each="w : ${weightClasses}">
-                    <input class="form-check-input" type="checkbox" name="genWeight" th:value="${w}" th:id="'genW' + ${w}">
-                    <label class="form-check-label" th:for="'genW' + ${w}" th:text="${w}">4U</label>
+                <div class="d-flex flex-wrap gap-2 mb-4" id="genWeights">
+                    <button type="button" class="vg-pill" th:each="w : ${weightClasses}"
+                            th:data-value="${w}" th:text="${w}" aria-pressed="false">4U</button>
                 </div>
-                <span class="form-label d-block mt-2">Cỡ cán</span>
-                <div class="form-check form-check-inline" th:each="g : ${gripSizes}">
-                    <input class="form-check-input" type="checkbox" name="genGrip" th:value="${g}" th:id="'genG' + ${g}">
-                    <label class="form-check-label" th:for="'genG' + ${g}" th:text="${g}">G5</label>
+                <span class="form-label d-block">Cỡ cán</span>
+                <div class="d-flex flex-wrap gap-2" id="genGrips">
+                    <button type="button" class="vg-pill" th:each="g : ${gripSizes}"
+                            th:data-value="${g}" th:text="${g}" aria-pressed="false">G5</button>
                 </div>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <label class="form-label" for="genPrice">Giá bán áp cho cả loạt (₫)</label>
-                <input class="form-control mb-2" id="genPrice" type="number" min="0" step="1000" placeholder="4690000">
+                <input class="form-control mb-4" id="genPrice" type="text" inputmode="decimal"
+                       data-money data-quick="price" placeholder="vd: 1m hoặc 1000000">
                 <label class="form-label" for="genStock">Tồn kho mỗi biến thể</label>
-                <input class="form-control" id="genStock" type="number" min="0" max="100000" value="10">
+                <input class="form-control" id="genStock" type="number" min="0" max="100000" value="10" data-quick="stock">
             </div>
-            <div class="col-12">
-                <button class="btn btn-outline-primary" type="button" id="genBtn">
+            <div class="col-12 d-flex flex-wrap gap-3 align-items-center pt-2">
+                <button class="btn btn-primary" type="button" id="genBtn">
                     <i class="bi bi-lightning-charge" aria-hidden="true"></i> Sinh dòng tự động
                 </button>
-                <span class="small text-muted ms-2">Mỗi dòng sinh ra vẫn sửa được từng ô trước khi lưu.</span>
+                <button class="btn btn-outline-secondary" type="button" id="resetGenBtn">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Đặt lại thông số
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ===== Bảng dòng biến thể – lưu MỘT lần ===== -->
+    <!-- ===== Bảng dòng xem trước – lưu MỘT lần ===== -->
     <form id="variantBulkForm" th:action="@{/admin/san-pham/{id}/bien-the/them-nhieu(id=${product.id})}"
-          th:object="${bulkForm}" method="post"
+          th:object="${bulkForm}" method="post" enctype="multipart/form-data"
           data-confirm="Thêm toàn bộ biến thể trong bảng?">
         <div class="card-soft">
-            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <span><i class="bi bi-boxes" aria-hidden="true"></i> Các biến thể sẽ thêm</span>
-                <span class="text-muted small" id="rowCount">0 / 40 dòng</span>
+                <span class="d-flex align-items-center gap-3">
+                    <span class="text-muted small" id="rowCount">0 / 40 dòng</span>
+                    <button class="btn btn-sm btn-outline-danger" type="button" id="clearRowsBtn">
+                        <i class="bi bi-trash3" aria-hidden="true"></i> Xoá hết dòng
+                    </button>
+                </span>
             </div>
             <div class="table-responsive">
                 <table class="table table-sm align-middle mb-0">
@@ -96,6 +104,7 @@
                         <th>Giá gốc (₫)</th>
                         <th>Tồn kho <span class="text-danger">*</span></th>
                         <th>Trạng thái</th>
+                        <th class="text-center">Ảnh</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -103,7 +112,7 @@
                     <tr class="variant-line" th:each="row, stat : *{rows}">
                         <td><input class="form-control form-control-sm text-uppercase" data-field="sku"
                                    th:field="*{rows[__${stat.index}__].sku}" maxlength="50" required></td>
-                        <td><input class="form-control form-control-sm" data-field="color"
+                        <td><input class="form-control form-control-sm" data-field="color" data-quick="color" data-capitalize
                                    th:field="*{rows[__${stat.index}__].color}" maxlength="50" required></td>
                         <td>
                             <select class="form-select form-select-sm" data-field="weightClass"
@@ -119,11 +128,12 @@
                                 <option th:each="g : ${gripSizes}" th:value="${g}" th:text="${g}">G5</option>
                             </select>
                         </td>
-                        <td><input class="form-control form-control-sm" data-field="price" type="number"
-                                   th:field="*{rows[__${stat.index}__].price}" min="0" step="1000" required></td>
-                        <td><input class="form-control form-control-sm" data-field="originalPrice" type="number"
-                                   th:field="*{rows[__${stat.index}__].originalPrice}" min="0" step="1000"></td>
-                        <td><input class="form-control form-control-sm" data-field="stockQuantity" type="number"
+                        <td><input class="form-control form-control-sm" data-field="price" type="text" inputmode="decimal"
+                                   data-money data-quick="price" th:field="*{rows[__${stat.index}__].price}" required></td>
+                        <td><input class="form-control form-control-sm" data-field="originalPrice" type="text" inputmode="decimal"
+                                   data-money data-hint="Bỏ trống nếu không giảm giá; nếu nhập phải ≥ giá bán."
+                                   th:field="*{rows[__${stat.index}__].originalPrice}"></td>
+                        <td><input class="form-control form-control-sm" data-field="stockQuantity" type="number" data-quick="stock"
                                    th:field="*{rows[__${stat.index}__].stockQuantity}" min="0" max="100000" required></td>
                         <td>
                             <select class="form-select form-select-sm" data-field="status"
@@ -132,14 +142,30 @@
                                         th:text="${s.name() == 'ACTIVE'} ? 'Đang bán' : 'Ngừng bán'">Trạng thái</option>
                             </select>
                         </td>
+                        <td class="text-center">
+                            <button type="button" class="vg-img-btn" title="Ảnh biến thể (tuỳ chọn)"><i class="bi bi-image" aria-hidden="true"></i></button>
+                            <input type="file" data-field="imageFile" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" hidden>
+                            <input type="text" data-field="imageUrl" maxlength="500" hidden
+                                   th:field="*{rows[__${stat.index}__].imageUrl}">
+                        </td>
                         <td class="text-end">
                             <button class="btn btn-sm btn-outline-danger js-remove-line" type="button" title="Bỏ dòng này">
                                 <i class="bi bi-trash3" aria-hidden="true"></i>
                             </button>
                         </td>
                     </tr>
+                    <tr id="emptyRow">
+                        <td colspan="10" class="text-center text-muted py-4">
+                            Chưa có dòng nào — bấm <strong>Sinh dòng tự động</strong> hoặc <strong>Thêm dòng trống</strong>.
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="vg-pager" id="pagerWrap" style="display:none">
+                <span class="vg-page-label" id="pageLabel">Trang 1/1</span>
+                <button type="button" id="pagePrev" aria-label="Trang trước"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+                <button type="button" id="pageNext" aria-label="Trang sau"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
             </div>
             <div class="form-actions">
                 <button class="btn btn-outline-secondary" type="button" id="addRowBtn">
@@ -152,18 +178,17 @@
                    th:href="@{/admin/san-pham/{id}/bien-the(id=${product.id})}">Huỷ</a>
             </div>
         </div>
-        <div class="alert alert-info small mt-3">
+        <div class="alert alert-info small">
             <i class="bi bi-info-circle" aria-hidden="true"></i>
-            Tối đa 40 dòng mỗi lần. Một dòng sai là <strong>không dòng nào được lưu</strong> – sửa đúng dòng bị báo rồi lưu lại.
-            Ảnh riêng của biến thể thêm sau bằng nút <strong>Sửa</strong>.
+            Tối đa 40 dòng mỗi lần. Một dòng sai là <strong>không dòng nào được lưu</strong>.
+            Dòng để trống hoàn toàn sẽ tự bị bỏ qua khi lưu.
         </div>
     </form>
 
-    <!-- Dòng mẫu cho JS nhân bản – giống cách trang tạo đơn thủ công đang làm -->
     <template id="variant-line-template">
         <tr class="variant-line">
             <td><input class="form-control form-control-sm text-uppercase" data-field="sku" maxlength="50" required></td>
-            <td><input class="form-control form-control-sm" data-field="color" maxlength="50" required></td>
+            <td><input class="form-control form-control-sm" data-field="color" data-quick="color" data-capitalize maxlength="50" required></td>
             <td>
                 <select class="form-select form-select-sm" data-field="weightClass" required>
                     <option value="">--</option><option>2U</option><option>3U</option><option>4U</option><option>5U</option>
@@ -174,13 +199,19 @@
                     <option value="">--</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option>
                 </select>
             </td>
-            <td><input class="form-control form-control-sm" data-field="price" type="number" min="0" step="1000" required></td>
-            <td><input class="form-control form-control-sm" data-field="originalPrice" type="number" min="0" step="1000"></td>
-            <td><input class="form-control form-control-sm" data-field="stockQuantity" type="number" min="0" max="100000" value="0" required></td>
+            <td><input class="form-control form-control-sm" data-field="price" type="text" inputmode="decimal" data-money data-quick="price" required></td>
+            <td><input class="form-control form-control-sm" data-field="originalPrice" type="text" inputmode="decimal" data-money
+                       data-hint="Bỏ trống nếu không giảm giá; nếu nhập phải ≥ giá bán."></td>
+            <td><input class="form-control form-control-sm" data-field="stockQuantity" type="number" data-quick="stock" min="0" max="100000" value="0" required></td>
             <td>
                 <select class="form-select form-select-sm" data-field="status">
                     <option value="ACTIVE">Đang bán</option><option value="INACTIVE">Ngừng bán</option>
                 </select>
+            </td>
+            <td class="text-center">
+                <button type="button" class="vg-img-btn" title="Ảnh biến thể (tuỳ chọn)"><i class="bi bi-image" aria-hidden="true"></i></button>
+                <input type="file" data-field="imageFile" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*" hidden>
+                <input type="text" data-field="imageUrl" maxlength="500" hidden>
             </td>
             <td class="text-end">
                 <button class="btn btn-sm btn-outline-danger js-remove-line" type="button" title="Bỏ dòng này">
@@ -193,33 +224,61 @@
     <script th:inline="javascript">
         (function () {
             'use strict';
-            var CAP = 40;
+            var CAP = 40, PAGE = 6, page = 1;
             var PRODUCT_CODE = /*[[${product.productCode}]]*/ 'MA-SP';
             var EXISTING = [
                 /*[# th:each="v : ${variants}"]*/
-                { sku: /*[[${v.sku}]]*/ '', color: /*[[${v.color}]]*/ '', weight: /*[[${v.weightClass}]]*/ '', grip: /*[[${v.gripSize}]]*/ '' },
+                { color: /*[[${v.color}]]*/ '', weight: /*[[${v.weightClass}]]*/ '', grip: /*[[${v.gripSize}]]*/ '' },
                 /*[/]*/
             ];
+
             var tbody = document.getElementById('variantRows');
+            var emptyRow = document.getElementById('emptyRow');
             var countEl = document.getElementById('rowCount');
+            var pagerWrap = document.getElementById('pagerWrap');
+            var pageLabel = document.getElementById('pageLabel');
+            var pagePrev = document.getElementById('pagePrev');
+            var pageNext = document.getElementById('pageNext');
             var template = document.getElementById('variant-line-template');
             var form = document.getElementById('variantBulkForm');
 
-            function toast(msg, kind) {
-                if (typeof window.badToast === 'function') { window.badToast(kind || 'error', msg); }
+            function toast(kind, msg) {
+                if (typeof window.badToast === 'function') { window.badToast(kind, msg); }
                 else { alert(msg); }
             }
             function fold(s) {
                 return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                     .replace(/đ/g, 'd').replace(/Đ/g, 'D').trim().replace(/\s+/g, ' ').toLowerCase();
             }
-            function slug(s) {
-                return fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toUpperCase();
+            function capitalize(s) {
+                if (typeof window.VG_capitalize === 'function') { return window.VG_capitalize(s); }
+                return String(s).trim().replace(/\s+/g, ' ').split(' ').map(function (w) {
+                    return w ? w.charAt(0).toUpperCase() + w.slice(1) : w;
+                }).join(' ');
             }
-            function comboKey(color, weight, grip) { return fold(color) + '|' + weight + '|' + grip; }
+            function slug(s) { return fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toUpperCase(); }
+            function comboKey(c, w, g) { return fold(c) + '|' + w + '|' + g; }
             function rows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr.variant-line')); }
             function field(tr, name) { return tr.querySelector('[data-field="' + name + '"]'); }
+            function money(raw) {
+                if (typeof window.VG_parseMoney === 'function') { return window.VG_parseMoney(raw); }
+                return Number(raw);
+            }
 
+            function renderPager() {
+                var list = rows();
+                var pages = Math.max(1, Math.ceil(list.length / PAGE));
+                if (page > pages) { page = pages; }
+                if (page < 1) { page = 1; }
+                list.forEach(function (tr, i) {
+                    tr.style.display = (i >= (page - 1) * PAGE && i < page * PAGE) ? '' : 'none';
+                });
+                emptyRow.style.display = list.length ? 'none' : '';
+                pagerWrap.style.display = list.length > PAGE ? '' : 'none';
+                pageLabel.textContent = 'Trang ' + page + '/' + pages;
+                pagePrev.disabled = page <= 1;
+                pageNext.disabled = page >= pages;
+            }
             function reindex() {
                 var list = rows();
                 list.forEach(function (tr, i) {
@@ -227,12 +286,10 @@
                         el.name = 'rows[' + i + '].' + el.dataset.field;
                         el.id = 'rows' + i + '.' + el.dataset.field;
                     });
-                    var btn = tr.querySelector('.js-remove-line');
-                    if (btn) { btn.disabled = list.length === 1; }
                 });
                 countEl.textContent = list.length + ' / ' + CAP + ' dòng';
+                renderPager();
             }
-
             function addRow(data) {
                 if (rows().length >= CAP) { return false; }
                 var tr = template.content.firstElementChild.cloneNode(true);
@@ -244,13 +301,39 @@
                     field(tr, 'price').value = data.price != null ? data.price : '';
                     field(tr, 'stockQuantity').value = data.stock != null ? data.stock : 0;
                 }
-                tbody.appendChild(tr);
+                tbody.insertBefore(tr, emptyRow);
                 return true;
+            }
+            function imgBadge(tr) {
+                var btn = tr.querySelector('.vg-img-btn');
+                var f = field(tr, 'imageFile');
+                var has = field(tr, 'imageUrl').value.trim() !== '' || (f.files && f.files.length > 0);
+                btn.classList.toggle('has-img', has);
+            }
+
+            pagePrev.addEventListener('click', function () { page--; renderPager(); });
+            pageNext.addEventListener('click', function () { page++; renderPager(); });
+
+            ['genWeights', 'genGrips'].forEach(function (id) {
+                document.getElementById(id).addEventListener('click', function (e) {
+                    var pill = e.target.closest('.vg-pill');
+                    if (!pill) { return; }
+                    var on = !pill.classList.contains('on');
+                    pill.classList.toggle('on', on);
+                    pill.setAttribute('aria-pressed', String(on));
+                });
+            });
+            function picked(id) {
+                return Array.prototype.map.call(
+                    document.querySelectorAll('#' + id + ' .vg-pill.on'),
+                    function (p) { return p.dataset.value; });
             }
 
             tbody.addEventListener('click', function (e) {
+                var img = e.target.closest('.vg-img-btn');
+                if (img) { openImagePanel(img.closest('tr.variant-line')); return; }
                 var btn = e.target.closest('.js-remove-line');
-                if (!btn || rows().length === 1) { return; }
+                if (!btn) { return; }
                 btn.closest('tr.variant-line').remove();
                 reindex();
             });
@@ -259,25 +342,53 @@
                 if (tr) { tr.classList.remove('table-danger'); }
             });
             document.getElementById('addRowBtn').addEventListener('click', function () {
-                if (!addRow()) { toast('Đã đạt trần ' + CAP + ' dòng. Lưu bớt rồi thêm tiếp nhé.', 'warning'); return; }
+                if (!addRow()) { toast('warning', 'Đã đạt trần ' + CAP + ' dòng. Lưu bớt rồi thêm tiếp nhé.'); return; }
+                page = Math.ceil(rows().length / PAGE);
                 reindex();
             });
 
+            document.getElementById('clearRowsBtn').addEventListener('click', function () {
+                var n = rows().length;
+                if (!n) { toast('info', 'Bảng đang trống sẵn rồi.'); return; }
+                function doClear() {
+                    rows().forEach(function (tr) { tr.remove(); });
+                    page = 1; reindex();
+                    toast('success', 'Đã xoá ' + n + ' dòng xem trước.');
+                }
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'warning', title: 'Xoá hết dòng?',
+                        text: 'Toàn bộ ' + n + ' dòng xem trước sẽ bị xoá. Chưa lưu vào CSDL nên không mất dữ liệu thật.',
+                        showCancelButton: true, confirmButtonText: 'Xoá hết', cancelButtonText: 'Huỷ', reverseButtons: true
+                    }).then(function (r) { if (r.isConfirmed) { doClear(); } });
+                } else if (window.confirm('Xoá hết ' + n + ' dòng xem trước?')) { doClear(); }
+            });
+
+            document.getElementById('resetGenBtn').addEventListener('click', function () {
+                document.getElementById('genColors').value = '';
+                document.querySelectorAll('.vg-pill.on').forEach(function (p) {
+                    p.classList.remove('on');
+                    p.setAttribute('aria-pressed', 'false');
+                });
+                document.getElementById('genPrice').value = '0';
+                document.getElementById('genStock').value = '0';
+                toast('info', 'Đã đặt lại thông số gốc về mặc định.');
+            });
+
             document.getElementById('genBtn').addEventListener('click', function () {
-                var colors = [];
-                var seenColor = {};
+                var colors = [], seenColor = {};
                 document.getElementById('genColors').value.split(/[,;\n]/).forEach(function (c) {
-                    var v = c.trim().replace(/\s+/g, ' ');
+                    var v = capitalize(c);
                     if (v && !seenColor[fold(v)]) { seenColor[fold(v)] = true; colors.push(v); }
                 });
-                var weights = Array.prototype.map.call(document.querySelectorAll('input[name="genWeight"]:checked'), function (c) { return c.value; });
-                var grips = Array.prototype.map.call(document.querySelectorAll('input[name="genGrip"]:checked'), function (c) { return c.value; });
-                if (!colors.length) { toast('Nhập ít nhất một màu sắc.', 'warning'); return; }
-                if (!weights.length || !grips.length) { toast('Tích ít nhất một trọng lượng và một cỡ cán.', 'warning'); return; }
-                var price = Number(document.getElementById('genPrice').value);
-                if (!isFinite(price) || price <= 0) { toast('Nhập giá bán hợp lệ cho cả loạt (vd: 4690000).', 'warning'); return; }
+                var weights = picked('genWeights'), grips = picked('genGrips');
+                if (!colors.length) { toast('warning', 'Nhập ít nhất một màu sắc.'); return; }
+                if (!weights.length || !grips.length) { toast('warning', 'Chọn ít nhất một trọng lượng và một cỡ cán.'); return; }
+                var price = money(document.getElementById('genPrice').value);
+                if (!isFinite(price) || price <= 0) { toast('warning', 'Giá bán phải lớn hơn 0 (vd: 1m, 500k, 1000000).'); return; }
+                document.getElementById('genPrice').value = String(price);
                 var stock = Number(document.getElementById('genStock').value);
-                if (!Number.isInteger(stock) || stock < 0 || stock > 100000) { toast('Tồn kho phải là số nguyên từ 0 đến 100000.', 'warning'); return; }
+                if (!Number.isInteger(stock) || stock < 0 || stock > 100000) { toast('warning', 'Tồn kho phải là số nguyên từ 0 đến 100000.'); return; }
 
                 var taken = {};
                 EXISTING.forEach(function (v) { taken[comboKey(v.color, v.weight, v.grip)] = true; });
@@ -299,22 +410,100 @@
                         });
                     });
                 });
+                if (added) { page = Math.ceil(rows().length / PAGE); }
                 reindex();
                 if (added === 0) {
-                    toast(skipped ? 'Tất cả tổ hợp đều đã tồn tại – không có dòng mới.' : 'Không sinh được dòng nào.', 'warning');
+                    toast('warning', skipped ? 'Tất cả tổ hợp đều đã tồn tại – không có dòng mới.' : 'Không sinh được dòng nào.');
                 } else {
-                    toast('Đã sinh ' + added + ' dòng' + (skipped ? ', bỏ qua ' + skipped + ' tổ hợp trùng' : '')
-                        + (capped ? ', ' + capped + ' tổ hợp vượt trần ' + CAP : '') + '.', 'success');
+                    toast('success', 'Đã sinh ' + added + ' dòng' + (skipped ? ', bỏ qua ' + skipped + ' tổ hợp trùng' : '')
+                        + (capped ? ', ' + capped + ' tổ hợp vượt trần ' + CAP : '') + '.');
                 }
             });
 
-            /* Kiểm tra ở pha CAPTURE – chạy TRƯỚC hộp xác nhận của main.js (bài học B4). */
+            /* ===== Panel ảnh cho từng dòng: chọn file HOẶC nhập URL, optional ===== */
+            function openImagePanel(tr) {
+                var urlInput = field(tr, 'imageUrl'), fileInput = field(tr, 'imageFile');
+                if (!window.Swal) {
+                    var u = window.prompt('Đường dẫn ảnh (để trống = dùng ảnh sản phẩm):', urlInput.value);
+                    if (u !== null) { urlInput.value = u.trim(); imgBadge(tr); }
+                    return;
+                }
+                var pickedFile = null;
+                Swal.fire({
+                    title: 'Ảnh cho biến thể',
+                    html: '<div class="text-start">' +
+                        '<img id="vgImgPrev" class="vg-img-prev" alt="" style="display:none">' +
+                        '<label class="form-label mt-3">Chọn ảnh từ máy (tối đa 5 MB)</label>' +
+                        '<input type="file" id="vgImgFile" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif,.svg,image/*">' +
+                        '<label class="form-label mt-3">Hoặc nhập đường dẫn ảnh</label>' +
+                        '<input type="text" id="vgImgUrl" class="form-control" maxlength="500" placeholder="/images/... hoặc https://...">' +
+                        '<div class="form-text mt-2">Để trống cả hai = dùng ảnh chính của sản phẩm. Chọn file thì file được ưu tiên.</div>' +
+                        '</div>',
+                    showCancelButton: true, showDenyButton: true,
+                    confirmButtonText: 'Xong', denyButtonText: 'Gỡ ảnh', cancelButtonText: 'Đóng',
+                    didOpen: function () {
+                        var popup = Swal.getPopup();
+                        var prev = popup.querySelector('#vgImgPrev');
+                        var f = popup.querySelector('#vgImgFile');
+                        var u = popup.querySelector('#vgImgUrl');
+                        u.value = urlInput.value;
+                        function show(src) {
+                            if (src) { prev.src = src; prev.style.display = ''; }
+                            else { prev.style.display = 'none'; }
+                        }
+                        show(tr.dataset.imgPreview || u.value);
+                        f.addEventListener('change', function () {
+                            var file = f.files[0];
+                            if (!file) { return; }
+                            if (file.size > 5 * 1024 * 1024) {
+                                Swal.showValidationMessage('Ảnh vượt quá 5 MB – chọn ảnh nhẹ hơn.');
+                                f.value = ''; return;
+                            }
+                            pickedFile = file;
+                            show(URL.createObjectURL(file));
+                        });
+                        u.addEventListener('input', function () { if (!pickedFile) { show(u.value.trim()); } });
+                    },
+                    preConfirm: function () {
+                        var u = Swal.getPopup().querySelector('#vgImgUrl');
+                        return { url: u.value.trim(), file: pickedFile };
+                    }
+                }).then(function (r) {
+                    if (r.isConfirmed) {
+                        urlInput.value = r.value.url;
+                        if (r.value.file) {
+                            var dt = new DataTransfer();
+                            dt.items.add(r.value.file);
+                            fileInput.files = dt.files;
+                            tr.dataset.imgPreview = URL.createObjectURL(r.value.file);
+                        }
+                        imgBadge(tr);
+                    } else if (r.isDenied) {
+                        urlInput.value = '';
+                        fileInput.value = '';
+                        delete tr.dataset.imgPreview;
+                        imgBadge(tr);
+                    }
+                });
+            }
+
+            /* Kiểm tra ở pha CAPTURE – chạy TRƯỚC hộp xác nhận của main.js.
+               Dòng trống hoàn toàn tự bỏ qua. Dòng lỗi ở trang khác → nhảy tới trang đó. */
             document.addEventListener('submit', function (e) {
                 if (e.target !== form) { return; }
-                var list = rows();
+                var list = rows().filter(function (tr) {
+                    var f = field(tr, 'imageFile');
+                    var untouched = field(tr, 'sku').value.trim() === '' && field(tr, 'color').value.trim() === '' &&
+                        field(tr, 'price').value.trim() === '' && field(tr, 'originalPrice').value.trim() === '' &&
+                        field(tr, 'weightClass').value === '' && field(tr, 'gripSize').value === '' &&
+                        field(tr, 'imageUrl').value.trim() === '' && !(f.files && f.files.length);
+                    if (untouched) { tr.remove(); return false; }
+                    return true;
+                });
+                reindex();
                 if (!list.length) {
                     e.preventDefault(); e.stopImmediatePropagation();
-                    toast('Chưa có dòng biến thể nào để thêm.', 'warning');
+                    toast('warning', 'Chưa có dòng biến thể nào để thêm.');
                     return;
                 }
                 var seenSku = {}, seenCombo = {};
@@ -325,36 +514,47 @@
                     var color = field(tr, 'color').value.trim();
                     var w = field(tr, 'weightClass').value;
                     var g = field(tr, 'gripSize').value;
-                    var price = Number(field(tr, 'price').value);
+                    var price = money(field(tr, 'price').value);
                     var originalRaw = field(tr, 'originalPrice').value;
+                    var original = originalRaw.trim() === '' ? null : money(originalRaw);
                     var stock = Number(field(tr, 'stockQuantity').value);
+                    var imgUrl = field(tr, 'imageUrl').value.trim();
+                    var imgFile = field(tr, 'imageFile').files[0];
                     var msg = null, focusEl = null;
                     if (!sku || !/^[A-Za-z0-9_-]{1,50}$/.test(sku)) { msg = label + 'SKU chỉ gồm chữ, số, gạch ngang/dưới, tối đa 50 ký tự.'; focusEl = field(tr, 'sku'); }
                     else if (!color) { msg = label + 'chưa nhập màu sắc.'; focusEl = field(tr, 'color'); }
                     else if (!w) { msg = label + 'chưa chọn trọng lượng.'; focusEl = field(tr, 'weightClass'); }
                     else if (!g) { msg = label + 'chưa chọn cỡ cán.'; focusEl = field(tr, 'gripSize'); }
-                    else if (!isFinite(price) || price < 0 || field(tr, 'price').value === '') { msg = label + 'giá bán không hợp lệ.'; focusEl = field(tr, 'price'); }
-                    else if (originalRaw !== '' && (!isFinite(Number(originalRaw)) || Number(originalRaw) < price)) { msg = label + 'giá gốc phải ≥ giá bán.'; focusEl = field(tr, 'originalPrice'); }
+                    else if (!isFinite(price) || price <= 0) { msg = label + 'giá bán phải lớn hơn 0 (vd: 1m, 500k).'; focusEl = field(tr, 'price'); }
+                    else if (price > 100000000) { msg = label + 'giá bán tối đa 100.000.000 ₫.'; focusEl = field(tr, 'price'); }
+                    else if (originalRaw.trim() !== '' && (!isFinite(original) || original < price)) { msg = label + 'giá gốc phải ≥ giá bán.'; focusEl = field(tr, 'originalPrice'); }
                     else if (!Number.isInteger(stock) || stock < 0 || stock > 100000) { msg = label + 'tồn kho phải là số nguyên 0–100000.'; focusEl = field(tr, 'stockQuantity'); }
+                    else if (imgUrl.length > 500) { msg = label + 'đường dẫn ảnh tối đa 500 ký tự.'; focusEl = tr.querySelector('.vg-img-btn'); }
+                    else if (imgFile && imgFile.size > 5 * 1024 * 1024) { msg = label + 'ảnh vượt quá 5 MB.'; focusEl = tr.querySelector('.vg-img-btn'); }
                     else if (seenSku[sku.toUpperCase()]) { msg = label + 'SKU "' + sku + '" bị lặp trong bảng.'; focusEl = field(tr, 'sku'); }
                     else if (seenCombo[comboKey(color, w, g)]) { msg = label + 'tổ hợp màu/trọng lượng/cỡ cán bị lặp trong bảng.'; focusEl = field(tr, 'color'); }
                     if (msg) {
                         e.preventDefault(); e.stopImmediatePropagation();
+                        page = Math.floor(i / PAGE) + 1;
+                        renderPager();
                         tr.classList.add('table-danger');
-                        toast(msg, 'error');
+                        toast('error', msg);
                         if (focusEl) { focusEl.focus(); }
                         return;
                     }
+                    field(tr, 'price').value = String(price);
+                    if (original != null) { field(tr, 'originalPrice').value = String(original); }
                     seenSku[sku.toUpperCase()] = true;
                     seenCombo[comboKey(color, w, g)] = true;
                 }
             }, true);
 
-            if (!rows().length) { addRow(); }
+            rows().forEach(imgBadge);
             reindex();
         })();
     </script>
 
+</div>
 </th:block>
 
 </body>

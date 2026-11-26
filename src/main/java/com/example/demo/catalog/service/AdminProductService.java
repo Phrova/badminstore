@@ -58,6 +58,8 @@ public interface AdminProductService {
 
     void deleteVariant(Integer productId, Integer variantId);
 
+    int deleteVariantsBulk(Integer productId);
+
     int updatePricesBulk(Integer productId, BulkPriceForm form);
 
     List<ProductImage> imagesOf(Integer productId);

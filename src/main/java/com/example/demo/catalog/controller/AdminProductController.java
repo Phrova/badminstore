@@ -257,6 +257,22 @@ public class AdminProductController {
         return "admin/variant-bulk-form";
     }
 
+    @PostMapping("/{id}/bien-the/xoa-tat-ca")
+    public String variantDeleteAll(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        Product product = adminProductService.requireProduct(id);
+        int total = adminProductService.variantsOf(id).size();
+        try {
+            int deleted = adminProductService.deleteVariantsBulk(id);
+            int kept = total - deleted;
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Đã xoá " + deleted + " biến thể của \"" + product.getName() + "\""
+                            + (kept > 0 ? ". Giữ lại " + kept + " biến thể đã có trong đơn hàng – chuyển \"Ngừng bán\" nếu muốn ẩn." : "."));
+        } catch (BusinessException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/admin/san-pham/" + id + "/bien-the";
+    }
+
     @GetMapping("/{id}/bien-the/{variantId}/sua")
     public String variantEditForm(@PathVariable("id") Integer id,
                                   @PathVariable("variantId") Integer variantId,

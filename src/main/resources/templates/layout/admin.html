@@ -12,7 +12,8 @@
 
     <!-- CSS riêng khu quản trị (đặt SAU theme.css để ghi đè khi cần) -->
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-        <link rel="stylesheet" th:href="@{/css/theme-toggle.css}">
+         <link rel="stylesheet" th:href="@{/css/theme-toggle.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-glass.css}">
     <!-- Không defer: áp chế độ đã lưu TRƯỚC khi vẽ body → không nháy sáng -->
     <script th:src="@{/js/theme-toggle.js}"></script>
 </head>
@@ -109,6 +110,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:src="@{/js/main.js}" defer></script>
 <script th:src="@{/js/app.js}" defer></script>
+<script th:src="@{/js/variant-tools.js}" defer></script>
 <th:block layout:fragment="scripts"></th:block>
 </body>
 </html>
