@@ -3,6 +3,7 @@ package com.example.demo.catalog.service;
 import com.example.demo.catalog.dto.BulkPriceForm;
 import com.example.demo.catalog.dto.ProductForm;
 import com.example.demo.catalog.dto.ProductRow;
+import com.example.demo.catalog.dto.VariantBulkForm;
 import com.example.demo.catalog.dto.VariantForm;
 import com.example.demo.catalog.entity.Brand;
 import com.example.demo.catalog.entity.Category;
@@ -50,6 +51,8 @@ public interface AdminProductService {
     ProductVariant createVariant(Integer productId, VariantForm form);
 
     ProductVariant updateVariant(Integer productId, Integer variantId, VariantForm form);
+
+    List<ProductVariant> createVariantsBulk(Integer productId, VariantBulkForm form);
 
     ProductVariant toggleVariantStatus(Integer productId, Integer variantId);
 

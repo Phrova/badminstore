@@ -32,9 +32,13 @@
                th:href="@{/admin/san-pham/{id}/sua(id=${product.id})}">
                 <i class="bi bi-pencil-square" aria-hidden="true"></i> Sửa thông tin chung
             </a>
-            <a class="btn btn-sm btn-primary"
+                     <a class="btn btn-sm btn-primary"
                th:href="@{/admin/san-pham/{id}/bien-the/tao-moi(id=${product.id})}">
                 <i class="bi bi-plus-square" aria-hidden="true"></i> Thêm biến thể
+            </a>
+            <a class="btn btn-sm btn-outline-primary"
+               th:href="@{/admin/san-pham/{id}/bien-the/them-nhieu(id=${product.id})}">
+                <i class="bi bi-lightning-charge" aria-hidden="true"></i> Thêm nhiều biến thể
             </a>
         </div>
     </div>

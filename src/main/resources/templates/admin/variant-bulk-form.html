@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/admin}">
+<head>
+    <title>Thêm nhiều biến thể</title>
+</head>
+<body>
+
+<th:block layout:fragment="content">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/admin}">Tổng quan</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/admin/san-pham}">Sản phẩm</a></li>
+            <li class="breadcrumb-item">
+                <a th:href="@{/admin/san-pham/{id}/bien-the(id=${product.id})}" th:text="${product.name}">Sản phẩm</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Thêm nhiều biến thể</li>
+        </ol>
+    </nav>
+
+    <div class="page-head">
+        <h1 class="page-title">
+            <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+            <span th:text="|Thêm nhiều biến thể cho &quot;${product.name}&quot;|">Thêm nhiều biến thể</span>
+        </h1>
+        <a class="btn btn-sm btn-outline-secondary"
+           th:href="@{/admin/san-pham/{id}/bien-the(id=${product.id})}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i> Về danh sách biến thể
+        </a>
+    </div>
+
+    <div class="alert alert-warning" th:if="${formError != null}" role="alert">
+        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> <span th:text="${formError}">Lý do lỗi</span>
+    </div>
+
+    <!-- ===== Sinh dòng tự động: màu × trọng lượng × cỡ cán ===== -->
+    <div class="card-soft mb-3">
+        <div class="card-header fw-semibold">
+            <i class="bi bi-magic" aria-hidden="true"></i> Tạo nhanh theo tổ hợp
+        </div>
+        <div class="card-body row g-3">
+            <div class="col-lg-6">
+                <label class="form-label" for="genColors">Màu sắc (phẩy hoặc xuống dòng để ngăn cách)</label>
+                <textarea class="form-control" id="genColors" rows="2"
+                          placeholder="Đỏ đô, Xanh đen, Trắng"></textarea>
+                <div class="form-text">Tổ hợp đã tồn tại của sản phẩm sẽ tự bị bỏ qua.</div>
+            </div>
+            <div class="col-lg-3">
+                <span class="form-label d-block">Trọng lượng</span>
+                <div class="form-check form-check-inline" th:each="w : ${weightClasses}">
+                    <input class="form-check-input" type="checkbox" name="genWeight" th:value="${w}" th:id="'genW' + ${w}">
+                    <label class="form-check-label" th:for="'genW' + ${w}" th:text="${w}">4U</label>
+                </div>
+                <span class="form-label d-block mt-2">Cỡ cán</span>
+                <div class="form-check form-check-inline" th:each="g : ${gripSizes}">
+                    <input class="form-check-input" type="checkbox" name="genGrip" th:value="${g}" th:id="'genG' + ${g}">
+                    <label class="form-check-label" th:for="'genG' + ${g}" th:text="${g}">G5</label>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <label class="form-label" for="genPrice">Giá bán áp cho cả loạt (₫)</label>
+                <input class="form-control mb-2" id="genPrice" type="number" min="0" step="1000" placeholder="4690000">
+                <label class="form-label" for="genStock">Tồn kho mỗi biến thể</label>
+                <input class="form-control" id="genStock" type="number" min="0" max="100000" value="10">
+            </div>
+            <div class="col-12">
+                <button class="btn btn-outline-primary" type="button" id="genBtn">
+                    <i class="bi bi-lightning-charge" aria-hidden="true"></i> Sinh dòng tự động
+                </button>
+                <span class="small text-muted ms-2">Mỗi dòng sinh ra vẫn sửa được từng ô trước khi lưu.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Bảng dòng biến thể – lưu MỘT lần ===== -->
+    <form id="variantBulkForm" th:action="@{/admin/san-pham/{id}/bien-the/them-nhieu(id=${product.id})}"
+          th:object="${bulkForm}" method="post"
+          data-confirm="Thêm toàn bộ biến thể trong bảng?">
+        <div class="card-soft">
+            <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-boxes" aria-hidden="true"></i> Các biến thể sẽ thêm</span>
+                <span class="text-muted small" id="rowCount">0 / 40 dòng</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>SKU <span class="text-danger">*</span></th>
+                        <th>Màu <span class="text-danger">*</span></th>
+                        <th>Trọng lượng <span class="text-danger">*</span></th>
+                        <th>Cỡ cán <span class="text-danger">*</span></th>
+                        <th>Giá bán (₫) <span class="text-danger">*</span></th>
+                        <th>Giá gốc (₫)</th>
+                        <th>Tồn kho <span class="text-danger">*</span></th>
+                        <th>Trạng thái</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="variantRows">
+                    <tr class="variant-line" th:each="row, stat : *{rows}">
+                        <td><input class="form-control form-control-sm text-uppercase" data-field="sku"
+                                   th:field="*{rows[__${stat.index}__].sku}" maxlength="50" required></td>
+                        <td><input class="form-control form-control-sm" data-field="color"
+                                   th:field="*{rows[__${stat.index}__].color}" maxlength="50" required></td>
+                        <td>
+                            <select class="form-select form-select-sm" data-field="weightClass"
+                                    th:field="*{rows[__${stat.index}__].weightClass}" required>
+                                <option value="">--</option>
+                                <option th:each="w : ${weightClasses}" th:value="${w}" th:text="${w}">4U</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" data-field="gripSize"
+                                    th:field="*{rows[__${stat.index}__].gripSize}" required>
+                                <option value="">--</option>
+                                <option th:each="g : ${gripSizes}" th:value="${g}" th:text="${g}">G5</option>
+                            </select>
+                        </td>
+                        <td><input class="form-control form-control-sm" data-field="price" type="number"
+                                   th:field="*{rows[__${stat.index}__].price}" min="0" step="1000" required></td>
+                        <td><input class="form-control form-control-sm" data-field="originalPrice" type="number"
+                                   th:field="*{rows[__${stat.index}__].originalPrice}" min="0" step="1000"></td>
+                        <td><input class="form-control form-control-sm" data-field="stockQuantity" type="number"
+                                   th:field="*{rows[__${stat.index}__].stockQuantity}" min="0" max="100000" required></td>
+                        <td>
+                            <select class="form-select form-select-sm" data-field="status"
+                                    th:field="*{rows[__${stat.index}__].status}">
+                                <option th:each="s : ${variantStatuses}" th:value="${s.name()}"
+                                        th:text="${s.name() == 'ACTIVE'} ? 'Đang bán' : 'Ngừng bán'">Trạng thái</option>
+                            </select>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger js-remove-line" type="button" title="Bỏ dòng này">
+                                <i class="bi bi-trash3" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline-secondary" type="button" id="addRowBtn">
+                    <i class="bi bi-plus-lg" aria-hidden="true"></i> Thêm dòng trống
+                </button>
+                <button class="btn btn-primary flex-grow-1" type="submit">
+                    <i class="bi bi-save" aria-hidden="true"></i> Lưu tất cả
+                </button>
+                <a class="btn btn-outline-secondary"
+                   th:href="@{/admin/san-pham/{id}/bien-the(id=${product.id})}">Huỷ</a>
+            </div>
+        </div>
+        <div class="alert alert-info small mt-3">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            Tối đa 40 dòng mỗi lần. Một dòng sai là <strong>không dòng nào được lưu</strong> – sửa đúng dòng bị báo rồi lưu lại.
+            Ảnh riêng của biến thể thêm sau bằng nút <strong>Sửa</strong>.
+        </div>
+    </form>
+
+    <!-- Dòng mẫu cho JS nhân bản – giống cách trang tạo đơn thủ công đang làm -->
+    <template id="variant-line-template">
+        <tr class="variant-line">
+            <td><input class="form-control form-control-sm text-uppercase" data-field="sku" maxlength="50" required></td>
+            <td><input class="form-control form-control-sm" data-field="color" maxlength="50" required></td>
+            <td>
+                <select class="form-select form-select-sm" data-field="weightClass" required>
+                    <option value="">--</option><option>2U</option><option>3U</option><option>4U</option><option>5U</option>
+                </select>
+            </td>
+            <td>
+                <select class="form-select form-select-sm" data-field="gripSize" required>
+                    <option value="">--</option><option>G3</option><option>G4</option><option>G5</option><option>G6</option>
+                </select>
+            </td>
+            <td><input class="form-control form-control-sm" data-field="price" type="number" min="0" step="1000" required></td>
+            <td><input class="form-control form-control-sm" data-field="originalPrice" type="number" min="0" step="1000"></td>
+            <td><input class="form-control form-control-sm" data-field="stockQuantity" type="number" min="0" max="100000" value="0" required></td>
+            <td>
+                <select class="form-select form-select-sm" data-field="status">
+                    <option value="ACTIVE">Đang bán</option><option value="INACTIVE">Ngừng bán</option>
+                </select>
+            </td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-danger js-remove-line" type="button" title="Bỏ dòng này">
+                    <i class="bi bi-trash3" aria-hidden="true"></i>
+                </button>
+            </td>
+        </tr>
+    </template>
+
+    <script th:inline="javascript">
+        (function () {
+            'use strict';
+            var CAP = 40;
+            var PRODUCT_CODE = /*[[${product.productCode}]]*/ 'MA-SP';
+            var EXISTING = [
+                /*[# th:each="v : ${variants}"]*/
+                { sku: /*[[${v.sku}]]*/ '', color: /*[[${v.color}]]*/ '', weight: /*[[${v.weightClass}]]*/ '', grip: /*[[${v.gripSize}]]*/ '' },
+                /*[/]*/
+            ];
+            var tbody = document.getElementById('variantRows');
+            var countEl = document.getElementById('rowCount');
+            var template = document.getElementById('variant-line-template');
+            var form = document.getElementById('variantBulkForm');
+
+            function toast(msg, kind) {
+                if (typeof window.badToast === 'function') { window.badToast(kind || 'error', msg); }
+                else { alert(msg); }
+            }
+            function fold(s) {
+                return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd').replace(/Đ/g, 'D').trim().replace(/\s+/g, ' ').toLowerCase();
+            }
+            function slug(s) {
+                return fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toUpperCase();
+            }
+            function comboKey(color, weight, grip) { return fold(color) + '|' + weight + '|' + grip; }
+            function rows() { return Array.prototype.slice.call(tbody.querySelectorAll('tr.variant-line')); }
+            function field(tr, name) { return tr.querySelector('[data-field="' + name + '"]'); }
+
+            function reindex() {
+                var list = rows();
+                list.forEach(function (tr, i) {
+                    tr.querySelectorAll('[data-field]').forEach(function (el) {
+                        el.name = 'rows[' + i + '].' + el.dataset.field;
+                        el.id = 'rows' + i + '.' + el.dataset.field;
+                    });
+                    var btn = tr.querySelector('.js-remove-line');
+                    if (btn) { btn.disabled = list.length === 1; }
+                });
+                countEl.textContent = list.length + ' / ' + CAP + ' dòng';
+            }
+
+            function addRow(data) {
+                if (rows().length >= CAP) { return false; }
+                var tr = template.content.firstElementChild.cloneNode(true);
+                if (data) {
+                    field(tr, 'sku').value = data.sku || '';
+                    field(tr, 'color').value = data.color || '';
+                    field(tr, 'weightClass').value = data.weight || '';
+                    field(tr, 'gripSize').value = data.grip || '';
+                    field(tr, 'price').value = data.price != null ? data.price : '';
+                    field(tr, 'stockQuantity').value = data.stock != null ? data.stock : 0;
+                }
+                tbody.appendChild(tr);
+                return true;
+            }
+
+            tbody.addEventListener('click', function (e) {
+                var btn = e.target.closest('.js-remove-line');
+                if (!btn || rows().length === 1) { return; }
+                btn.closest('tr.variant-line').remove();
+                reindex();
+            });
+            tbody.addEventListener('input', function (e) {
+                var tr = e.target.closest('tr.variant-line');
+                if (tr) { tr.classList.remove('table-danger'); }
+            });
+            document.getElementById('addRowBtn').addEventListener('click', function () {
+                if (!addRow()) { toast('Đã đạt trần ' + CAP + ' dòng. Lưu bớt rồi thêm tiếp nhé.', 'warning'); return; }
+                reindex();
+            });
+
+            document.getElementById('genBtn').addEventListener('click', function () {
+                var colors = [];
+                var seenColor = {};
+                document.getElementById('genColors').value.split(/[,;\n]/).forEach(function (c) {
+                    var v = c.trim().replace(/\s+/g, ' ');
+                    if (v && !seenColor[fold(v)]) { seenColor[fold(v)] = true; colors.push(v); }
+                });
+                var weights = Array.prototype.map.call(document.querySelectorAll('input[name="genWeight"]:checked'), function (c) { return c.value; });
+                var grips = Array.prototype.map.call(document.querySelectorAll('input[name="genGrip"]:checked'), function (c) { return c.value; });
+                if (!colors.length) { toast('Nhập ít nhất một màu sắc.', 'warning'); return; }
+                if (!weights.length || !grips.length) { toast('Tích ít nhất một trọng lượng và một cỡ cán.', 'warning'); return; }
+                var price = Number(document.getElementById('genPrice').value);
+                if (!isFinite(price) || price <= 0) { toast('Nhập giá bán hợp lệ cho cả loạt (vd: 4690000).', 'warning'); return; }
+                var stock = Number(document.getElementById('genStock').value);
+                if (!Number.isInteger(stock) || stock < 0 || stock > 100000) { toast('Tồn kho phải là số nguyên từ 0 đến 100000.', 'warning'); return; }
+
+                var taken = {};
+                EXISTING.forEach(function (v) { taken[comboKey(v.color, v.weight, v.grip)] = true; });
+                rows().forEach(function (tr) {
+                    taken[comboKey(field(tr, 'color').value, field(tr, 'weightClass').value, field(tr, 'gripSize').value)] = true;
+                });
+
+                var added = 0, skipped = 0, capped = 0;
+                colors.forEach(function (color) {
+                    weights.forEach(function (w) {
+                        grips.forEach(function (g) {
+                            var key = comboKey(color, w, g);
+                            if (taken[key]) { skipped++; return; }
+                            if (rows().length >= CAP) { capped++; return; }
+                            taken[key] = true;
+                            var sku = (PRODUCT_CODE + '-' + slug(color) + '-' + w + '-' + g).slice(0, 50);
+                            addRow({ sku: sku, color: color, weight: w, grip: g, price: price, stock: stock });
+                            added++;
+                        });
+                    });
+                });
+                reindex();
+                if (added === 0) {
+                    toast(skipped ? 'Tất cả tổ hợp đều đã tồn tại – không có dòng mới.' : 'Không sinh được dòng nào.', 'warning');
+                } else {
+                    toast('Đã sinh ' + added + ' dòng' + (skipped ? ', bỏ qua ' + skipped + ' tổ hợp trùng' : '')
+                        + (capped ? ', ' + capped + ' tổ hợp vượt trần ' + CAP : '') + '.', 'success');
+                }
+            });
+
+            /* Kiểm tra ở pha CAPTURE – chạy TRƯỚC hộp xác nhận của main.js (bài học B4). */
+            document.addEventListener('submit', function (e) {
+                if (e.target !== form) { return; }
+                var list = rows();
+                if (!list.length) {
+                    e.preventDefault(); e.stopImmediatePropagation();
+                    toast('Chưa có dòng biến thể nào để thêm.', 'warning');
+                    return;
+                }
+                var seenSku = {}, seenCombo = {};
+                for (var i = 0; i < list.length; i++) {
+                    var tr = list[i];
+                    var label = 'Dòng ' + (i + 1) + ': ';
+                    var sku = field(tr, 'sku').value.trim();
+                    var color = field(tr, 'color').value.trim();
+                    var w = field(tr, 'weightClass').value;
+                    var g = field(tr, 'gripSize').value;
+                    var price = Number(field(tr, 'price').value);
+                    var originalRaw = field(tr, 'originalPrice').value;
+                    var stock = Number(field(tr, 'stockQuantity').value);
+                    var msg = null, focusEl = null;
+                    if (!sku || !/^[A-Za-z0-9_-]{1,50}$/.test(sku)) { msg = label + 'SKU chỉ gồm chữ, số, gạch ngang/dưới, tối đa 50 ký tự.'; focusEl = field(tr, 'sku'); }
+                    else if (!color) { msg = label + 'chưa nhập màu sắc.'; focusEl = field(tr, 'color'); }
+                    else if (!w) { msg = label + 'chưa chọn trọng lượng.'; focusEl = field(tr, 'weightClass'); }
+                    else if (!g) { msg = label + 'chưa chọn cỡ cán.'; focusEl = field(tr, 'gripSize'); }
+                    else if (!isFinite(price) || price < 0 || field(tr, 'price').value === '') { msg = label + 'giá bán không hợp lệ.'; focusEl = field(tr, 'price'); }
+                    else if (originalRaw !== '' && (!isFinite(Number(originalRaw)) || Number(originalRaw) < price)) { msg = label + 'giá gốc phải ≥ giá bán.'; focusEl = field(tr, 'originalPrice'); }
+                    else if (!Number.isInteger(stock) || stock < 0 || stock > 100000) { msg = label + 'tồn kho phải là số nguyên 0–100000.'; focusEl = field(tr, 'stockQuantity'); }
+                    else if (seenSku[sku.toUpperCase()]) { msg = label + 'SKU "' + sku + '" bị lặp trong bảng.'; focusEl = field(tr, 'sku'); }
+                    else if (seenCombo[comboKey(color, w, g)]) { msg = label + 'tổ hợp màu/trọng lượng/cỡ cán bị lặp trong bảng.'; focusEl = field(tr, 'color'); }
+                    if (msg) {
+                        e.preventDefault(); e.stopImmediatePropagation();
+                        tr.classList.add('table-danger');
+                        toast(msg, 'error');
+                        if (focusEl) { focusEl.focus(); }
+                        return;
+                    }
+                    seenSku[sku.toUpperCase()] = true;
+                    seenCombo[comboKey(color, w, g)] = true;
+                }
+            }, true);
+
+            if (!rows().length) { addRow(); }
+            reindex();
+        })();
+    </script>
+
+</th:block>
+
+</body>
+</html>

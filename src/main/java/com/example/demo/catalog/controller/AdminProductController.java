@@ -30,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.example.demo.catalog.dto.VariantBulkForm;
+import com.example.demo.catalog.enums.VariantStatus;
+import java.util.List;
 /**
  * Quản trị danh mục bán hàng:
  * – sản phẩm: danh sách có lọc, thêm/sửa, ẩn-hiện, xoá mềm;
@@ -209,6 +211,50 @@ public class AdminProductController {
             prepareVariantForm(model, product, form, null);
             return "admin/variant-form";
         }
+    }
+
+    @GetMapping("/{id}/bien-the/them-nhieu")
+    public String variantBulkForm(@PathVariable("id") Integer id, Model model) {
+        Product product = adminProductService.requireProduct(id);
+        model.addAttribute("product", product);
+        model.addAttribute("variants", adminProductService.variantsOf(id));
+        if (!model.containsAttribute("bulkForm")) {
+            model.addAttribute("bulkForm", new VariantBulkForm());
+        }
+        model.addAttribute("weightClasses", List.of("2U", "3U", "4U", "5U"));
+        model.addAttribute("gripSizes", List.of("G3", "G4", "G5", "G6"));
+        model.addAttribute("variantStatuses", VariantStatus.values());
+        model.addAttribute("adminMenu", "products");
+        return "admin/variant-bulk-form";
+    }
+
+    @PostMapping("/{id}/bien-the/them-nhieu")
+    public String variantBulkCreate(@PathVariable("id") Integer id,
+                                    @ModelAttribute("bulkForm") VariantBulkForm bulkForm,
+                                    BindingResult bindingResult,
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) {
+        Product product = adminProductService.requireProduct(id);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("formError",
+                    "Có ô nhập sai định dạng (giá và tồn kho phải là số). Bạn kiểm tra lại từng dòng giúp nhé.");
+        } else {
+            try {
+                List<ProductVariant> created = adminProductService.createVariantsBulk(id, bulkForm);
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Đã thêm " + created.size() + " biến thể cho \"" + product.getName() + "\".");
+                return "redirect:/admin/san-pham/" + id + "/bien-the";
+            } catch (BusinessException ex) {
+                model.addAttribute("formError", ex.getMessage());
+            }
+        }
+        model.addAttribute("product", product);
+        model.addAttribute("variants", adminProductService.variantsOf(id));
+        model.addAttribute("weightClasses", List.of("2U", "3U", "4U", "5U"));
+        model.addAttribute("gripSizes", List.of("G3", "G4", "G5", "G6"));
+        model.addAttribute("variantStatuses", VariantStatus.values());
+        model.addAttribute("adminMenu", "products");
+        return "admin/variant-bulk-form";
     }
 
     @GetMapping("/{id}/bien-the/{variantId}/sua")

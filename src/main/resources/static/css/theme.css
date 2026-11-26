@@ -4093,3 +4093,101 @@ body .swal2-toast.bad-toast.swal2-toast-hide { animation: glassToastOut .2s var(
     body .swal2-toast.bad-toast.swal2-hide,
     body .swal2-toast.bad-toast.swal2-toast-hide { animation-duration: .01s; }
 }
+
+/* =========================================================================
+   40. TỐI ƯU HIỆU NĂNG — giảm chi phí backdrop-filter, GIỮ NGUYÊN animation.
+   Blur phải lấy mẫu lại pixel phía sau MỖI khung hình; animation chỉ đổi
+   transform/opacity nên GPU xử lý rất rẻ. Vì vậy: cắt blur, giữ nhịp nhún.
+   ========================================================================= */
+
+/* 40.1 Bề mặt TĨNH nằm trên nền phẳng của trang: blur không tạo khác biệt
+   hình ảnh nào (phía sau là một màu đặc), chỉ tốn GPU mỗi lần cuộn.
+   Tắt blur, giữ nguyên gradient đa sắc + specular + viền + bo góc. */
+.glass-panel, .card.glass-panel,
+.table-glass-wrap, .cart-bulk-bar {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 40.2 Phần tử NHỎ và LẶP LẠI nhiều lần (mỗi nút kính, mỗi ô +/−, mỗi dòng
+   tóm tắt): mỗi phần tử là một lớp blur riêng → rất đắt. Chúng nằm trên thẻ
+   đã đặc nên bỏ blur không đổi giao diện. */
+.btn-glass, .btn-glass--primary, .btn-glass--danger,
+.quantity-group .btn,
+.page-title .badge,
+.catalog-pager .page-link.page-step,
+.summary-lines > li,
+body .swal2-popup .swal2-confirm,
+body .swal2-popup .swal2-cancel,
+body .swal2-toast.bad-toast .bad-toast__close {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* 40.3 Bề mặt DÍNH (sticky) có nội dung cuộn phía sau → giữ blur nhưng nhẹ. */
+.summary-card {
+    backdrop-filter: blur(10px) saturate(140%);
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+}
+
+/* 40.4 Lớp phủ NỔI thật (modal / dropdown / toast): giữ blur, giảm bán kính
+   28 → 14. Ở độ đục hiện tại mắt gần như không phân biệt được. */
+.modal-content {
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+}
+.navbar-bad .dropdown-menu,
+body .swal2-toast.bad-toast,
+body .swal2-popup.bad-confirm {
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* 40.5 Màn hình nhỏ / máy yếu: tắt sạch blur, lớp phủ dùng nền đặc để vẫn
+   đọc rõ. Không đụng animation, không đụng vòng đời toast. */
+@media (max-width: 991.98px) {
+    .glass-panel, .card.glass-panel, .summary-card, .table-glass-wrap,
+    .cart-bulk-bar, .navbar-bad, .admin-topbar, .form-actions,
+    .nav-seg-opt::after {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    .modal-content,
+    .navbar-bad .dropdown-menu {
+        background-image: none;
+        background-color: var(--bad-surface);
+    }
+    body .swal2-toast.bad-toast,
+    body .swal2-popup.bad-confirm { background: var(--bad-surface); }
+}
+
+/* 40.6 Hệ điều hành yêu cầu giảm trong suốt → nền đặc, tương phản giữ nguyên. */
+@media (prefers-reduced-transparency: reduce) {
+    .glass-panel, .card.glass-panel, .summary-card, .table-glass-wrap,
+    .cart-bulk-bar, .modal-content, .navbar-bad .dropdown-menu,
+    body .swal2-toast.bad-toast, body .swal2-popup.bad-confirm {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background-image: none;
+        background-color: var(--bad-surface);
+    }
+}
+
+/* =========================================================================
+   41. Chữ gợi ý LUÔN HIỆN (bỏ kiểu thu gọn chỉ mở khi hover).
+   Trước đây .checkout-hint bị giấu (max-height:0, opacity:0), chỉ mở khi rê
+   chuột hoặc focus vào khối cha → trên điện thoại gần như không đọc được.
+   Nay hiện mặc định như bản gốc; margin cố định nên không dịch bố cục.
+   ========================================================================= */
+.checkout-hint,
+.pick-card:hover .checkout-hint,
+.pick-card:focus-within .checkout-hint,
+.summary-card:hover .checkout-hint,
+.summary-card:focus-within .checkout-hint {
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+    margin-top: .2rem;
+    transition: none;
+}
+

@@ -1,6 +1,7 @@
 package com.example.demo.catalog.service.impl;
 
 import com.example.demo.catalog.dto.BulkPriceForm;
+import com.example.demo.catalog.dto.VariantBulkForm;
 import com.example.demo.catalog.dto.ProductForm;
 import com.example.demo.catalog.dto.ProductRow;
 import com.example.demo.catalog.dto.VariantForm;
@@ -24,7 +25,9 @@ import com.example.demo.common.util.ColorNames;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,7 +38,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.demo.catalog.service.AdminProductService;
 import com.example.demo.catalog.service.FileStorageService;
 
@@ -57,6 +61,7 @@ public class AdminProductServiceImpl implements AdminProductService {
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
     private static final BigDecimal THOUSAND = BigDecimal.valueOf(1000);
     private static final BigDecimal MAX_DISCOUNT_PERCENT = BigDecimal.valueOf(90);
+    private static final int MAX_BULK_VARIANTS = 40;
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
@@ -233,6 +238,57 @@ public class AdminProductServiceImpl implements AdminProductService {
         String imageUrl = variant.getImageUrl();
         productVariantRepository.delete(variant);
         deleteVariantImageIfUnused(imageUrl, variantId);
+    }
+
+    /**
+     * Thêm NHIỀU biến thể trong một lần: kiểm tra TẤT CẢ các dòng trước khi lưu (all-or-nothing),
+     * lỗi dòng nào báo đúng số dòng đó. Trùng SKU / trùng tổ hợp bị chặn cả trong lô lẫn dưới CSDL.
+     */
+    @Override
+    @Transactional
+    public List<ProductVariant> createVariantsBulk(Integer productId, VariantBulkForm form) {
+        List<VariantForm> rows = (form == null || form.getRows() == null) ? List.of() : form.getRows();
+        if (rows.isEmpty()) {
+            throw new BusinessException("Chưa có dòng biến thể nào để thêm.");
+        }
+        if (rows.size() > MAX_BULK_VARIANTS) {
+            throw new BusinessException("Tối đa " + MAX_BULK_VARIANTS
+                    + " biến thể mỗi lần thêm. Bạn chia nhỏ danh sách giúp nhé.");
+        }
+        Product product = requireProduct(productId);
+
+        Set<String> seenSkus = new HashSet<>();
+        Set<String> seenCombinations = new HashSet<>();
+        List<ProductVariant> prepared = new ArrayList<>();
+
+        for (int i = 0; i < rows.size(); i++) {
+            VariantForm row = rows.get(i);
+            String label = "Dòng " + (i + 1) + ": ";
+            try {
+                if (row == null) {
+                    throw new BusinessException("dòng đang trống, hãy điền đủ thông tin hoặc xoá dòng này.");
+                }
+                ProductVariant variant = new ProductVariant();
+                variant.setSku(normalizeCode(row.getSku()));
+                applyVariantForm(variant, row);
+                variant.setProduct(product);
+
+                String combination = (variant.getColor() + "|" + variant.getWeightClass()
+                        + "|" + variant.getGripSize()).toLowerCase(Locale.ROOT);
+                if (!seenSkus.add(variant.getSku())) {
+                    throw new BusinessException("SKU \"" + variant.getSku() + "\" bị lặp lại trong danh sách.");
+                }
+                if (!seenCombinations.add(combination)) {
+                    throw new BusinessException("tổ hợp màu/trọng lượng/cỡ cán bị lặp lại trong danh sách.");
+                }
+                requireFreeSku(variant);
+                requireFreeCombination(variant, false);
+                prepared.add(variant);
+            } catch (BusinessException ex) {
+                throw new BusinessException(label + ex.getMessage());
+            }
+        }
+        return productVariantRepository.saveAll(prepared);
     }
 
     // ==================== CẬP NHẬT GIÁ HÀNG LOẠT ====================
