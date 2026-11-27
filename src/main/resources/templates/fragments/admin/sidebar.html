@@ -3,16 +3,17 @@
 <body>
 
 <!--
-  Menu dọc của khu quản trị. Controller đặt model "adminMenu" = dashboard|pos|orders|products|brands|categories|vouchers|users
+  Menu dọc của khu quản trị – kính nổi (admin-glass.css mục Round 4).
+  Controller đặt model "adminMenu" = dashboard|pos|orders|products|brands|categories|vouchers|users
   để tô đậm mục đang mở (null cũng an toàn: mọi so sánh đều sai).
 -->
-<nav th:fragment="sidebar(active)" class="admin-sidebar d-flex flex-column p-3">
+<nav th:fragment="sidebar(active)" class="admin-sidebar vglass d-flex flex-column p-3">
 
     <a class="admin-brand mb-3" th:href="@{/admin}">
         <span class="admin-brand-mark"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
         <span>
             BadStore
-            <span class="d-block small fw-normal text-white-50">Trang quản trị</span>
+            <span class="admin-brand-sub d-block small fw-normal">Trang quản trị</span>
         </span>
     </a>
 
@@ -77,12 +78,13 @@
     </ul>
 
     <div class="admin-foot mt-auto pt-3 d-grid gap-2">
-        <a class="btn btn-sm btn-outline-light" th:href="@{/}">
+        <a class="btn btn-sm btn-outline-secondary" th:href="@{/}">
             <i class="bi bi-shop" aria-hidden="true"></i> Xem cửa hàng
         </a>
-        <p class="small text-white-50 mb-0">
-            <i class="bi bi-info-circle" aria-hidden="true"></i> Đổi trạng thái đơn sẽ trừ/cộng kho ngay.
-        </p>
+        <button type="button" class="vg-eye-row"
+                data-hint="Đổi trạng thái đơn sẽ trừ/cộng kho ngay.">
+            <i class="bi bi-eye" aria-hidden="true"></i> Lưu ý về kho
+        </button>
     </div>
 </nav>
 

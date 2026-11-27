@@ -295,3 +295,401 @@ body .swal2-container.swal2-backdrop-show { background: rgba(4, 8, 6, .6); }
     .vglass .btn, .vg-pill, .vg-quick button, .vg-img-btn, .vg-pager button,
     body .swal2-popup .swal2-styled { transition: none; }
 }
+
+/* =========================================================================
+   Round 4 — Glass cho TOÀN BỘ khu quản trị (layout gắn .vglass vào
+   .admin-content + .admin-topbar nên mọi trang /admin/** tự hưởng).
+   Sidebar/topbar = kính nổi; nút đặc (success/danger) nền xanh/đỏ ĐẬM cố định
+   cả hai chế độ – hết cảnh nền nhạt chữ trắng do token màu CHỮ bị đem làm nền.
+   Prefix `html` + khai báo đủ thuộc tính ở cả 2 chế độ để thắng rule gốc
+   trong theme.css mà không cần sửa file đó.
+   ========================================================================= */
+
+/* --- 1. Sidebar: panel kính nổi, nav-link dạng pill kính --- */
+html .admin-shell { background: transparent; }
+html .admin-offcanvas { --bs-offcanvas-bg: var(--bs-body-bg); }
+html .admin-offcanvas .offcanvas-header { border-bottom: 1px solid var(--vg-border); color: var(--vg-text); }
+
+html .admin-sidebar {
+    margin: .75rem;
+    min-height: calc(100vh - 1.5rem);
+    border-radius: 24px;
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+    box-shadow: var(--lg-specular), var(--lg-depth);
+    color: var(--vg-text);
+}
+html .admin-sidebar .admin-brand { display: flex; align-items: center; gap: .75rem; color: var(--vg-text); text-decoration: none; font-weight: 700; }
+html .admin-sidebar .admin-brand-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 14px; font-size: 1.15rem;
+    background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd));
+    color: #fff;
+    box-shadow: var(--vg-btn-specular), 0 6px 16px rgba(15, 138, 95, .35);
+}
+html .admin-sidebar .admin-brand-sub { color: var(--vg-muted); }
+html .admin-sidebar .nav-section {
+    color: var(--vg-muted); font-size: .7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .08em;
+    margin: 1rem 0 .35rem; padding-inline: .5rem;
+}
+html .admin-sidebar .nav-link {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .55rem .9rem; border-radius: 999px;
+    color: var(--vg-text); font-weight: 600; font-size: .92rem;
+    border: 1px solid transparent;
+    transition: transform .18s cubic-bezier(.22, 1.28, .36, 1), background-color .15s ease,
+                border-color .15s ease, color .15s ease, box-shadow .18s ease;
+}
+html .admin-sidebar .nav-link .bi { font-size: 1.05rem; color: var(--vg-green-text); }
+html .admin-sidebar .nav-link:hover,
+html .admin-sidebar .nav-link:focus-visible {
+    color: var(--vg-text);
+    background-image: var(--lg-sheen), var(--lg-tint);
+    border-color: var(--lg-tint-edge);
+    transform: translateX(3px);
+    box-shadow: var(--lg-specular);
+}
+html .admin-sidebar .nav-link.active {
+    background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd));
+    border-color: rgba(255, 255, 255, .25);
+    color: #fff;
+    box-shadow: var(--vg-btn-specular), 0 8px 20px rgba(15, 138, 95, .35);
+}
+html .admin-sidebar .nav-link.active .bi { color: #fff; }
+html .admin-sidebar .admin-foot { border-top: 1px solid var(--vg-border); }
+
+/* Dark: khai báo lại để thắng rule dark gốc của theme.css (cùng specificity, nạp sau) */
+html[data-bs-theme="dark"] .admin-sidebar {
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+    box-shadow: var(--lg-specular), var(--lg-depth);
+    color: var(--vg-text);
+}
+html[data-bs-theme="dark"] .admin-sidebar .admin-brand { color: var(--vg-text); }
+html[data-bs-theme="dark"] .admin-sidebar .admin-brand-sub,
+html[data-bs-theme="dark"] .admin-sidebar .nav-section { color: var(--vg-muted); }
+html[data-bs-theme="dark"] .admin-sidebar .nav-link { color: var(--vg-text); }
+html[data-bs-theme="dark"] .admin-sidebar .nav-link .bi { color: var(--vg-green-text); }
+html[data-bs-theme="dark"] .admin-sidebar .nav-link:hover,
+html[data-bs-theme="dark"] .admin-sidebar .nav-link:focus-visible {
+    color: var(--vg-text);
+    background-image: var(--lg-sheen), var(--lg-tint);
+    border-color: var(--lg-tint-edge);
+}
+html[data-bs-theme="dark"] .admin-sidebar .nav-link.active { color: #fff; background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd)); }
+html[data-bs-theme="dark"] .admin-sidebar .nav-link.active .bi { color: #fff; }
+
+/* --- 2. Topbar kính (blur chỉ từ lg – mục 40.5 theme.css đã tắt blur dưới lg) --- */
+html .admin-topbar {
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border-bottom: 1px solid var(--lg-edge-bottom);
+    box-shadow: var(--lg-specular);
+    color: var(--vg-text);
+}
+html[data-bs-theme="dark"] .admin-topbar {
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border-bottom-color: var(--lg-edge-bottom);
+    color: var(--vg-text);
+}
+@media (min-width: 992px) {
+    html .admin-topbar { backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); }
+}
+
+/* --- 3. Nút đặc: nền ĐẬM cố định, không phụ thuộc token màu chữ --- */
+html .vglass .btn-success {
+    background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd));
+    border: 1px solid rgba(255, 255, 255, .2); color: #fff;
+    --bs-btn-disabled-bg: var(--vg-green-d);
+    --bs-btn-disabled-border-color: var(--vg-green-d);
+    --bs-btn-disabled-color: #fff;
+}
+html .vglass .btn-success:hover:not(:disabled),
+html .vglass .btn-success:focus-visible {
+    background: linear-gradient(140deg, #0d7f57, var(--vg-green-d));
+    color: #fff;
+}
+html .vglass .btn-success:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--vg-btn-specular), 0 8px 22px rgba(15, 138, 95, .35); }
+html .vglass .btn-danger {
+    background: linear-gradient(140deg, #a8232f, #7c1620);
+    border: 1px solid rgba(255, 255, 255, .2); color: #fff;
+    --bs-btn-disabled-bg: #a8232f; --bs-btn-disabled-border-color: #a8232f; --bs-btn-disabled-color: #fff;
+}
+html .vglass .btn-danger:hover:not(:disabled),
+html .vglass .btn-danger:focus-visible { background: linear-gradient(140deg, #c22b38, #a8232f); color: #fff; }
+/* Trạng thái bận/khoá: vẫn đọc được, không nảy */
+html .vglass .btn:disabled, html .vglass .btn.disabled { opacity: .6; box-shadow: none; }
+/* btn-link (nút xoá dòng POS): trả về dạng link, không pill kính */
+html .vglass .btn-link { background: transparent; border: 0; box-shadow: none; }
+/* Nút trung tính còn sót (btn-light/outline-light/secondary) không được chìm trên kính */
+html .vglass .btn-light, html .vglass .btn-secondary, html .vglass .btn-outline-light {
+    background: linear-gradient(140deg, rgba(127, 140, 130, .14), rgba(127, 140, 130, .06));
+    border: 1px solid var(--vg-border); color: var(--vg-text);
+}
+html .vglass .btn-light:hover, html .vglass .btn-secondary:hover, html .vglass .btn-outline-light:hover {
+    background: rgba(15, 138, 95, .16); border-color: var(--vg-green); color: var(--vg-green-text);
+}
+
+/* --- 4. Toggle btn-check (Tiền mặt / Chuyển khoản): đang chọn = xanh đậm đặc --- */
+html .vglass .btn-check:checked + .btn {
+    background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd));
+    border-color: rgba(255, 255, 255, .25); color: #fff;
+    box-shadow: var(--vg-btn-specular), 0 4px 14px rgba(15, 138, 95, .35);
+}
+html .vglass .btn-check:checked + .btn .bi { color: #fff; }
+html .vglass .btn-check:focus-visible + .btn { outline: 3px solid rgba(15, 138, 95, .55); outline-offset: 2px; }
+
+/* --- 5. Input-group addon (icon quét mã, icon SĐT): kính, không nền trắng --- */
+html .vglass .input-group-text {
+    background: var(--vg-chip); border: 1px solid var(--vg-border);
+    color: var(--vg-green-text);
+}
+
+/* --- 6. Thẻ thường, stat-card, list-group, alert, dropdown, phân trang --- */
+html .vglass .card { background: var(--vg-surface); border: 1px solid var(--vg-border); border-radius: 18px; box-shadow: var(--vg-card-shadow); }
+html .vglass .card .card-header { background: transparent; border-bottom-color: var(--vg-border); }
+html .vglass .stat-card {
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+    border-radius: 18px; box-shadow: var(--lg-specular), var(--lg-depth);
+}
+html .vglass .list-group-item { background: transparent; border-color: var(--vg-border); color: var(--vg-text); }
+html .vglass .list-group-flush > .list-group-item:last-child { border-bottom: 0; }
+html .vglass .alert { border: 1px solid var(--vg-border); box-shadow: var(--vg-btn-specular); }
+html .vglass .alert-success { background: rgba(15, 138, 95, .12); color: var(--vg-green-text); border-color: rgba(15, 138, 95, .35); }
+html .vglass .alert-danger  { background: rgba(207, 36, 49, .10); color: var(--vg-red-text);  border-color: rgba(207, 36, 49, .35); }
+html .vglass .alert-warning { background: rgba(255, 183, 3, .12); color: var(--bad-warning-text); border-color: rgba(255, 183, 3, .40); }
+html .vglass .alert-info    { background: rgba(37, 99, 235, .10); color: #1e40af; border-color: rgba(37, 99, 235, .30); }
+html[data-bs-theme="dark"] .vglass .alert-warning { color: #ffd166; }
+html[data-bs-theme="dark"] .vglass .alert-info { color: #93c5fd; }
+html .vglass .dropdown-menu {
+    --bs-dropdown-bg: var(--vg-pop); --bs-dropdown-color: var(--vg-text);
+    --bs-dropdown-border-color: var(--vg-border);
+    --bs-dropdown-link-color: var(--vg-text);
+    --bs-dropdown-link-hover-bg: var(--vg-chip); --bs-dropdown-link-hover-color: var(--vg-green-text);
+    --bs-dropdown-link-active-bg: var(--vg-green-d);
+    border-radius: 14px; box-shadow: 0 14px 34px rgba(0, 0, 0, .25);
+    backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+html .vglass .pagination .page-link { background: var(--vg-chip); border-color: var(--vg-border); color: var(--vg-text); border-radius: 10px; margin-inline: 2px; }
+html .vglass .pagination .page-item.active .page-link { background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd)); border-color: rgba(255, 255, 255, .25); color: #fff; }
+html .vglass .pagination .page-item.disabled .page-link { background: transparent; color: var(--vg-muted); opacity: .5; }
+html .vglass .table-light { --bs-table-bg: var(--vg-chip); --bs-table-color: var(--vg-text); --bs-table-border-color: var(--vg-border); }
+html .vglass kbd { background: var(--vg-chip); color: var(--vg-text); border: 1px solid var(--vg-border); border-radius: 6px; }
+html .vglass .admin-thumb, html .vglass .variant-thumb { background: #fff; border-radius: 10px; }
+html .vglass .admin-thumb-empty { background: var(--vg-chip); color: var(--vg-muted); border: 1px dashed var(--vg-border); border-radius: 10px; }
+html .vglass .empty-state { color: var(--vg-muted); }
+
+/* --- 7. POS: thẻ kết quả + dòng hoá đơn (class do pos.js sinh ra) --- */
+html .vglass .pos-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: .75rem; }
+html .vglass .pos-result {
+    display: flex; align-items: center; gap: .75rem; width: 100%; text-align: start;
+    padding: .8rem .9rem; border-radius: 16px;
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+    color: var(--vg-text);
+    box-shadow: var(--lg-specular), 0 4px 14px rgba(16, 24, 40, .08);
+    transition: transform .18s cubic-bezier(.22, 1.28, .36, 1), box-shadow .18s ease, border-color .15s ease;
+}
+html .vglass .pos-result:hover { transform: translateY(-2px); border-color: var(--lg-tint-edge); box-shadow: var(--lg-specular), var(--lg-depth); }
+html .vglass .pos-result:active { transform: scale(.98); }
+html .vglass .pos-result-out { border-style: dashed; opacity: .65; }
+html .vglass .pos-result-out:hover { transform: none; box-shadow: var(--lg-specular); }
+html .vglass .pos-result-thumb { width: 44px; height: 44px; flex: 0 0 auto; object-fit: contain; border-radius: 10px; background: #fff; padding: 3px; }
+html .vglass .pos-result-name { font-weight: 600; font-size: .92rem; }
+html .vglass .pos-result-side { margin-left: auto; text-align: end; white-space: nowrap; }
+html .vglass .pos-line { display: flex; align-items: center; gap: .6rem; padding: .65rem .25rem; border-bottom: 1px solid var(--vg-border); }
+html .vglass .pos-line:last-of-type { border-bottom: 0; }
+html .vglass .pos-line-error { background: rgba(207, 36, 49, .07); border-radius: 12px; }
+html .vglass .pos-line-main { flex: 1 1 auto; min-width: 0; }
+html .vglass .pos-line-qty { display: flex; align-items: center; gap: .3rem; }
+html .vglass .pos-line-qty .form-control { width: 4.2rem; }
+html .vglass .pos-line-total { white-space: nowrap; }
+html .vglass .pos-total { color: var(--vg-green-text); font-weight: 700; }
+html[data-bs-theme="dark"] .vglass .pos-result { color: var(--vg-text); background-image: var(--lg-sheen), var(--lg-surface); }
+html[data-bs-theme="dark"] .vglass .pos-line { border-bottom-color: var(--vg-border); }
+
+/* --- 8. Mắt kính: nút con mắt + nhãn hint (popup dùng lại .vg-hint của variant-tools.js) --- */
+.vg-eye {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; border-radius: 12px;
+    border: 1px solid var(--vg-border); background: var(--vg-chip);
+    color: var(--vg-green-text); cursor: help;
+    box-shadow: var(--vg-btn-specular);
+    transition: background-color .15s ease, border-color .15s ease, transform .16s cubic-bezier(.22, 1.28, .36, 1);
+}
+.vg-eye:hover, .vg-eye:focus-visible { border-color: var(--vg-green); background: rgba(15, 138, 95, .18); transform: translateY(-1px); }
+html[data-bs-theme="dark"] .vg-eye:hover, html[data-bs-theme="dark"] .vg-eye:focus-visible { background: rgba(126, 208, 165, .2); }
+.vg-eye-row {
+    display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+    padding: .35rem .8rem; border-radius: 999px;
+    border: 1px solid var(--vg-border); background: var(--vg-chip);
+    color: var(--vg-muted); font-size: .78rem; font-weight: 600; cursor: help;
+}
+.vg-eye-row:hover, .vg-eye-row:focus-visible { color: var(--vg-green-text); border-color: var(--vg-green); }
+.vg-empty-hint { cursor: help; width: fit-content; border-bottom: 1px dashed var(--vg-border); padding-bottom: 2px; }
+.vg-empty-hint:hover, .vg-empty-hint:focus-visible { color: var(--vg-green-text) !important; border-bottom-color: var(--vg-green); }
+
+/* --- 9. In phiếu: giấy trắng chữ đen, không kính/không menu --- */
+@media print {
+    html .admin-shell, html .admin-topbar, html .vg-eye, html .vg-eye-row { display: none !important; }
+    html .admin-content { width: 100% !important; max-width: 100% !important; }
+    html .vglass .card-soft, html .vglass .pos-receipt {
+        background: #fff !important; background-image: none !important;
+        border: 0 !important; box-shadow: none !important; animation: none !important; color: #000 !important;
+    }
+    html .vglass .pos-receipt .text-muted { color: #444 !important; }
+    html .vglass .pos-receipt .table { color: #000 !important; }
+    html .vglass .pos-receipt .status-pill { border: 1px solid #999; }
+}
+
+/* --- 10. Giảm chuyển động cho các phần tử mới --- */
+@media (prefers-reduced-motion: reduce) {
+    html .admin-sidebar .nav-link, html .vglass .pos-result, .vg-eye { transition: none; }
+    html .admin-sidebar .nav-link:hover, html .vglass .pos-result:hover, .vg-eye:hover { transform: none; }
+}
+/* =========================================================================
+   Round 5 — POS: 3 cột (tìm kiếm | voucher+khách+gần đây | hoá đơn+thanh toán),
+   kết quả 1 cột, dòng hoá đơn: giá trên – số lượng dưới, nút xoá có thiết kế.
+   ========================================================================= */
+
+/* --- 1. Ô tìm: nền bớt đen, placeholder + nút Tìm đọc rõ cả 2 chế độ --- */
+html[data-bs-theme="dark"] { --vg-field: rgba(10, 16, 13, .35); }
+html .vglass .form-control::placeholder { color: var(--vg-muted); opacity: 1; }
+html .vglass .input-group .btn-primary {
+    background: linear-gradient(140deg, var(--vg-green-d), var(--vg-green-dd));
+    border: 1px solid rgba(255, 255, 255, .2);
+    color: #fff;
+}
+html .vglass .input-group .btn-primary:hover:not(:disabled),
+html .vglass .input-group .btn-primary:focus-visible {
+    background: linear-gradient(140deg, #0d7f57, var(--vg-green-d));
+    color: #fff;
+}
+
+/* --- 2. Kết quả tìm: MỘT cột, thẻ dài hết khổ cột --- */
+html .vglass .pos-results { grid-template-columns: 1fr; }
+
+/* --- 3. Dòng hoá đơn: tên chiếm trọn cột trái; phải = giá (trên) + SL (dưới) ---
+   pos.js sinh thứ tự main → qty → total → nút xoá; grid-area đặt lại vị trí,
+   không cần sửa JS. Hai hàng auto nên tên dài thì giá/SL tự giãn theo chiều dọc. */
+html .vglass .pos-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+        "main total del"
+        "main qty   qty";
+    column-gap: .6rem;
+    row-gap: .5rem;
+    align-items: center;
+}
+html .vglass .pos-line-main  { grid-area: main; align-self: center; }
+html .vglass .pos-line-total { grid-area: total; min-width: 0; align-self: center; }
+html .vglass .pos-line-qty   { grid-area: qty; justify-self: end; }
+html .vglass .pos-line > .btn-link { grid-area: del; justify-self: end; align-self: center; }
+
+/* --- 4. Nút xoá dòng: ô kính đỏ vuông bo góc, hết chữ X trơ ---
+   .text-danger của Bootstrap là !important nên màu chữ cũng phải !important. */
+html .vglass .pos-line > .btn-link {
+    width: 36px; height: 36px; min-height: 0; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(207, 36, 49, .4);
+    background: rgba(207, 36, 49, .1);
+    color: #b0222f !important;
+    box-shadow: var(--vg-btn-specular);
+    transition: transform .16s cubic-bezier(.22, 1.28, .36, 1),
+                background-color .15s ease, border-color .15s ease;
+}
+html .vglass .pos-line > .btn-link:hover:not(:disabled) {
+    background: rgba(207, 36, 49, .22); border-color: var(--vg-red);
+    transform: translateY(-1px);
+}
+html[data-bs-theme="dark"] .vglass .pos-line > .btn-link {
+    border-color: rgba(255, 143, 152, .45);
+    background: rgba(255, 143, 152, .12);
+    color: #ff8f98 !important;
+}
+html[data-bs-theme="dark"] .vglass .pos-line > .btn-link:hover:not(:disabled) {
+    background: rgba(255, 143, 152, .24); border-color: rgba(255, 143, 152, .75);
+}
+
+/* --- 5. Tổng tiền: không bao giờ rớt chữ ₫ xuống dòng riêng --- */
+html .vglass .pos-total {
+    font-size: 1.5rem;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- 6. Điện thoại: tên một dòng riêng, rồi giá + nút xoá, rồi số lượng --- */
+@media (max-width: 575.98px) {
+    html .vglass .pos-line {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "main  main"
+            "total del"
+            "qty   qty";
+    }
+    hadmin-glasstml .vglass .pos-line-qty { justify-self: end; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html .vglass .pos-line > .btn-link { transition: none; }
+    html .vglass .pos-line > .btn-link:hover { transform: none; }
+}
+
+/* =========================================================================
+   Round 6 — Danh sách biến thể cao hơn: 58vh → 80vh (~thêm 2 thẻ nhìn thấy).
+   Vẫn cuộn TRONG danh sách nên cột hoá đơn không bị đẩy xuống.
+   Điện thoại giữ 46vh để không chôn cột hoá đơn dưới danh sách dài.
+   Muốn cao hơn nữa: chỉ đổi số 80vh.
+   ========================================================================= */
+html .vglass .pos-results { max-height: 80vh; }
+@media (max-width: 575.98px) {
+    html .vglass .pos-results { max-height: 46vh; }
+}
+
+/* =========================================================================
+   Round 7 — Order detail: chip "!" + panel ghi chú GHN (Bootstrap collapse).
+   Kèm sửa lỗi Round 4: chữ header offcanvas mobile vẫn xám nhạt (#cbd5e1 của
+   theme.css) trên nền MỚI sáng → vô hình ở chế độ sáng. Đổi theo token.
+   ========================================================================= */
+html .admin-offcanvas { --bs-offcanvas-color: var(--vg-text); }
+
+.vg-hint-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; flex: 0 0 auto; padding: 0;
+    border-radius: 999px;
+    border: 1px solid var(--vg-border);
+    background: var(--vg-chip);
+    color: var(--bad-warning-text);
+    cursor: help;
+    box-shadow: var(--vg-btn-specular);
+    transition: background-color .15s ease, border-color .15s ease,
+                transform .16s cubic-bezier(.22, 1.28, .36, 1);
+}
+.vg-hint-btn:hover, .vg-hint-btn:focus-visible {
+    border-color: var(--vg-green); background: rgba(15, 138, 95, .18); transform: translateY(-1px);
+}
+html[data-bs-theme="dark"] .vg-hint-btn:hover,
+html[data-bs-theme="dark"] .vg-hint-btn:focus-visible { background: rgba(126, 208, 165, .2); }
+
+.ghn-note {
+    padding: .6rem .85rem;
+    border: 1px solid var(--vg-border);
+    border-radius: 12px;
+    background: var(--vg-chip);
+    color: var(--vg-text);
+    line-height: 1.55;
+}
+
+@media print {
+    .ghn-note { background: #fff; border-color: #999; color: #000; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .vg-hint-btn { transition: none; }
+    .vg-hint-btn:hover { transform: none; }
+}

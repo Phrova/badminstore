@@ -31,7 +31,7 @@
                  aria-labelledby="adminSidebarLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="adminSidebarLabel">Menu quản trị</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
                             data-bs-target="#adminSidebar" aria-label="Đóng menu"></button>
                 </div>
                 <div class="offcanvas-body p-0">
@@ -42,7 +42,7 @@
 
         <!-- Nội dung chính -->
         <main id="noi-dung-chinh" tabindex="-1" class="col-lg-10 d-flex flex-column p-0">
-            <header class="admin-topbar d-print-none">
+       <header class="admin-topbar vglass d-print-none">
                 <button class="btn btn-sm btn-outline-secondary d-lg-none" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#adminSidebar" aria-controls="adminSidebar" aria-label="Mở menu quản trị">
                     <i class="bi bi-list" aria-hidden="true"></i>
@@ -91,7 +91,7 @@
                 </div>
             </header>
 
-            <div class="admin-content p-3 p-lg-4 flex-grow-1">
+           <div class="admin-content vglass p-3 p-lg-4 flex-grow-1">
                 <div th:replace="~{fragments/flash :: flash}"></div>
                 <th:block layout:fragment="content"></th:block>
             </div>

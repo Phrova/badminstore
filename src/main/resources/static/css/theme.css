@@ -7,14 +7,14 @@
    Quy ước: mọi màu/bo góc/khoảng cách lấy từ biến --bad-* hoặc --bs-* bên dưới,
    KHÔNG viết CSS inline trong template.
    ========================================================================= */
-
+pos
 /* ============ 1. Design token ============ */
 :root {
     /* Ghi đè biến Bootstrap để cả site theo đúng palette của UI_GUIDE */
     --bs-primary: #0f8a5f;
     --bs-primary-rgb: 15, 138, 95;
     --bs-primary-text-emphasis: #0b5137;
-    --bs-primary-bg-subtle: #d9f2e8;
+    --bs-primary-bg-subtle: #d9f2e8;    
     --bs-primary-border-subtle: #a7e0c9;
 
     /* Liên kết: dùng màu XANH CHỮ (--bad-primary-text) chứ không dùng --bs-primary.

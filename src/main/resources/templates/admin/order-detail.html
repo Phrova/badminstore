@@ -235,12 +235,17 @@
                         <span class="text-muted">Giao dự kiến</span>
                         <span class="fw-semibold" th:text="${ghnLeadtime.estimateDateLabel()}">04/11/2026 17:00</span>
                     </div>
-                    <div class="small text-muted"
+                                        <div class="d-flex align-items-center gap-2 small text-muted"
                          th:if="${ghnShippingEnabled and ghnFeeEstimate == null and detail.order.ghnOrderCode == null}">
-                        <i class="bi bi-info-circle" aria-hidden="true"></i>
-                        Chưa tính được phí GHN: đơn chưa có mã Quận/Huyện – Phường/Xã của GHN.
+                        <span>Chưa tính được phí GHN</span>
+                        <button type="button" class="vg-hint-btn"
+                                th:data-hint="|Đơn chưa có mã Quận/Huyện – Phường/Xã của GHN. Khối lượng tính phí: ${ghnWeightGram} g.|"
+                                aria-label="Vì sao chưa tính được phí GHN">
+                            <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                        </button>
                     </div>
-                    <div class="small text-muted">
+                    <div class="small text-muted"
+                         th:unless="${ghnShippingEnabled and ghnFeeEstimate == null and detail.order.ghnOrderCode == null}">
                         Khối lượng tính phí:
                         <span th:text="${ghnWeightGram}">1500</span> g
                     </div>
@@ -290,12 +295,19 @@
                         </button>
                     </form>
 
-                    <p class="small text-muted mb-0 mt-2">
-                        GHN báo “Đã giao” ⇒ đơn chuyển <strong>Giao thành công</strong>;
-                        báo “Đã hoàn hàng” chỉ tự chuyển <strong>Hoàn trả</strong> khi đơn đã giao thành công,
-                        còn lại hệ thống giữ nguyên để admin kiểm tra.
-                        Ngoại lệ/hư hỏng/mất hàng/tiêu hủy: không tự hủy, chỉ cảnh báo để admin xử lý tay.
-                    </p>
+                                     <button class="btn btn-sm btn-outline-secondary mt-3" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#ghnNotePanel"
+                            aria-expanded="false" aria-controls="ghnNotePanel">
+                        <i class="bi bi-info-circle" aria-hidden="true"></i> GHN lưu ý
+                    </button>
+                    <div class="collapse" id="ghnNotePanel">
+                        <div class="ghn-note small mt-2">
+                            GHN báo “Đã giao” ⇒ đơn chuyển <strong>Giao thành công</strong>;
+                            báo “Đã hoàn hàng” chỉ tự chuyển <strong>Hoàn trả</strong> khi đơn đã giao thành công,
+                            còn lại hệ thống giữ nguyên để admin kiểm tra.
+                            Ngoại lệ/hư hỏng/mất hàng/tiêu hủy: không tự hủy, chỉ cảnh báo để admin xử lý tay.
+                        </div>
+                    </div>
                 </div>
             </div>
 
