@@ -178,10 +178,20 @@
             <div class="card-body">
                 <div id="posLines"></div>
                 <p class="visually-hidden mb-0" role="status" id="posLinesStatus"></p>
-                <p class="text-muted small mb-0 vg-empty-hint" id="posEmpty" tabindex="0"
+                        <p class="text-muted small mb-0 vg-empty-hint" id="posEmpty" tabindex="0"
                    data-hint="Tìm ở khung bên trái rồi bấm vào sản phẩm để thêm vào hoá đơn.">
                     Chưa có sản phẩm
                 </p>
+
+                <div class="vg-pager px-0 pb-0 mt-2" id="posLinePager" hidden>
+                    <span class="vg-page-label" id="posLinePageLabel">Trang 1/1</span>
+                    <button type="button" id="posLinePrev" aria-label="Trang trước của hoá đơn">
+                        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" id="posLineNext" aria-label="Trang sau của hoá đơn">
+                        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                    </button>
+                </div>
 
                 <dl class="row mb-0 mt-3" id="posTotals" hidden>
                     <dt class="col-7 fw-normal text-muted">Tạm tính</dt>

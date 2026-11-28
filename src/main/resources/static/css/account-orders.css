@@ -98,9 +98,12 @@
 /* ============ 2. Đơn hàng của tôi ============ */
 /* Thẻ đơn: nổi nhẹ khi rê chuột (không dùng .shadow-sm để giữ được hiệu ứng hover) */
 .orders-page .order-card {
-    background: var(--bad-surface);
+    background-color: var(--bad-surface);
+    background-image: var(--lg-sheen);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
     border-radius: var(--bs-border-radius-lg);
-    box-shadow: var(--bad-card-shadow);
+    box-shadow: var(--lg-specular), var(--bad-card-shadow);
     transition: transform var(--bad-transition), box-shadow var(--bad-transition);
 }
 

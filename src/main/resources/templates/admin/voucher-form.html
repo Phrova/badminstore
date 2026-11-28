@@ -10,7 +10,7 @@
 
 <th:block layout:fragment="content">
 
-    <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb">order-detai
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/admin}">Tổng quan</a></li>
             <li class="breadcrumb-item"><a th:href="@{/admin/voucher}">Voucher</a></li>
@@ -93,9 +93,11 @@
                             <label class="form-label" for="discountValue">
                                 Giá trị giảm <span class="text-danger">*</span>
                             </label>
-                            <input class="form-control" id="discountValue" th:field="*{discountValue}" type="number"
+                                               <input class="form-control" id="discountValue" th:field="*{discountValue}"
+                                   type="text" inputmode="decimal" data-money data-decimal data-quick="percent"
+                                   pattern="[0-9]+(\.[0-9]{1,2})?"
                                    th:classappend="${#fields.hasErrors('discountValue')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('discountValue')}"
-                                   min="0" step="0.01" required placeholder="10 (với % ) hoặc 100000 (với số tiền)">
+                                   required placeholder="10% hoặc 100k">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('discountValue')}"
                                  th:errors="*{discountValue}">Giá trị giảm không hợp lệ</div>
                             <div class="form-text">Kiểu phần trăm: 1–100. Kiểu số tiền: đơn vị VNĐ.</div>
@@ -103,17 +105,21 @@
                         <div class="col-sm-6">
                             <label class="form-label" for="minOrderValue">Đơn hàng tối thiểu (₫)
                                 <span class="text-danger">*</span></label>
-                            <input class="form-control" id="minOrderValue" th:field="*{minOrderValue}" type="number"
+                                                <input class="form-control" id="minOrderValue" th:field="*{minOrderValue}"
+                                   type="text" inputmode="numeric" data-money data-quick="order"
+                                   pattern="[0-9]+"
                                    th:classappend="${#fields.hasErrors('minOrderValue')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('minOrderValue')}"
-                                   min="0" step="1000" required>
+                                   required placeholder="vd: 100k, 1tr, 5tr">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('minOrderValue')}"
                                  th:errors="*{minOrderValue}">Giá trị không hợp lệ</div>
                         </div>
                         <div class="col-sm-6">
                             <label class="form-label" for="maxDiscountAmount">Giảm tối đa (₫)</label>
-                            <input class="form-control" id="maxDiscountAmount" th:field="*{maxDiscountAmount}"
-                                   type="number" th:classappend="${#fields.hasErrors('maxDiscountAmount')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('maxDiscountAmount')}"
-                                   min="0" step="1000" placeholder="Bỏ trống = không giới hạn">
+                                                 <input class="form-control" id="maxDiscountAmount" th:field="*{maxDiscountAmount}"
+                                   type="text" inputmode="numeric" data-money data-quick="order"
+                                   pattern="[0-9]+"
+                                   th:classappend="${#fields.hasErrors('maxDiscountAmount')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('maxDiscountAmount')}"
+                                   placeholder="Bỏ trống = không giới hạn (vd: 100k)">
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('maxDiscountAmount')}"
                                  th:errors="*{maxDiscountAmount}">Giá trị không hợp lệ</div>
                         </div>
@@ -127,7 +133,7 @@
                     <div class="card-body row g-3">
                         <div class="col-sm-6">
                             <label class="form-label" for="quantity">Số lượt phát hành <span class="text-danger">*</span></label>
-                            <input class="form-control" id="quantity" th:field="*{quantity}" type="number"
+                                              <input class="form-control" id="quantity" th:field="*{quantity}" type="number" data-quick="issue"
                                    th:classappend="${#fields.hasErrors('quantity')} ? 'is-invalid'" th:aria-invalid="${#fields.hasErrors('quantity')}"
                                    min="1" max="100000" required>
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('quantity')}"
@@ -173,7 +179,37 @@
             </div>
         </div>
     </form>
+    <script>
+        (function () {
+            'use strict';
+            var form = document.querySelector('form[data-confirm]');
+            var type = document.getElementById('discountType');
+            var value = document.getElementById('discountValue');
+            var code = document.getElementById('code');
+            if (!form) { return; }
 
+            /* Kiểu % → gợi ý 10/15/20%; kiểu số tiền → gợi ý 100k/1tr/5tr. */
+            function syncQuick() {
+                if (!type || !value) { return; }admin
+                var percent = type.value === 'PERCENT';
+                value.setAttribute('data-quick', percent ? 'percent' : 'order');
+                value.placeholder = percent ? 'vd: 10 hoặc 15%' : 'vd: 100k hoặc 1tr';
+                if (percent) { value.setAttribute('data-decimal', ''); }
+                else { value.removeAttribute('data-decimal'); }
+            }
+            if (type) { type.addEventListener('change', syncQuick); syncQuick(); }
+
+            /* Hint hứa "tự viết hoa và bỏ khoảng trắng" — làm cho đúng lời hứa.
+               Chạy ở pha capture trên form nên kịp trước hộp xác nhận của main.js. */
+            function cleanCode() {
+                if (!code) { return; }
+                var v = code.value.replace(/\s+/g, '').toUpperCase();
+                if (v !== code.value) { code.value = v; }
+            }
+            if (code) { code.addEventListener('blur', cleanCode); }
+            form.addEventListener('submit', cleanCode, true);
+        })();
+    </script>
 </th:block>
 
 </body>

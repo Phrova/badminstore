@@ -1,0 +1,340 @@
+/* =========================================================================
+   shop-glass.css — đồng bộ khu KHÁCH với kính iOS của khu quản trị.
+   Nạp SAU theme.css (layout/base.html). Mọi rule prefix `html` để thắng
+   theme.css / home.css / product-detail.css bất kể thứ tự nạp.
+   Dùng đúng token --lg-* / --bad-* của theme.css => cùng một họ kính với admin.
+   ========================================================================= */
+
+/* --- 0. Thanh cuộn theo bảng màu (không để mặc định trình duyệt) --- */
+html { scrollbar-color: #2f6b52 #101613; scrollbar-width: thin; }
+html ::-webkit-scrollbar { width: 10px; height: 10px; }
+html ::-webkit-scrollbar-track { background: #101613; }
+html ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #2f6b52, #1d4a39);
+    border-radius: 999px; border: 2px solid #101613;
+}
+html ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #3f8a6a, #2f6b52); }
+
+/* --- 1. Bề mặt kính đồng bộ với admin (card / panel / toolbar / steps) --- */
+html .card-soft,
+html .card,
+html .summary-card,
+html .buy-box,
+html .filter-card,
+html .catalog-toolbar,
+html .checkout-steps,
+html .tab-content,
+html .navbar-bad {
+    background-image: var(--lg-sheen), var(--lg-surface);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+    box-shadow: var(--lg-specular), var(--lg-depth);
+    border-radius: 18px;
+}
+html .navbar-bad { border-radius: 0; }
+html .card .card-header,
+html .card-soft .card-header { background: transparent; border-bottom: 1px solid var(--lg-edge-bottom); }
+
+/* --- 2. Breadcrumb dạng pill (giống admin) cho khu khách --- */
+html .breadcrumb { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; padding: 0; }
+html .breadcrumb-item { display: flex; align-items: center; padding: 0; }
+html .breadcrumb-item + .breadcrumb-item::before { content: none; }
+html .breadcrumb-item a,
+html .breadcrumb-item.active {
+    padding: .4rem 1rem; border-radius: 999px;
+    border: 1px solid var(--lg-tint-edge);
+    background-image: var(--lg-sheen), var(--lg-tint);
+    color: var(--bs-body-color); font-size: .82rem; font-weight: 600; text-decoration: none;
+    box-shadow: var(--lg-specular);
+    transition: transform .16s cubic-bezier(.22,1.28,.36,1), border-color .15s ease, color .15s ease;
+}
+html .breadcrumb-item a:hover { transform: translateY(-1px); color: var(--bad-primary-text); border-color: var(--bs-primary); }
+html .breadcrumb-item.active {
+    background: linear-gradient(140deg, var(--bad-primary-dark), var(--bad-primary-darker));
+    color: #fff; border-color: rgba(255,255,255,.2);
+}
+
+/* --- 3. Tiêu đề khối: cân bằng khoảng cách trên/dưới (Vợt mới về / Theo hãng / Chọn nhanh) --- */
+html .section-title { margin: 0 0 1.25rem; align-items: center; }
+html div:has(> .section-title) > .section-title,
+html header:has(> .section-title) > .section-title { margin-bottom: 0; }
+html .section-title .badge { vertical-align: middle; }
+/* Hàng chứa tiêu đề + nút "Xem tất cả": canh giữa, một khoảng dưới thống nhất */
+html div:has(> .section-title),
+html div:has(> h2.section-title),
+html header:has(> .section-title) {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: .75rem;
+    margin: 0 0 1.25rem;
+}
+html div:has(> .section-title) > .btn,
+html header:has(> .section-title) > .btn { margin: 0; }
+/* Khoảng trên của mỗi khối tiếp theo đồng nhất */
+html .section-title { scroll-margin-top: 6rem; }
+
+/* --- 4. Ô icon / chữ cái hãng: màu theo CHẾ ĐỘ ---
+   Sáng: tint xanh + chữ xanh ĐẬM (đọc rõ trên nền trắng).
+   Tối: mint sáng + chữ gần trắng (không chìm trên nền xanh đậm). */
+html .brand-tile-initial,
+html .quick-tile .quick-tile-icon,
+html .bad-toast-cart__icon,
+html .checkout-step .step-index {
+    background: rgba(15, 138, 95, .14) !important;
+    color: #0c7852 !important;
+    border: 1px solid rgba(15, 138, 95, .35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+html[data-bs-theme="dark"] .brand-tile-initial,
+html[data-bs-theme="dark"] .quick-tile .quick-tile-icon,
+html[data-bs-theme="dark"] .bad-toast-cart__icon,
+html[data-bs-theme="dark"] .checkout-step .step-index {
+    background: rgba(126, 208, 165, .26) !important;
+    color: #d9f5e6 !important;
+    border-color: rgba(126, 208, 165, .45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+html .brand-tile-initial { display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+/* stat-icon giữ màu ngữ nghĩa (xanh / lam / hổ phách), chỉ nâng sáng ở chế độ tối */
+html .stat-icon.bg-info-subtle { color: #055160 !important; }
+html .stat-icon.bg-warning-subtle { color: #8a6100 !important; }
+html[data-bs-theme="dark"] .stat-icon { background: rgba(126, 208, 165, .22) !important; color: #a5e2c2 !important; }
+html[data-bs-theme="dark"] .stat-icon.bg-info-subtle { background: rgba(110, 223, 246, .18) !important; color: #6edff6 !important; }
+html[data-bs-theme="dark"] .stat-icon.bg-warning-subtle { background: rgba(255, 209, 102, .16) !important; color: #ffd166 !important; }
+/* Ô bước đang chọn / đã qua */
+html .checkout-step.step-current .step-index,
+html .checkout-step.step-done .step-index {
+    background: rgba(15, 138, 95, .22) !important;
+    color: #0b5137 !important;
+    border-color: rgba(15, 138, 95, .5);
+}
+html[data-bs-theme="dark"] .checkout-step.step-current .step-index,
+html[data-bs-theme="dark"] .checkout-step.step-done .step-index {
+    background: rgba(126, 208, 165, .4) !important;
+    color: #06281c !important;
+    border-color: rgba(126, 208, 165, .7);
+}
+
+/* --- 5. Chữ các bước thanh toán: sáng hơn, nền thấp màu để không chói chữ --- */
+html .checkout-step { color: #dfe9e2; }
+html .checkout-step a { color: #dfe9e2; }
+html .checkout-step .step-sep { color: #9fb8ab; }
+html .checkout-step.step-done { color: #a5e2c2; }
+html .checkout-step.step-current { color: #eafff3; font-weight: 700; }
+html .checkout-steps { background-image: var(--lg-sheen), var(--lg-tint); }
+
+/* --- 6. Toast "đã thêm vào giỏ": icon sáng, nhìn rõ trên nền tối --- */
+html .bad-toast-cart__icon { font-size: 1.05rem; }
+html .bad-toast-cart__eyebrow { color: #a5e2c2; }
+html .bad-toast-cart__link { background: rgba(126,208,165,.2); color: #c9efdb; }
+html .bad-toast-cart__link:hover { background: rgba(126,208,165,.32); color: #eafff3; }
+
+/* --- 7. Panel Thông số kỹ thuật + bảng bên trong: kính iOS --- */
+html .nav-tabs { border-bottom: 1px solid var(--lg-edge-bottom); gap: .25rem; }
+html .nav-tabs .nav-link {
+    border: 1px solid transparent; border-radius: 999px;
+    color: var(--bad-muted); font-weight: 600; padding: .5rem 1.1rem;
+}
+html .nav-tabs .nav-link:hover { color: var(--bad-primary-text); background: rgba(126,208,165,.12); }
+html .nav-tabs .nav-link.active {
+    color: #fff;
+    background: linear-gradient(140deg, var(--bad-primary-dark), var(--bad-primary-darker));
+    border-color: rgba(255,255,255,.2);
+    box-shadow: var(--lg-specular);
+}
+html .tab-content { padding: 1.25rem; }
+html .tab-pane .table { --bs-table-bg: transparent; --bs-table-color: var(--bs-body-color); }
+html .tab-pane .table thead th {
+    background: rgba(126,208,165,.12); color: #a5e2c2;
+    border-bottom: 1px solid var(--lg-edge-bottom);
+}
+html .tab-pane .table tbody td,
+html .tab-pane .table tbody th { border-bottom: 1px solid var(--lg-edge-bottom); }
+html .tab-pane .table tbody tr:hover td,
+html .tab-pane .table tbody tr:hover th { background: rgba(126,208,165,.07); }
+
+/* --- 8. Bảng so sánh: kính + hàng tiêu chí nổi, chuẩn bị chỗ cho vương miện --- */
+html .compare-table { --bs-table-bg: transparent; --bs-table-color: var(--bs-body-color); }
+html .compare-table .compare-criteria { background: rgba(126,208,165,.1); color: #a5e2c2; font-weight: 600; }
+html .compare-table td, html .compare-table th { border-bottom: 1px solid var(--lg-edge-bottom); vertical-align: middle; }
+html .compare-table tbody tr:hover td { background: rgba(126,208,165,.06); }
+/* Vương miện vàng cho ô tốt hơn ở tiêu chí đó */
+html .cmp-crown {
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: .4rem; vertical-align: middle;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+html .cmp-crown svg { width: 18px; height: 18px; display: block; }
+html .cmp-legend {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
+    padding: .6rem .9rem; margin-bottom: 1rem;
+    border: 1px solid var(--lg-tint-edge); border-radius: 12px;
+    background-image: var(--lg-sheen), var(--lg-tint);
+    color: var(--bs-body-color); font-size: .85rem;
+}
+
+/* --- 9. Nút khu khách đồng bộ gradient với admin --- */
+html .btn-primary, html .btn-success {
+    background: linear-gradient(140deg, var(--bad-primary-dark), var(--bad-primary-darker));
+    border: 1px solid rgba(255, 255, 255, .2); color: #fff;
+}
+html .btn-primary:hover:not(:disabled), html .btn-success:hover:not(:disabled) {
+    background: linear-gradient(140deg, #0d7f57, var(--bad-primary-dark)); color: #fff;
+}
+html .btn-outline-primary, html .btn-outline-success {
+    background: linear-gradient(140deg, rgba(15, 138, 95, .10), rgba(15, 138, 95, .04));
+    border: 1px solid rgba(15, 138, 95, .5); color: #0c7852;
+}
+html .btn-outline-primary:hover:not(:disabled), html .btn-outline-success:hover:not(:disabled) {
+    background: linear-gradient(140deg, rgba(15, 138, 95, .18), rgba(15, 138, 95, .10));
+    color: #0b6b4a; border-color: rgba(15, 138, 95, .7);
+}
+html[data-bs-theme="dark"] .btn-outline-primary, html[data-bs-theme="dark"] .btn-outline-success {
+    background: linear-gradient(140deg, rgba(126, 208, 165, .16), rgba(126, 208, 165, .07));
+    border-color: rgba(126, 208, 165, .5); color: #a5e2c2;
+}
+html[data-bs-theme="dark"] .btn-outline-primary:hover:not(:disabled),
+html[data-bs-theme="dark"] .btn-outline-success:hover:not(:disabled) {
+    background: linear-gradient(140deg, rgba(126, 208, 165, .28), rgba(126, 208, 165, .15));
+    color: #c9efdb; border-color: rgba(126, 208, 165, .75);
+}
+html .btn-outline-secondary {
+    background: linear-gradient(140deg, rgba(127, 140, 130, .14), rgba(127, 140, 130, .06));
+    border: 1px solid rgba(92, 99, 106, .5); color: #5c636a;
+}
+html[data-bs-theme="dark"] .btn-outline-secondary { border-color: var(--lg-edge-side); color: var(--bs-body-color); }
+html .btn-outline-danger {
+    background: linear-gradient(140deg, rgba(207, 36, 49, .08), rgba(207, 36, 49, .03));
+    border: 1px solid rgba(207, 36, 49, .5); color: #b0222f;
+}
+html[data-bs-theme="dark"] .btn-outline-danger {
+    background: linear-gradient(140deg, rgba(255, 143, 152, .14), rgba(255, 143, 152, .06));
+    border-color: rgba(255, 143, 152, .5); color: #ff8f98;
+}
+
+/* --- 10. Nút mở/đóng gợi ý phí giao hàng (checkout) --- */
+html .ship-hint-toggle {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .4rem .9rem; border-radius: 999px;
+    border: 1px solid var(--lg-tint-edge);
+    background-image: var(--lg-sheen), var(--lg-tint);
+    color: #a5e2c2; font-size: .82rem; font-weight: 600; cursor: pointer;
+}
+html .ship-hint-toggle:hover { color: #c9efdb; border-color: rgba(126,208,165,.7); }
+html .ship-hint-body {
+    margin-top: .5rem; padding: .6rem .85rem;
+    border: 1px solid var(--lg-edge-bottom); border-radius: 12px;
+    background: rgba(126,208,165,.08); color: var(--bs-body-color);
+    font-size: .85rem; line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html .breadcrumb-item a, html .btn { transition: none; }
+    html .breadcrumb-item a:hover { transform: none; }
+}
+
+/* =========================================================================
+   Fix round 2 — viền kính chế độ sáng, panel account một màu, khoảng thở home
+   ========================================================================= */
+
+/* 1) Viền btn-glass SÁNG: cạnh trắng specular vô hình trên nền trắng →
+   viền xanh đều 4 cạnh, hover đậm hơn. Chế độ tối giữ nguyên cạnh specular. */
+html:not([data-bs-theme="dark"]) .btn-glass { border-color: rgba(15, 138, 95, .35); }
+html:not([data-bs-theme="dark"]) .btn-glass--primary { border-color: rgba(15, 138, 95, .45); }
+html:not([data-bs-theme="dark"]) .btn-glass--danger { border-color: rgba(207, 36, 49, .45); }
+html:not([data-bs-theme="dark"]) .btn-glass:hover:not(:disabled) { border-color: rgba(15, 138, 95, .65); }
+html:not([data-bs-theme="dark"]) .btn-glass--danger:hover:not(:disabled) { border-color: rgba(207, 36, 49, .65); }
+
+/* 2) Account: các PANEL LỚN một màu phẳng (bỏ gradient trái-sáng phải-tối).
+   Nút nhỏ + menu trái giữ kính như cũ. */
+html .account-page .card,
+html .account-page .account-summary {
+    background-image: none;
+    background-color: var(--bad-surface);
+    border: 1px solid var(--bad-border);
+    box-shadow: var(--bad-card-shadow);
+}
+
+/* 3) Home: khoảng thở TRÊN mỗi khối (Vợt mới về / Theo hãng / Chọn nhanh).
+   Trước đây chỉ có khoảng dưới (mb-3) nên tiêu đề dính vào khối phía trên. */
+html .home-page > section { margin-top: 2.25rem; }
+
+/* =========================================================================
+   Fix round 3 — SÁNG: chữ/nền phải dùng tông ĐẬM, không reuse palette tối.
+   Chỉ ghi đè chế độ sáng; chế độ tối giữ nguyên các rule trên.
+   ========================================================================= */
+
+/* 1) Thanh cuộn sáng: track theo nền trang, không phải đen */
+html:not([data-bs-theme="dark"]) { scrollbar-color: #0f8a5f #eef1f4; }
+html:not([data-bs-theme="dark"]) ::-webkit-scrollbar-track { background: #eef1f4; }
+html:not([data-bs-theme="dark"]) ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #0f8a5f, #0b6b4a);
+    border-color: #eef1f4;
+}
+html:not([data-bs-theme="dark"]) ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #0c7852, #0a5c40);
+}
+
+/* 2) Chữ các bước thanh toán: đậm trên nền kính nhạt */
+html:not([data-bs-theme="dark"]) .checkout-step { color: #5f6975; }
+html:not([data-bs-theme="dark"]) .checkout-step a { color: #0c7852; }
+html:not([data-bs-theme="dark"]) .checkout-step .step-sep { color: #8a949e; }
+html:not([data-bs-theme="dark"]) .checkout-step.step-done { color: #0b6b4a; }
+html:not([data-bs-theme="dark"]) .checkout-step.step-current { color: #0b5137; }
+
+/* 3) Toast thêm vào giỏ: eyebrow + link đọc rõ trên nền sáng */
+html:not([data-bs-theme="dark"]) .bad-toast-cart__eyebrow { color: #0c7852; }
+html:not([data-bs-theme="dark"]) .bad-toast-cart__link { background: rgba(15, 138, 95, .12); color: #0c7852; }
+html:not([data-bs-theme="dark"]) .bad-toast-cart__link:hover { background: rgba(15, 138, 95, .2); color: #0b6b4a; }
+
+/* 4) Tiêu đề bảng trong tab (Thông số / Phiên bản & giá bán) — lỗi bạn chụp */
+html:not([data-bs-theme="dark"]) .tab-pane .table thead th {
+    background: rgba(15, 138, 95, .08);
+    color: #0c7852;
+}
+html:not([data-bs-theme="dark"]) .tab-pane .table tbody tr:hover td,
+html:not([data-bs-theme="dark"]) .tab-pane .table tbody tr:hover th { background: rgba(15, 138, 95, .06); }
+html:not([data-bs-theme="dark"]) .nav-tabs .nav-link:hover { background: rgba(15, 138, 95, .1); }
+
+/* 5) Cột tiêu chí bảng so sánh */
+html:not([data-bs-theme="dark"]) .compare-table .compare-criteria { background: rgba(15, 138, 95, .08); color: #0c7852; }
+html:not([data-bs-theme="dark"]) .compare-table tbody tr:hover td { background: rgba(15, 138, 95, .05); }
+
+/* 6) Nút "Phí giao hàng tính" */
+html:not([data-bs-theme="dark"]) .ship-hint-toggle { color: #0c7852; }
+html:not([data-bs-theme="dark"]) .ship-hint-toggle:hover { color: #0b6b4a; border-color: rgba(15, 138, 95, .7); }
+
+/* 7) Bonus (dòng <tr table-warning> bạn gửi): hàng hết hàng trong giỏ ở chế độ TỐI
+   đang vàng sáng chói trên nền đen → nhuộm vàng trầm + chữ vàng sáng */
+html[data-bs-theme="dark"] .table-warning {
+    --bs-table-bg: rgba(255, 193, 7, .12);
+    --bs-table-color: #ffd166;
+    --bs-table-border-color: rgba(255, 193, 7, .25);
+}
+/* =========================================================================
+   Fix round 4 — Panel LỚN (3 panel checkout + tóm tắt + card account):
+   xanh ĐẬM MỘT màu nhưng VẪN là kính.
+   Round 2/4 lỡ bỏ luôn ánh kính (sheen trên-trái + viền specular + bóng sâu)
+   nên panel trông như design cũ. Nay giữ nền một màu (--bad-surface) nhưng
+   gắn lại ánh sáng kính + viền 4 cạnh + bóng sâu => cùng họ với ô stat nhỏ
+   (account-stat) bạn chỉ; KHÔNG còn dải sáng-trái → tối-phải gây mỏi mắt.
+   Không đụng ô stat nhỏ / menu trái (chúng đang đúng).
+   ========================================================================= */
+html body:has(.pick-card) .card.border-0,
+html body:has(.pick-card) .card-soft,
+html body:has(.pick-card) .summary-card.border-0,
+html .account-page .card.border-0,
+html .account-page .account-summary,
+html .order-detail-page .card.border-0,
+html .order-detail-page .card-soft,
+html .orders-page .card.border-0,
+html .orders-page .order-card,
+html body:has(.compare-table) .card.border-0,
+html body:has(.compare-table) .table-glass-wrap {
+    background-color: var(--bad-surface);
+    background-image: var(--lg-sheen);
+    border: 1px solid !important;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side) !important;
+    box-shadow: var(--lg-specular), var(--lg-depth);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}

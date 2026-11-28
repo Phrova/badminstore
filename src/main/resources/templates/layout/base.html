@@ -7,7 +7,9 @@
     <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">BadStore – Vợt cầu lông chính hãng</title>
 
     <!-- charset, viewport, favicon, font Be Vietnam Pro, Bootstrap 5, Bootstrap Icons, theme.css -->
-    <th:block th:replace="~{fragments/head-common :: commonHead}"></th:block>
+      <th:block th:replace="~{fragments/head-common :: commonHead}"></th:block>
+    <!-- Kính iOS đồng bộ khu khách với khu quản trị (nạp SAU theme.css) -->
+    <link rel="stylesheet" th:href="@{/css/shop-glass.css}">
 
     <!-- Swiper – slider banner (chỉ trang khách dùng) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
@@ -47,6 +49,7 @@
 <script th:src="@{/js/main.js}" defer></script>
 <!-- app.js: khoá nút chống bấm đúp, window.toast(), nút lên đầu trang, dự phòng khi AOS lỗi -->
 <script th:src="@{/js/app.js}" defer></script>
+<script th:src="@{/js/shop-glass.js}" defer></script>
 <!-- Chart.js / script riêng của từng trang nạp qua layout:fragment="scripts" -->
 <th:block layout:fragment="scripts"></th:block>
 </body>

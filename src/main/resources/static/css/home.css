@@ -106,8 +106,11 @@
     height: 100%;
     padding: 1rem;
     border-radius: var(--bs-border-radius-lg);
-    background: var(--bad-surface);
-    box-shadow: var(--bad-card-shadow);
+       background-color: var(--bad-surface);
+    background-image: var(--lg-sheen);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+    box-shadow: var(--lg-specular), var(--bad-card-shadow);
     color: inherit;
     text-decoration: none;
     transition: transform var(--bad-transition), box-shadow var(--bad-transition),
@@ -157,6 +160,8 @@
     padding: 1.25rem 1.5rem;
     border-radius: var(--bs-border-radius-lg);
     background: var(--bs-primary-bg-subtle);
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
 }
 
 .home-page .home-cta-title {
@@ -182,4 +187,7 @@
 
 /* Dải lợi ích: tách khỏi banner một khoảng thở, viền nhẹ để nổi khối riêng */
 .home-page .benefit-strip { margin-top: 1.25rem; }
-.home-page .benefit-strip > li { border: 1px solid var(--bad-border); }
+.home-page .benefit-strip > li {
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+}

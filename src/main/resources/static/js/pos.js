@@ -12,7 +12,11 @@
     var URL_SEARCH = '/admin/ban-hang/tim';
     var URL_CUSTOMER = '/admin/ban-hang/khach';
     var URL_PRICE = '/admin/ban-hang/tinh-tien';
-    var CONFIRM_TEXT = 'Thu tiền và trừ kho cho hoá đơn này?';
+        var CONFIRM_TEXT = 'Thu tiền và trừ kho cho hoá đơn này?';
+    /* Hoá đơn phân trang 3 dòng/trang. CHỈ ẩn dòng, không bỏ khỏi DOM:
+       ô ẩn lines[i].sku / lines[i].quantity nằm trong dòng, mất dòng là mất hàng khi bán. */
+    var LINE_PAGE_SIZE = 3;
+    var linePage = 1;
 
     var refs = {
         search: document.getElementById('posSearch'),
@@ -40,8 +44,12 @@
         cashReceived: document.getElementById('posCashReceived'),
         change: document.querySelector('[data-pos-change] strong'),
         orderCode: document.getElementById('posOrderCode'),
-        resultsStatus: document.getElementById('posResultsStatus'),
+              resultsStatus: document.getElementById('posResultsStatus'),
         linesStatus: document.getElementById('posLinesStatus'),
+        linePager: document.getElementById('posLinePager'),
+        linePageLabel: document.getElementById('posLinePageLabel'),
+        linePrev: document.getElementById('posLinePrev'),
+        lineNext: document.getElementById('posLineNext'),
         submit: document.getElementById('posSubmit')
     };
 
@@ -236,11 +244,13 @@
             notify('error', product.productName + ' đã hết hàng trong kho.');
             return;
         }
-        var existing = state.lines.filter(function (line) {
+            var existing = state.lines.filter(function (line) {
             return line.sku === product.sku;
         })[0];
+        var index;
         if (existing) {
             existing.quantity = existing.quantity + 1;
+            index = state.lines.indexOf(existing);
         } else {
             state.lines.push({
                 sku: product.sku,
@@ -252,7 +262,10 @@
                 stock: product.stock,
                 error: null
             });
+            index = state.lines.length - 1;
         }
+        /* Quét mã liên tiếp: luôn nhảy tới trang chứa dòng vừa thêm để quầy thấy ngay. */
+        linePage = Math.floor(index / LINE_PAGE_SIZE) + 1;
         renderLines();
         refreshPrice();
         announce(refs.linesStatus, 'Đã thêm ' + (product.productName || product.sku) + ' vào hoá đơn. '
@@ -260,6 +273,28 @@
     }
 
     // ------------------------------------------------------------------ hoá đơn
+
+      function linePages() {
+        return Math.max(1, Math.ceil(state.lines.length / LINE_PAGE_SIZE));
+    }
+
+    /** Ẩn dòng ngoài trang hiện tại. Dòng vẫn nằm trong DOM nên ô ẩn vẫn được gửi lên server. */
+    function applyLinePage() {
+        var pages = linePages();
+        if (linePage > pages) { linePage = pages; }
+        if (linePage < 1) { linePage = 1; }
+        if (refs.lines) {
+            var start = (linePage - 1) * LINE_PAGE_SIZE;
+            var rows = refs.lines.querySelectorAll('.pos-line');
+            Array.prototype.forEach.call(rows, function (row, i) {
+                row.hidden = !(i >= start && i < start + LINE_PAGE_SIZE);
+            });
+        }
+        if (refs.linePager) { refs.linePager.hidden = state.lines.length <= LINE_PAGE_SIZE; }
+        if (refs.linePageLabel) { refs.linePageLabel.textContent = 'Trang ' + linePage + '/' + pages; }
+        if (refs.linePrev) { refs.linePrev.disabled = linePage <= 1; }
+        if (refs.lineNext) { refs.lineNext.disabled = linePage >= pages; }
+    }
 
     function renderLines() {
         if (!refs.lines) {
@@ -375,20 +410,30 @@
             refs.lines.appendChild(row);
         });
 
-        renderTotals();
+               renderTotals();
+        applyLinePage();
         restoreFocus();
     }
 
     /** Trả focus về đúng ô/nút vừa thao tác sau khi hoá đơn được vẽ lại. */
-    function restoreFocus() {
+       function restoreFocus() {
         if (!focusAfterRender || !refs.lines) {
             return;
         }
         var target = refs.lines.querySelector('[aria-label="' + focusAfterRender.replace(/"/g, '\\"') + '"]');
         focusAfterRender = null;
-        if (target) {
-            target.focus();
+        if (!target) {
+            return;
         }
+        /* Ô cần focus có thể nằm ở trang khác → nhảy tới trang đó trước khi focus. */
+        var row = target.closest('.pos-line');
+        if (row) {
+            var rows = Array.prototype.slice.call(refs.lines.querySelectorAll('.pos-line'));
+            var idx = rows.indexOf(row);
+            if (idx >= 0) { linePage = Math.floor(idx / LINE_PAGE_SIZE) + 1; }
+        }
+        applyLinePage();
+        target.focus();
     }
 
     function changeQuantity(index, value) {
@@ -743,8 +788,9 @@
     }
 
     /** Bỏ toàn bộ hoá đơn đang lập (chỉ ở trình duyệt, chưa ghi gì vào CSDL). */
-    function clearInvoice() {
+     function clearInvoice() {
         state.lines = [];
+        linePage = 1;
         focusAfterRender = null;
         renderLines();
         refreshPrice();
@@ -779,6 +825,20 @@
             if (!refs.search.value.trim()) {
                 restoreDefaultList();
             }
+        });
+    }
+    if (refs.linePrev) {
+        refs.linePrev.addEventListener('click', function () {
+            linePage--;
+            applyLinePage();
+            announce(refs.linesStatus, 'Hoá đơn: trang ' + linePage + '/' + linePages() + '.');
+        });
+    }
+    if (refs.lineNext) {
+        refs.lineNext.addEventListener('click', function () {
+            linePage++;
+            applyLinePage();
+            announce(refs.linesStatus, 'Hoá đơn: trang ' + linePage + '/' + linePages() + '.');
         });
     }
     if (refs.clear) {

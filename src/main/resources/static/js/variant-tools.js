@@ -6,14 +6,18 @@
 
     var PRICE_PRESETS = [{ label: '100k', value: 100000 }, { label: '1m', value: 1000000 }, { label: '10m', value: 10000000 }];
     var STOCK_PRESETS = [{ label: '5', value: 5 }, { label: '20', value: 20 }, { label: '50', value: 50 }];
-    var COLOR_PRESETS = ['Đen', 'Đỏ', 'Trắng'];
+     var COLOR_PRESETS = ['Đen', 'Đỏ', 'Trắng'];
+    var ISSUE_PRESETS = [{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '50', value: 50 }];
+    var PERCENT_PRESETS = [{ label: '10%', value: 10 }, { label: '15%', value: 15 }, { label: '20%', value: 20 }];
+    var ORDER_PRESETS = [{ label: '100k', value: 100000 }, { label: '1tr', value: 1000000 }, { label: '5tr', value: 5000000 }];
     var NAME_PRESETS = ['Vợt cầu lông Yonex', 'Vợt cầu lông Lining', 'Vợt cầu lông Victor'];
 
     function toast(kind, msg) { if (typeof window.badToast === 'function') { window.badToast(kind, msg); } }
 
-    function parseMoney(raw) {
+       function parseMoney(raw, keepDecimals) {
         var s = String(raw == null ? '' : raw).trim().toLowerCase().replace(/\s+/g, '');
         if (!s) { return NaN; }
+        s = s.replace(/%$/, '');
         if (/^\d{1,3}(\.\d{3})+$/.test(s)) { s = s.replace(/\./g, ''); }
         s = s.replace(',', '.');
         var m = s.match(/^(\d+(?:\.\d+)?)(m|tr|trieu|triệu|k|nghin|nghìn|ngan|ngàn)?$/);
@@ -22,7 +26,8 @@
         var u = m[2];
         if (u === 'm' || u === 'tr' || u === 'trieu' || u === 'triệu') { n *= 1e6; }
         else if (u) { n *= 1e3; }
-        return Math.round(n);
+        /* Phần trăm cần giữ số lẻ (10.5% không được làm tròn thành 11%). */
+        return keepDecimals ? Math.round(n * 100) / 100 : Math.round(n);
     }
     window.VG_parseMoney = parseMoney;
 
@@ -40,7 +45,7 @@
         function normalize() {
             var raw = input.value;
             if (!String(raw).trim()) { return; }
-            var n = parseMoney(raw);
+                     var n = parseMoney(raw, input.hasAttribute('data-decimal'));
             if (isNaN(n)) { toast('warning', 'Chưa hiểu giá "' + raw + '" – thử 1m, 500k hoặc 1000000.'); return; }
             if (String(n) !== String(raw)) {
                 input.value = String(n);
@@ -55,8 +60,11 @@
 
     var pop = null, popFor = null, hideTimer = null;
     function presetsFor(kind) {
-        if (kind === 'price') { return PRICE_PRESETS; }
+          if (kind === 'price') { return PRICE_PRESETS; }
         if (kind === 'stock') { return STOCK_PRESETS; }
+        if (kind === 'issue') { return ISSUE_PRESETS; }
+        if (kind === 'percent') { return PERCENT_PRESETS; }
+        if (kind === 'order') { return ORDER_PRESETS; }
         if (kind === 'name') { return NAME_PRESETS.map(function (c) { return { label: c, value: c }; }); }
         return COLOR_PRESETS.map(function (c) { return { label: c, value: c }; });
     }

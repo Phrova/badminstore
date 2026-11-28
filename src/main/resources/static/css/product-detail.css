@@ -22,7 +22,8 @@
 }
 
 .pdp .card-soft {
-    border: 0;
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
     border-radius: var(--bs-border-radius-lg);
     box-shadow: var(--bad-card-shadow);
     background: var(--bad-surface);
@@ -561,7 +562,11 @@ html[data-bs-theme="dark"] .pdp .btn-check:disabled + .pdp-option {
 }
 
 /* Ba nhóm chọn mang lớp glass-panel (theme.css); ở đây chỉ thêm khoảng đệm */
-.pdp .pdp-selector.glass-panel { padding: .75rem .85rem; }
+.pdp .pdp-selector.glass-panel {
+    padding: .75rem .85rem;
+    border: 1px solid;
+    border-color: var(--lg-edge-top) var(--lg-edge-side) var(--lg-edge-bottom) var(--lg-edge-side);
+}
 
 /* Dòng "Đang chọn": nâng lên kính nhấn (đè rule nền đặc cũ ở cuối file đợt 2) */
 .pdp .pdp-selection-status {

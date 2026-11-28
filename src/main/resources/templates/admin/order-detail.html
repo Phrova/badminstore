@@ -331,10 +331,17 @@
                         <button class="btn btn-primary w-100" type="submit">
                             <i class="bi bi-check2-circle" aria-hidden="true"></i> Cập nhật trạng thái
                         </button>
-                        <p class="small text-muted mb-0 mt-2">
-                            Lưu ý: xác nhận đơn sẽ <strong>trừ kho</strong>; huỷ/hoàn trả sẽ <strong>cộng lại kho</strong>,
-                            trả lượt voucher và hoàn tiền nếu đã thu.
-                        </p>
+                                             <button class="btn btn-sm btn-outline-secondary mt-3 collapsed" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#statusNotePanel"
+                                aria-expanded="false" aria-controls="statusNotePanel">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> Xác nhận đơn lưu ý
+                        </button>
+                        <div class="collapse" id="statusNotePanel">
+                            <div class="ghn-note small mt-2">
+                                Xác nhận đơn sẽ <strong>trừ kho</strong>; huỷ/hoàn trả sẽ <strong>cộng lại kho</strong>,
+                                trả lượt voucher và hoàn tiền nếu đã thu.
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
